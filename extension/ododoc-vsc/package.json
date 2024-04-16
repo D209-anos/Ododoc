@@ -1,7 +1,7 @@
 {
-  "name": "autodoc-vsc",
-  "displayName": "autodoc_vsc",
-  "description": "autodoc extension for vsc",
+  "name": "ododoc-vsc",
+  "displayName": "ododoc_vsc",
+  "description": "ododoc extension for vsc",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.88.0"
@@ -14,7 +14,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "autodoc-vsc.helloWorld",
+        "command": "ododoc-vsc.helloWorld",
         "title": "Hello World"
       }
     ]
