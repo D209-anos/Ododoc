@@ -1,3 +1,19 @@
 .App {
   text-align: center;
 }
+
+@font-face {
+  font-family: 'BMJUAFont';
+  src: url('./assets/fonts/BMJUA_ttf.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.bmjuaFont {
+  font-family: 'BMJUAFont', sans-serif;
+  color: white;
+}
+
+.fontWhiteColor {
+  color: white;
+}
