@@ -5,7 +5,7 @@ import StartPage from '../src/view/StartPage'
 function App() {
   
   return (
-      <div className="App">
+      <div>
         <StartPage></StartPage>
       </div>
   );
