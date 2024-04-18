@@ -35,16 +35,8 @@ interface StartPage1Props {
 function StartPage1(props: StartPage1Props) {
     return (
         <>
-<<<<<<< HEAD
-            <header className={startPage1.nav}>
-                <img src={BlackLogoMark} alt="black-logo-mark" style={{
-                    width: 220,
-                    height: 80
-                }} />
-=======
-            <header className={startPage1.nav} style={{background: props.backgroundColor}}>
-                <img src={BlackLogoMark} alt="black-logo-mark" className={startPage1.logo}/>
->>>>>>> FE_feature/startPage5
+            <header className={startPage1.nav} style={{ background: props.backgroundColor }}>
+                <img src={BlackLogoMark} alt="black-logo-mark" className={startPage1.logo} />
             </header>
             <section className={startPage1.start1} style={{
                 background: props.backgroundColor,
@@ -57,8 +49,8 @@ function StartPage1(props: StartPage1Props) {
                     <div className={`${startPage1.bmjuaFont} ${startPage1.mainText} ${startPage1.fontWhiteColor}`}>
                         <ReactTyped
                             strings={['번거롭게 정리에 시간쓰지 마세요', '개발과 정리를 한 번에 해보세요', '개발기록과 검색결과를 요약해드립니다', '에디터로 직접 문서 정리 가능해요', '여러분은 개발에 더 집중하세요']}
-                            typeSpeed = {40}
-                            backSpeed = {25}
+                            typeSpeed={40}
+                            backSpeed={25}
                             loop
                             shuffle
                         />

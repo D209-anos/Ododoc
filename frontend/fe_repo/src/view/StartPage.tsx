@@ -81,8 +81,6 @@ function StartPage() {
       }
     </div>
   )
-
-
 }
 
 export default StartPage;
