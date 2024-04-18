@@ -5,9 +5,9 @@ import StartPage from '../src/view/StartPage'
 function App() {
   
   return (
-      <div>
+      <>
         <StartPage></StartPage>
-      </div>
+      </>
   );
 }
 
