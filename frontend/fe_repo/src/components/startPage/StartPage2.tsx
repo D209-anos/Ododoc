@@ -34,7 +34,7 @@ function StartPage2() {
 
 
     return (
-        <div className={styles.container} ref={elementRef}>
+        <section className={styles.container} ref={elementRef}>
             <div className={`${styles.halfContainerSide} ${styles.textSide}`}>
                 <p className={styles.bmjuaFont}>빌드 감지, 문서 정리를<br/> 자동으로</p>
             </div>
@@ -43,7 +43,7 @@ function StartPage2() {
                 <img src={IntellijScreen} alt="IntellijScreen" className={styles.intellijImage} />
                 <img src={EditorScreen} alt="EditorScreen" className={styles.editorImage} />
             </div>
-        </div>
+        </section>
     )
 }
 

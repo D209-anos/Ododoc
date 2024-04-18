@@ -1,10 +1,6 @@
-
-import BlackLogoMark from "../../assets/images/blacklogomark.png"
-import styles from "../../css/components/StartPage1.module.css"
-import React, { useEffect, useState } from 'react';
+import BlackLogoMark from "../../assets/images/ododoc-black.png"
 import startPage1 from "../../css/components/StartPage1.module.css"
-import BlackLogoImg from "../../assets/images/blacklogoimg.png"
-import { start } from 'repl';
+import MainLogo from "../../assets/images/mainLogo.png"
 import { ReactTyped } from "react-typed";
 
 
@@ -39,12 +35,8 @@ interface StartPage1Props {
 function StartPage1(props: StartPage1Props) {
     return (
         <>
-            <header className={startPage1.nav}>
-                <img src={BlackLogoMark} alt="black-logo-mark" style={{
-                    opacity: props.opacity,
-                    width: 220,
-                    height: 80
-                }} />
+            <header className={startPage1.nav} style={{background: props.backgroundColor}}>
+                <img src={BlackLogoMark} alt="black-logo-mark" className={startPage1.logo}/>
             </header>
             <section className={startPage1.start1} style={{
                 background: props.backgroundColor,
@@ -52,7 +44,7 @@ function StartPage1(props: StartPage1Props) {
 
                 <div className={startPage1.main}>
                     <div className={startPage1.mainImg}>
-                        <img src={BlackLogoImg} alt="black-logo-mark" className={startPage1.mainlogoPosition} />
+                        <img src={MainLogo} alt="black-logo-mark" className={startPage1.mainlogoPosition} />
                     </div>
                     <div className={`${startPage1.bmjuaFont} ${startPage1.mainText} ${startPage1.fontWhiteColor}`}>
                         <ReactTyped
