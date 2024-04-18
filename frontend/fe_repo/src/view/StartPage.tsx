@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StartPage1 from '../components/startPage/StartPage1';
+import StartPage2 from '../components/startPage/StartPage2';
+import StartPage3 from '../components/startPage/StartPage3';
 
 
 function StartPage() {
@@ -28,8 +30,10 @@ function StartPage() {
   }, []);
 
   return(
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column'}}>
         <StartPage1 backgroundColor={backgroundColor} opacity={opacity} />
+        <StartPage2></StartPage2>
+        <StartPage3></StartPage3>
     </div>
   )
 }

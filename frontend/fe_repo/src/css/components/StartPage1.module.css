@@ -13,3 +13,9 @@
 .fontWhiteColor {
     color: white;
 }
+
+.container {
+    height: 100vh;
+    z-index: 1;
+    position: relative;
+}

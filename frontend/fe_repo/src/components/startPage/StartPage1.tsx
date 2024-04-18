@@ -1,6 +1,6 @@
 import React from "react";
-import "../../css/components/StartPage1.css"
 import BlackLogoMark from "../../assets/images/blacklogomark.png"
+import styles from "../../css/components/StartPage1.module.css"
 
 interface StartPage1Props {
     backgroundColor: string;
@@ -10,12 +10,12 @@ interface StartPage1Props {
 function StartPage1(props:StartPage1Props) {
     return(
         <div style={{ 
-            height: '100vh', 
+            height: '100vh',
             background: props.backgroundColor, 
             paddingTop: 20,
             position: 'relative'
-            }}>
-            <img src={BlackLogoMark} alt="black-logo-mark" className="logoMarkPosition" style={{ 
+            }} className={styles.container}>
+            <img src={BlackLogoMark} alt="black-logo-mark" className={styles.logoMarkPosition} style={{ 
                 position: 'absolute',
                 top: 0,
                 left: 0,
