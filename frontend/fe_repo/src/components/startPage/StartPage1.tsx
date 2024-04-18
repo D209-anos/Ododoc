@@ -41,7 +41,6 @@ function StartPage1(props: StartPage1Props) {
         <>
             <header className={startPage1.nav}>
                 <img src={BlackLogoMark} alt="black-logo-mark" style={{
-                    opacity: props.opacity,
                     width: 220,
                     height: 80
                 }} />
