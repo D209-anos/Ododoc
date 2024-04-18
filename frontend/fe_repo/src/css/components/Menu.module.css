@@ -21,13 +21,6 @@
   z-index: 2;
 }
 
-.bar {
-  width: 30px;
-  height: 3px;
-  background-color: black;
-  margin: 2px 0;
-}
-
 .menu {
   position: fixed;
   right: 20px;
@@ -47,8 +40,14 @@
 }
 
 .menu li {
+  text-align: center;
+  width: 50px;
   padding: 8px;
   border-bottom: 1px solid #ccc;
+}
+
+.menu li:hover{
+  font-weight: bold;
 }
 
 .menu li:last-child {
