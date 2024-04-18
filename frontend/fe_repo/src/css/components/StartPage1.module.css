@@ -14,13 +14,12 @@
     color: white;
 }
 
-<<<<<<< HEAD
 .container {
     height: 100vh;
     z-index: 1;
     position: relative;
 }
-=======
+
 .start1{
     height: calc(200vh - 80px);
     display: flex;
@@ -96,5 +95,5 @@
 .nav{
     height: 80px;
     background-color: black;
+    z-index: 1;
 }
->>>>>>> FE_feature/publishing
