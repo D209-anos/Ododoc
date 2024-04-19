@@ -1,43 +1,21 @@
 'use strict';
 
-// Content script file will run in the context of web page.
-// With content script you can manipulate the web pages using
-// Document Object Model (DOM).
-// You can also pass information to the parent extension.
+function collectPageText() {
+  // 페이지의 모든 텍스트를 수집합니다.
+  let url = window.location.href;
+  if (!url.includes("https://www.google.com/search?")) {
 
-// We execute this script by making an entry in manifest.json file
-// under `content_scripts` property
+      let pageHTML = document.documentElement.innerHTML;
+    
+      // 백그라운드 스크립트로 수집된 텍스트 데이터를 전송합니다.
+      chrome.runtime.sendMessage({ action: "sendText", html: pageHTML });
 
-// For more information on Content Scripts,
-// See https://developer.chrome.com/extensions/content_scripts
+  } else {
 
-// Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
-console.log(
-  `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-);
+      let searchText =  document.title;
 
-// Communicate with background file by sending a message
-chrome.runtime.sendMessage(
-  {
-    type: 'GREETINGS',
-    payload: {
-      message: 'Hello, my name is Con. I am from ContentScript.',
-    },
-  },
-  response => {
-    console.log(response.message);
+      chrome.runtime.sendMessage({ action: "searchText", text : searchText });
   }
-);
+}
 
-// Listen for message
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'COUNT') {
-    console.log(`Current count is ${request.payload.count}`);
-  }
-
-  // Send an empty response
-  // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-  sendResponse({});
-  return true;
-});
+collectPageText();
