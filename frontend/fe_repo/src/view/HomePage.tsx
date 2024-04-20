@@ -57,18 +57,6 @@ function HomePage() {
       <HomePage3 backgroundColor={backgroundColor} textColor={textColor}></HomePage3>
       <HomePage4></HomePage4>
       <HomePage6></HomePage6>
-      {/* <div className={startPage.toggleButton} onClick={() => setMenuOpen(!menuOpen)}>
-        <MenuIcon />
-      </div>
-      {menuOpen && (
-        <div className={startPage.menu}>
-          <ul>
-            <li>Docs</li>
-            <li>Login</li>  
-            <li>Editor</li>
-          </ul>
-        </div>
-      )} */}
     </div>
   )
 }

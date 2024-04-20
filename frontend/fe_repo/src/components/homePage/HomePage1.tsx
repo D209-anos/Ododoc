@@ -1,5 +1,5 @@
 import BlackLogoMark from "../../assets/images/ododoc-black.png"
-import startPage1 from "../../css/components/StartPage1.module.css"
+import HomePage1 from "../../css/components/Home1.module.css"
 import MainLogo from "../../assets/images/mainLogo.png"
 import { ReactTyped } from "react-typed";
 
@@ -13,18 +13,18 @@ interface StartPage1Props {
 function StartPage1(props: StartPage1Props) {
     return (
         <>
-            <header className={startPage1.nav} style={{ background: props.backgroundColor }}>
-                <img src={BlackLogoMark} alt="black-logo-mark" className={startPage1.logo} />
+            <header className={HomePage1.nav} style={{ background: props.backgroundColor }}>
+                <img src={BlackLogoMark} alt="black-logo-mark" className={HomePage1.logo} />
             </header>
-            <section className={startPage1.start1} style={{
+            <section className={HomePage1.start1} style={{
                 background: props.backgroundColor,
             }}>
 
-                <div className={startPage1.main}>
-                    <div className={startPage1.mainImg}>
-                        <img src={MainLogo} alt="black-logo-mark" className={startPage1.mainlogoPosition} />
+                <div className={HomePage1.main}>
+                    <div className={HomePage1.mainImg}>
+                        <img src={MainLogo} alt="black-logo-mark" className={HomePage1.mainlogoPosition} />
                     </div>
-                    <div className={`${startPage1.bmjuaFont} ${startPage1.mainText} ${startPage1.fontWhiteColor}`}>
+                    <div className={`${HomePage1.bmjuaFont} ${HomePage1.mainText} ${HomePage1.fontWhiteColor}`}>
                         <ReactTyped
                             strings={['번거롭게 정리에 시간쓰지 마세요', '개발과 정리를 한 번에 해보세요', '개발기록과 검색결과를 요약해드립니다', '에디터로 직접 문서 정리 가능해요', '여러분은 개발에 더 집중하세요']}
                             typeSpeed={40}
@@ -34,12 +34,12 @@ function StartPage1(props: StartPage1Props) {
                         />
                     </div>
                 </div>
-                <div className={startPage1.textWrapper}>
-                    <div className={`${startPage1.bmjuaFont} ${startPage1.text}`} style={{ color: props.textColor }}>
-                        <span className={startPage1.textTitle}>
+                <div className={HomePage1.textWrapper}>
+                    <div className={`${HomePage1.bmjuaFont} ${HomePage1.text}`} style={{ color: props.textColor }}>
+                        <span className={HomePage1.textTitle}>
                             <p>개발과 정리를 한 번에</p>
                         </span>
-                        <span className={startPage1.textContent}>
+                        <span className={HomePage1.textContent}>
                             개발 과정 기록은 저희에게 맡기고 개발에만 집중하세요 <br />
                             검색결과, 작성코드, 오류정보를 정확히 추출해 드립니다 <br />
                             기록과정이 번거로웠던 당신을 위한 서비스 <br />
