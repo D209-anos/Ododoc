@@ -9,17 +9,35 @@ function HomePage() {
   const [backgroundColor, setBackgroundColor] = useState('black');
   const [opacity, setOpacity] = useState(1);
   const [textColor, setTextColor] = useState('white');
+
   useEffect(() => {
-    // 화면 스크롤 시 검은 배경 -> 흰 배경
     const handleScroll = () => {
       const windowHeight = window.innerHeight;
       const scrollPosition = window.scrollY;
-      const maxScroll = windowHeight;
-      const newOpacity = Math.min(scrollPosition / maxScroll, 1);
-      const colorValue = Math.floor(255 * newOpacity);
-      setBackgroundColor(`rgb(${colorValue}, ${colorValue}, ${colorValue})`)
-      setOpacity(newOpacity)
 
+      // 배경: 검은색 -> 흰색
+      if (scrollPosition <= windowHeight) {
+        const newOpacity = Math.min(scrollPosition / windowHeight, 1);
+        const colorValue = Math.floor(255 * newOpacity);
+        setBackgroundColor(`rgb(${colorValue}, ${colorValue}, ${colorValue})`);
+      }
+    
+      // 시작하는 지점에서 노란색
+      if (scrollPosition >= 300 * windowHeight && scrollPosition < 400 * windowHeight) {
+        const transitionProgress = 300;
+        const colorValue = Math.floor(255 * transitionProgress);
+        setBackgroundColor(`rgb(${colorValue}, ${colorValue}, ${colorValue})`);
+      }
+
+      // // 끝나는 지점에서 흰색
+      // if (scrollPosition >= 400 * windowHeight && scrollPosition < 500 * windowHeight) {
+      //   const transitionProgress = (scrollPosition - 400 * windowHeight) / (100 * windowHeight);
+      //   const colorValue = Math.floor(255 * transitionProgress);
+      //   setBackgroundColor(`rgb(255, 255, ${colorValue})`);
+      // }
+
+      // 텍스트 색상 및 기타 스타일 조정
+      setOpacity(1 - (scrollPosition % windowHeight) / windowHeight);
       const newTextColor = scrollPosition > windowHeight / 2 ? 'black' : 'white';
       setTextColor(newTextColor);
     };
@@ -36,9 +54,21 @@ function HomePage() {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <HomePage1 backgroundColor={backgroundColor} opacity={opacity} textColor={textColor} />
       <HomePage2></HomePage2>
-      <HomePage3></HomePage3>
+      <HomePage3 backgroundColor={backgroundColor} textColor={textColor}></HomePage3>
       <HomePage4></HomePage4>
       <HomePage6></HomePage6>
+      {/* <div className={startPage.toggleButton} onClick={() => setMenuOpen(!menuOpen)}>
+        <MenuIcon />
+      </div>
+      {menuOpen && (
+        <div className={startPage.menu}>
+          <ul>
+            <li>Docs</li>
+            <li>Login</li>  
+            <li>Editor</li>
+          </ul>
+        </div>
+      )} */}
     </div>
   )
 }

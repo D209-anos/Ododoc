@@ -56,8 +56,8 @@
     position: absolute;
     top: 270px;
     bottom: 40px;
-    right: 7%;
-    width: 42%;
+    right: 5%;
+    height: 65%;
     z-index: 3;
     border-radius: 8px;
     box-shadow: 5px 5px 35px rgba(0, 0, 0, 0.6);
