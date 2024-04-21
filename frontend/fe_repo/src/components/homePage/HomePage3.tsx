@@ -1,4 +1,3 @@
-import React from 'react';
 import Home3 from '../../css/components/Home3.module.css'
 import EditorErrorPage from '../../assets/images/editorErrorpage.png'
 import ErrorScreen from '../../assets/images/errorScreen.png'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Logo from '../assets/images/ododoc-start.png'
 import start from '../css/view/Start.module.css';
 import VSCode from '../components/start/VSCode';

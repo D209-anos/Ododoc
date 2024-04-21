@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import VisualScreen from '../../assets/images/visualScreen.png'
 import IntellijScreen from '../../assets/images/intellijScreen.png'
 import EditorScreen from '../../assets/images/editorpage.png'
