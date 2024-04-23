@@ -1,6 +1,9 @@
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
+
 buildscript {
     ext {
         queryDslVersion = "5.0.0"
+        restdocsApiSpecVersion = '0.18.2'
     }
 }
 
@@ -8,6 +11,13 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
+
+    // AsciiDoc 문서를 다른 형식으로 변환하기 위한 Asciidoctor 플러그인
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
+    // openAPI 플러그인 추가 -> Spring Rest Docs 의 결과물을 openAPI3 스펙으로 변환하는 플러그인
+    id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+    // swaggerUI 플러그인 추가 -> openAPI3 스펙 기반으로 SwaggerUI 생성
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'com.ssafy'
@@ -21,6 +31,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExt
 }
 
 repositories {
@@ -77,12 +88,86 @@ dependencies {
 
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.2'
+
+    // restdocs + swagger
+    testImplementation "com.epages:restdocs-api-spec-mockmvc:${restdocsApiSpecVersion}"
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.squareup.okhttp3:mockwebserver'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+
+    // google case format
+    implementation 'com.google.guava:guava:31.1-jre'
+}
+
+openapi3 {
+    servers = [
+            { url = "http://localhost:8080" }
+    ]
+    title = "SSAFY D209 Ododoc API"
+    description = "SSAFY 자율프로젝트 Ododoc 에서 사용할 API 문서입니다."
+    version = "0.0.1"
+    outputFileNamePrefix = 'open-api-3.0.1'
+    format = "json"
+
+    outputDirectory = 'build/resources/main/static/docs'
 }
 
 def querydslDir = 'src/main/generated'
 
 tasks.withType(JavaCompile).configureEach {
     options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+tasks.withType(GenerateSwaggerUI).configureEach {
+    dependsOn 'openapi3'
+
+    delete file('src/main/resources/static/docs/')
+    copy {
+        from "build/resources/main/static/docs"
+        into "src/main/resources/static/docs/"
+    }
+}
+
+// 테스트를 통해 생성된 snippets 출력 위치 정의
+tasks.register("ext") {
+    snippetsDir = file('build/generated-snippets')
+}
+
+tasks.named('test') {
+    systemProperty "JASYPT_KEY", System.getProperty("JASYPT_KEY")
+    useJUnitPlatform()
+
+    outputs.dir 'snippetsDir'
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+// asciidoctor 작업을 구성
+tasks.named("asciidoctor") {
+    inputs.dir 'snippetsDir'
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+tasks.named("bootJar") {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+    dependsOn(':openapi3')
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    from file("$buildDir/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+tasks.named("build") {
+    dependsOn copyDocument
 }
 
 sourceSets {
@@ -93,7 +178,3 @@ clean {
     delete file(querydslDir)
 }
 
-tasks.named('test') {
-    systemProperty "JASYPT_KEY", System.getProperty("JASYPT_KEY")
-    useJUnitPlatform()
-}
