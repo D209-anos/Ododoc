@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public class TokenInvalidException extends CustomException {
 
-    public TokenInvalidException(String message){
+    public TokenInvalidException(String message) {
         super(message, HttpStatus.UNAUTHORIZED);
     }
 }

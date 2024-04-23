@@ -12,6 +12,7 @@ import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -27,19 +28,15 @@ import java.util.Date;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class JwtProvider {
+
     private final UserDetailsService userDetailsService;
     private final RefreshTokenRedisRepository redisRepository;
-    private String secretKey;
 
-    public JwtProvider(UserDetailsService userDetailsService,
-                            RefreshTokenRedisRepository redisRepository,
-                            @Value("${jwt.secret.key}") String secretKey) {
-        this.userDetailsService = userDetailsService;
-        this.secretKey = secretKey;
-        this.redisRepository = redisRepository;
-    }
+    @Value("${jwt.secret.key}")
+    private String secretKey;
 
     public static long tokenValidTime = 3 * 60 * 60 * 1000L;    // 3시간
     public static long refreshTokenValidTime = 15 * 60 * 60 * 24 * 1000L;   // 15일
@@ -50,12 +47,12 @@ public class JwtProvider {
     public JwtCode validateToken(String token) {
         if(token == null) {
             log.debug("JWT token이 null 입니다.");
-            return JwtCode.DENIED;
+            return JwtCode.INVALID;
         }
 
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return JwtCode.ACCESS;
+            return JwtCode.DENIED;
         } catch (ExpiredJwtException e) {
             log.debug("만료된 JWT 토큰입니다.");
             return JwtCode.EXPIRED;
@@ -63,7 +60,7 @@ public class JwtProvider {
             log.debug("잘못된 JWT 토큰입니다.");
         }
 
-        return JwtCode.DENIED;
+        return JwtCode.INVALID;
     }
 
     private String makeRefreshToken(String code, OAuthProvider oAuthProvider) {
@@ -170,6 +167,6 @@ public class JwtProvider {
         log.info("refresh token : {}", refreshToken);
         return refreshToken == null
                 || redisRepository.findByRefreshToken(refreshToken).isEmpty()
-                || validateToken(refreshToken) != JwtCode.ACCESS;
+                || validateToken(refreshToken) != JwtCode.DENIED;
     }
 }

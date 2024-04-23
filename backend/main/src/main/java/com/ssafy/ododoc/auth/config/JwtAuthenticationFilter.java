@@ -16,6 +16,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtProvider jwtProvider;
 
     @Override
@@ -23,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = jwtProvider.resolveToken(request);
         JwtCode jwtCode = jwtProvider.validateToken(token);
 
-        if(jwtCode == JwtCode.ACCESS) {
+        if(jwtCode == JwtCode.DENIED) {
             Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
