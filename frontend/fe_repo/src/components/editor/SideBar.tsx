@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, RefObject } from 'react';
 import Sidebar from '../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../assets/images/pencil.png'
 import FolderImage from '../../assets/images/forder.png'
@@ -6,6 +6,9 @@ import FileImage from '../../assets/images/file.png'
 import Line from '../../assets/images/line.png'
 import MakeFileImage from '../../assets/images/plusbutton.png'
 import AddButton from '../../assets/images/addbutton.png'
+import TrashButton from '../../assets/images/trashIcon.png'
+import SettingButton from '../../assets/images/settingIcon.png'
+import AddModal from '../../components/editor/AddModal'
 
 interface IContentItem {
     id: number;
@@ -56,7 +59,7 @@ const dummyData: IContentItem = {
                             {
                                 "id": 13,
                                 "type": "FILE",
-                                "name": "file13sfdsfdsfsdfsdfdsf",
+                                "name": "fileSDFSDFWDFSFSDFSDFSD",
                                 "contents": "13번입니다."
                             },
                             {
@@ -88,19 +91,37 @@ const dummyData: IContentItem = {
 };
 
 function SideBar() {
+    const [modalActive, setModalActive] = useState<Record<number, boolean>>({});
+
+    const [activeButtonRef, setActiveButtonRef] = useState<RefObject<HTMLImageElement> | null>(null);
+
+    const toggleModal = (id: number) => {
+        setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
+    };
+
+    const imgRef = useRef<HTMLImageElement>(null);
+
     const renderContents = (contents: IContentItem[]): JSX.Element[] => {
         return contents.map((item: IContentItem) => {
             if (item.type === 'FOLDER') {
                 // FOLDER 타입일 경우 하위 항목 추가
                 return (
-                    <div key={item.name} style={{ marginLeft: '20px' }} className={Sidebar.forderSpace}>
-                        <div className={Sidebar.folderWrapper}>
-                            <img src={FolderImage} alt="folder-image" className={Sidebar.forderImage} />
-                            <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.folderName}>{item.name}</div>
-                            <img src={AddButton} alt="add-button" className={Sidebar.addButton} />
+                    <div key={item.id} style={{ marginLeft: '20px' }} className={Sidebar.forderSpace}>
+                    <div className={Sidebar.folderWrapper}>
+                        <img src={FolderImage} alt="folder-image" className={Sidebar.forderImage} />
+                        <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.folderName}>{item.name}</div>
+                        <div>
+                            <img src={AddButton} alt="add-button" className={Sidebar.addButton} onClick={() => toggleModal(item.id)} />
+                            {modalActive[item.id] && (
+                                <AddModal isOpen={modalActive[item.id]} onClose={() => toggleModal(item.id)}>
+                                    <h2>Modal Title</h2>
+                                    <p>This is modal content!</p>
+                                </AddModal>
+                            )}
                         </div>
-                        {renderContents(item.contents as IContentItem[])}
                     </div>
+                    {item.contents && Array.isArray(item.contents) && renderContents(item.contents)}
+                </div>
                 );
             } else {
                 // FILE 타입일 경우 contents를 문자열로 취급
@@ -122,7 +143,11 @@ function SideBar() {
             </span>
             <img src={Line} alt="line" className={Sidebar.line}/>
             {renderContents(dummyData.contents as IContentItem[])}
-            <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton}/>
+            <div className={Sidebar.sideButtonWrapper}>
+                <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton}/>
+                <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} />
+                <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} />
+            </div>
         </div>
     )
 }
