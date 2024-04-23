@@ -45,6 +45,7 @@ public class WebSecurityConfig {
                         SessionCreationPolicy.STATELESS
                 ))
 
+                // Todo : 확인이 필요한 EndPoint 작성
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll())
 

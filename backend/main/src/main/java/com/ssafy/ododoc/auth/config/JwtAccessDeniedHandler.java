@@ -17,6 +17,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
+
     private final JwtProvider jwtProvider;
     private final ObjectMapper objectMapper;
 
@@ -33,7 +34,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     private int getStatusInfo(JwtCode jwtCode) {
-        if(jwtCode == JwtCode.ACCESS) {
+        if(jwtCode == JwtCode.DENIED) {
             return HttpStatus.FORBIDDEN.value();
         }
         return HttpStatus.UNAUTHORIZED.value();
@@ -41,9 +42,9 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     private static CommonWrapperResponse getErrorResponse(JwtCode jwtCode, int status) {
         ErrorResponse errorResponse = switch (jwtCode) {
-            case ACCESS -> errorResponseBuilder("AccessDeniedException", "권한이 없습니다.");
-            case EXPIRED -> errorResponseBuilder("TokenExpieredException", "토큰이 만료되었습니다.");
-            case DENIED -> errorResponseBuilder("TokenInvalidException", "토큰이 유효하지 않습니다.");
+            case DENIED -> errorResponseBuilder("AccessDeniedException", "권한이 없습니다.");
+            case EXPIRED -> errorResponseBuilder("TokenExpiredException", "토큰이 만료되었습니다.");
+            case INVALID -> errorResponseBuilder("TokenInvalidException", "토큰이 유효하지 않습니다.");
         };
 
         return CommonWrapperResponse.builder()
