@@ -35,7 +35,6 @@ public class NaverOAuth2Utils {
     private String infoUrl;
 
     public NaverMemberInfoResponse getUserInfo(String code, String redirect) {
-
         if(redirect == null){
             redirect = redirectUrl;
         }
@@ -54,7 +53,6 @@ public class NaverOAuth2Utils {
     }
 
     private String getAccessToken(String code, String redirect) {
-
         WebClient webClient = WebClient.builder()
                 .baseUrl(tokenUrl)
                 .build();

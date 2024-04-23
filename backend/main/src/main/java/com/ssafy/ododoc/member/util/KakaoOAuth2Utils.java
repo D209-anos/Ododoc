@@ -32,7 +32,6 @@ public class KakaoOAuth2Utils {
     private String kakaoInfoUrl;
 
     public KakaoMemberInfoResponse getUserInfo(String code, String redirect) {
-
         if(redirect == null){
             redirect = redirectUri;
         }
@@ -52,7 +51,6 @@ public class KakaoOAuth2Utils {
     }
 
     public String getKakaoToken(String code, String redirect) {
-
         WebClient webClient = WebClient.builder()
                 .baseUrl(kakaoTokenUrl)
                 .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")

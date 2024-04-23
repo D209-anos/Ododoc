@@ -31,9 +31,6 @@ public class MemberController {
      */
     @PostMapping(value = "/authorization/{provider}")
     public JwtTokenResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
-
-        log.info("social login 호출");
-
         Member memberInfo = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
 
         jwtProvider.setRefreshTokenForClient(response, memberInfo);
@@ -53,7 +50,7 @@ public class MemberController {
                                   @PathVariable String provider,
                                   HttpServletResponse response) {
 
-        log.info("[테스트 social login 호출] : {} {}", provider, code);
+        log.debug("[테스트 social login 호출] : {} {}", provider, code);
         Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
 
         jwtProvider.setRefreshTokenForClient(response, memberInfo);
