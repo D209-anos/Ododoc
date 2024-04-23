@@ -1,7 +1,7 @@
 package com.ssafy.ododoc.member.util;
 
-import com.ssafy.ododoc.member.dto.response.NaverMemberInfoResponse;
-import com.ssafy.ododoc.member.dto.response.NaverTokenResponse;
+import com.ssafy.ododoc.member.dto.response.GoogleMemberInfoResponse;
+import com.ssafy.ododoc.member.dto.response.GoogleTokenResponse;
 import com.ssafy.ododoc.member.exception.OAuthDeniedException;
 import com.ssafy.ododoc.member.exception.OAuthInfoNullException;
 import lombok.RequiredArgsConstructor;
@@ -17,55 +17,63 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Slf4j
 @PropertySource("classpath:oauth.properties")
-public class NaverOAuth2Utils {
+public class GoogleOAuth2Utils {
 
-    @Value("${naver.client-id}")
+    @Value("${google.client-id}")
     private String clientId;
 
-    @Value("${naver.client-secret}")
+    @Value("${google.client-secret}")
     private String clientSecret;
 
-    @Value("${naver.token-url}")
-    private String naverTokenUrl;
+    @Value("${google.redirect-uri}")
+    private String goolgeRedirectUri;
 
-    @Value("${naver.info-url}")
-    private String naverInfoUrl;
+    @Value("${google.token-url}")
+    private String googleTokenUrl;
 
-    public NaverMemberInfoResponse getUserInfo(String code) {
+    @Value("${google.info-url}")
+    private String googleInfoUrl;
 
-        String NaverAccessToken = getNaverToken(code);
+    public GoogleMemberInfoResponse getUserInfo(String code, String redirect) {
+        if(redirect == null){
+            redirect = goolgeRedirectUri;
+        }
+
+        String googleAccessToken = getGoogleToken(code,redirect);
 
         WebClient webClient = WebClient.builder()
-                .baseUrl(naverInfoUrl)
-                .defaultHeader("Authorization", "Bearer " + NaverAccessToken)
+                .baseUrl(googleInfoUrl)
+                .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                .defaultHeader("Authorization", "Bearer " + googleAccessToken)
                 .build();
 
         return webClient.get()
                 .retrieve()
-                .bodyToMono(NaverMemberInfoResponse.class)
+                .bodyToMono(GoogleMemberInfoResponse.class)
                 .block();
     }
-
-    private String getNaverToken(String code) {
+    public String getGoogleToken (String code, String redirect) {
         WebClient webClient = WebClient.builder()
-                .baseUrl(naverTokenUrl)
+                .baseUrl(googleTokenUrl)
+                .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
                 .build();
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", "authorization_code");
+        requestBody.add("redirect_uri", redirect);
+        requestBody.add("code", code);
         requestBody.add("client_id", clientId);
         requestBody.add("client_secret", clientSecret);
-        requestBody.add("code", code);
 
-        NaverTokenResponse naverTokenResponse = webClient.post()
+        GoogleTokenResponse googleTokenResponse = webClient.post()
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(NaverTokenResponse.class)
+                .bodyToMono(GoogleTokenResponse.class)
                 .onErrorMap(e -> new OAuthDeniedException("유효하지 않은 정보입니다."))
                 .block();
 
-        if(naverTokenResponse != null){
-            return naverTokenResponse.getAccessToken();
+        if(googleTokenResponse != null){
+            return googleTokenResponse.getAccessToken();
         }
 
         throw new OAuthInfoNullException("존재하지 않는 사용자입니다.");
