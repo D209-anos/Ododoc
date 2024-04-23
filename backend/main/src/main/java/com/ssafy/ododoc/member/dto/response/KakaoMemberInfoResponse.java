@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class KakaoMemberfInfoResponse implements OAuthMemberInfo {
+public class KakaoMemberInfoResponse implements OAuthMemberInfo {
 
     private Long id;
     private Timestamp connecetedAt;
