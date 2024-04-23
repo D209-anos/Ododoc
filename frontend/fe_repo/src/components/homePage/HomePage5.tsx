@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'
 import Home5 from '../../css/components/Home5.module.css'
 import VscodeIcon from '../../assets/images/vscodeIcon.png'
 import IntellijIcon from '../../assets/images/intellijIcon.png'
@@ -11,6 +12,7 @@ interface CarouselElement {
     label: string;
     content: string;
     button: string;
+    path: string;
 }
 
 // 카로셀 요소
@@ -19,23 +21,27 @@ const carouselElements: CarouselElement[] = [
         src: VscodeIcon,
         label: 'Visual Studio Extension',
         content: '실시간으로 코드에서 발생하는\n 이슈들을 ododoc으로 전송합니다.\n 문서화 작업을 자동화함으로써\n 개발 속도를 가속화해보세요.',
-        button: '자세히보기'
+        button: '자세히보기',
+        path: '/start/vscode'
     },
     { 
         src: IntellijIcon, 
         label: 'IntelliJ Plugin', 
         content: 'IDE 내에서 발생하는 모든 에러를\n 자동으로 포착하여 해결책을 찾는데\n 소요되는 시간을 줄여보세요.',
-        button: '자세히보기'
+        button: '자세히보기',
+        path: '/start/intellij'
     },
     { 
         src: ChromeIcon,
         label: 'Chrome Extension',
         content: '웹 서핑 중 발견한 솔루션과\n 참고 자료들을 ododoc에 저장하세요. \n Editor와 통합하여 검색한 정보를\n 즉각적으로 문서에 반영합니다.',
-        button: '자세히보기'
+        button: '자세히보기',
+        path: '/start/chrome'
     }
 ];
 
 function HomePage5() {
+    const navigate = useNavigate()
     const carouselRef = useRef<HTMLDivElement>(null);
     const [angle, setAngle] = useState(0);
     const [isRow, setIsRow] = useState(false);
@@ -64,12 +70,10 @@ function HomePage5() {
         const tz = Math.round((800 / 2) / Math.tan(radian));
         setTranslateZ(tz);
 
-        // window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mousedown', handleMouseDown)
         window.addEventListener('mouseup', handleMouseUp);
 
         return () => {
-            // window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mousedown', handleMouseDown)
             window.removeEventListener('mouseup', handleMouseUp);
         }
@@ -82,6 +86,10 @@ function HomePage5() {
     const handleNextClick = () => {
         setAngle(prevAngle => prevAngle + ratateAngle);
     };
+
+    const buttonClick = (path: string) => {
+        navigate(path)
+    }
     
     return (
         <div className={Home5.container}>
@@ -129,6 +137,7 @@ function HomePage5() {
                                 <button
                                     className={Home5.button}
                                     style={{ fontFamily: 'hanbitFont', opacity: isMain ? 1 : 0 }}
+                                    onClick={() => buttonClick(element.path)}
                                     >
                                     {element.button}
                                 </button>

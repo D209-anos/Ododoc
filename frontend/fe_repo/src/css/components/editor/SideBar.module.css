@@ -1,0 +1,119 @@
+@font-face {
+    font-family: 'BMJUAFont';
+    src: url('../../../assets/fonts/BMJUA_ttf.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HanbitFont';
+    src: url('../../../assets/fonts/KCC-Hanbit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.bmjuaFont {
+    font-family: 'BMJUAFont', sans-serif;
+}
+
+.hanbitFont {
+    font-family: 'HanbitFont', sans-serif;
+    margin-bottom: 10vh;
+    text-align: right;
+    margin-right: 15%;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 18%;
+    height: 100vh;
+    background-color: rgb(197, 192, 192);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2vh;
+    pointer-events: none;
+    user-select: none;
+}
+
+.nicknameSpace {
+    display: flex;
+    flex-direction: row;
+    margin: 3vh 0vh 2vh 0vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.nickname {
+    font-size: 20px;
+}
+
+.pencil {
+    width: 9%;
+    margin: 0vh 0vh 0vh 2vh;
+}
+
+.line {
+    width: 88%;
+    height: 20px;
+    margin-bottom: 3vh;
+}
+
+.forderSpace {
+    display: flex;
+    flex-direction: column;
+    align-items:flex-start;
+    width: 100%;
+}
+
+.folderWrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 0vh 0vh 0.5vh 0vh;
+    align-items: center;
+}
+.forderImage {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 1.5vh;
+    margin-left: 3vh;
+}
+
+.folderName {
+    width: fit-content;
+}
+
+.fileSpace {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0vh 0vh 0.5vh 0vh;
+    width: 100%;
+}
+
+.fileImage {
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-right: 1.5vh;
+    margin-left: 3vh;
+}
+
+.makeFileButton {
+    position: absolute;
+    left: 3vh;
+    bottom: 5vh;
+    width: 15%;
+}
+
+.addButton {
+    width: 8%;
+    margin-left: 3vh;
+}
