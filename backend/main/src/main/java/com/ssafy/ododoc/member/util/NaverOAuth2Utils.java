@@ -1,7 +1,7 @@
 package com.ssafy.ododoc.member.util;
 
-import com.ssafy.ododoc.member.dto.response.KakaoMemberInfoResponse;
-import com.ssafy.ododoc.member.dto.response.KakaoTokenResponse;
+import com.ssafy.ododoc.member.dto.response.NaverMemberInfoResponse;
+import com.ssafy.ododoc.member.dto.response.NaverTokenResponse;
 import com.ssafy.ododoc.member.exception.OAuthDeniedException;
 import com.ssafy.ododoc.member.exception.OAuthInfoNullException;
 import lombok.RequiredArgsConstructor;
@@ -17,62 +17,63 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Slf4j
 @PropertySource("classpath:oauth.properties")
-public class KakaoOAuth2Utils {
+public class NaverOAuth2Utils {
 
-    @Value("${kakao.client-id}")
+    @Value("${naver.client-id}")
     private String clientId;
 
-    @Value("${kakao.redirect-uri}")
-    private String redirectUri;
+    @Value("${naver.client-secret}")
+    private String clientSecret;
 
-    @Value("${kakao.token-url}")
-    private String kakaoTokenUrl;
+    @Value("${naver.redirect-url}")
+    private String redirectUrl;
 
-    @Value("${kakao.info-url}")
-    private String kakaoInfoUrl;
+    @Value("${naver.token-url}")
+    private String tokenUrl;
 
-    public KakaoMemberInfoResponse getUserInfo(String code, String redirect) {
+    @Value("${naver.info-url}")
+    private String infoUrl;
+
+    public NaverMemberInfoResponse getUserInfo(String code, String redirect) {
 
         if(redirect == null){
-            redirect = redirectUri;
+            redirect = redirectUrl;
         }
 
-        String kakaoAccessToken = getKakaoToken(code, redirect);
+        String NaverAccessToken = getAccessToken(code, redirect);
 
         WebClient webClient = WebClient.builder()
-                .baseUrl(kakaoInfoUrl)
-                .defaultHeader("Authorization","Bearer " + kakaoAccessToken)
-                .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                .baseUrl(infoUrl)
+                .defaultHeader("Authorization", "Bearer " + NaverAccessToken)
                 .build();
 
         return webClient.get()
                 .retrieve()
-                .bodyToMono(KakaoMemberInfoResponse.class)
+                .bodyToMono(NaverMemberInfoResponse.class)
                 .block();
     }
 
-    public String getKakaoToken(String code, String redirect) {
+    private String getAccessToken(String code, String redirect) {
 
         WebClient webClient = WebClient.builder()
-                .baseUrl(kakaoTokenUrl)
-                .defaultHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                .baseUrl(tokenUrl)
                 .build();
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", "authorization_code");
         requestBody.add("client_id", clientId);
-        requestBody.add("redirect_uri", redirect);
+        requestBody.add("client_secret", clientSecret);
         requestBody.add("code", code);
 
-        KakaoTokenResponse kakaoTokenResponse = webClient.post()
+        NaverTokenResponse naverTokenResponse = webClient.post()
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(KakaoTokenResponse.class)
+                .bodyToMono(NaverTokenResponse.class)
                 .onErrorMap(e -> new OAuthDeniedException("유효하지 않은 정보입니다."))
                 .block();
 
-        if(kakaoTokenResponse != null){
-            return kakaoTokenResponse.getAccessToken();
+        if(naverTokenResponse != null){
+            return naverTokenResponse.getAccessToken();
         }
 
         throw new OAuthInfoNullException("존재하지 않는 사용자입니다.");
