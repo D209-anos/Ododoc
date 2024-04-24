@@ -1,14 +1,14 @@
 // src/components/Menu.js
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import menu from '../css/components/Menu.module.css';
-import CloseIcon from '@mui/icons-material/Close';
+import Login from '../components/login/Login'
 
 function Menu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const loginBackground = useRef<HTMLDivElement>(null);
+
   return (
     <div>
       <div className={menu.toggleButton} onClick={() => setMenuOpen(!menuOpen)}>
@@ -24,27 +24,7 @@ function Menu() {
           </ul>
         </div>
       )}
-      {
-        loginOpen &&
-        <div className={menu.loginContainer} ref={loginBackground} onClick={e => {
-          if (e.target === loginBackground.current) {
-            setLoginOpen(false);
-          }
-        }}>
-          <div className={menu.loginContent}>
-            <div className={menu.loginTitleWrapper}>
-              <p className={menu.loginTitle}>Login</p>
-              <CloseIcon className={`${menu.clickable} ${menu.loginCloseBtn}`} onClick={() => setLoginOpen(false)}></CloseIcon>
-            </div>
-            <div className={menu.socialLoginBtnWrapper}>
-              <div className={`${menu.naverBtn} ${menu.socialLoginBtn}`}></div>
-              <div className={`${menu.googleBtn} ${menu.socialLoginBtn}`}></div>
-              <div className={`${menu.kakaoBtn} ${menu.socialLoginBtn}`}></div>
-            </div>
-
-          </div>
-        </div>
-      }
+      <Login isOpen={loginOpen} onClose={() => setLoginOpen(false)}/>
     </div>
   );
 }
