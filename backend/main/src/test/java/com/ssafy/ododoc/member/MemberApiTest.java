@@ -45,7 +45,7 @@ public class MemberApiTest extends ApiTest {
                 .andExpect(cookie().exists("refreshToken"))
                 .andDo(this::print)
                 .andDo(document(DEFAULT_RESTDOC_PATH, "소셜 로그인 처리 API 입니다." +
-                        "<br><br><b>소셜 로그인에서 받아온 정상적인 code와 타겟으로 하는 provider, 현재 처리하고 있는 redirect url<b>을" +
+                        "<br><br><b>소셜 로그인에서 받아온 정상적인 code와 타겟으로 하는 provider, 현재 처리하고 있는 redirect url</b>을" +
                         "<br>request body에 담아 post 요청 해주세요." +
                         "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 JWT Access Token 관련 정보들</b>이 반환됩니다." +
                         "<br> - 추가로 <b>refresh token이 cookie에 반환</b>됩니다." +
