@@ -126,9 +126,6 @@ public class JwtProvider {
     }
 
     public void removeRefreshTokenForClient(HttpServletRequest request, HttpServletResponse response) {
-
-        log.info("request cookie: {}", request.getCookies());
-
         ResponseCookie cookie = ResponseCookie.from("refreshToken", null)
                 .maxAge(0)
                 .httpOnly(true)
