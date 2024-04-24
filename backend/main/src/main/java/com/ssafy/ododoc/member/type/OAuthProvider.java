@@ -1,5 +1,7 @@
 package com.ssafy.ododoc.member.type;
 
+import com.ssafy.ododoc.member.exception.ProviderNotSupportedException;
+
 public enum OAuthProvider {
 
     GOOGLE, KAKAO, NAVER;
@@ -14,7 +16,7 @@ public enum OAuthProvider {
             case "GOOGLE" -> GOOGLE;
 
             // TODO : ProviderNotSupportedException 만들어서 처리하기
-            default -> null;
+            default -> throw new ProviderNotSupportedException("지원하지 않는 플랫폼입니다.");
         };
     }
 }
