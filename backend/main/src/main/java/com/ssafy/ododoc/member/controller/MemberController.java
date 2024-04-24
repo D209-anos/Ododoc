@@ -5,6 +5,7 @@ import com.ssafy.ododoc.auth.response.JwtTokenResponse;
 import com.ssafy.ododoc.member.dto.request.LoginRequest;
 import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,4 +58,14 @@ public class MemberController {
         return jwtProvider.makeJwtTokenResponse(memberInfo);
     }
 
+    /**
+     * 로그아웃
+     *
+     * @param request
+     * @param response 쿠키 삭제를 위한 response
+     */
+    @GetMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        jwtProvider.removeRefreshTokenForClient(request, response);
+    }
 }
