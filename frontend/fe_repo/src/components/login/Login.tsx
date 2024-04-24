@@ -59,7 +59,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
             google: "your-google-client-id",
             naver: "your-naver-client-id"
         };
-        const redirectUri = "http://localhost:3000/"
+        const redirectUri = "http://localhost:3000/oauth"
         // 카카오 로그인 URL
         const loginUrl = {
             kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri}&response_type=code`,
