@@ -3,13 +3,11 @@ package com.ssafy.ododoc.member.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssafy.ododoc.member.dto.OAuthMemberInfo;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.util.Map;
 
 @Getter
-@Setter
 public class KakaoMemberInfoResponse implements OAuthMemberInfo {
 
     private Long id;
