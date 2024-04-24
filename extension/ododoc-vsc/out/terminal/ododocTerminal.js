@@ -33,6 +33,7 @@ class OdodocTerminal {
     folderPath;
     inputCommand = "";
     cursorPosition = 0;
+    subprocesses = [];
     constructor() {
         this.ptyProcess = null;
         this.folderPath = vscode.workspace.workspaceFolders
@@ -57,8 +58,11 @@ class OdodocTerminal {
         this.writeEmitter.fire("\x1b[0m> ");
     }
     close() {
-        // Handle closing the terminal
-        this.ptyProcess.kill();
+        if (this.ptyProcess) {
+            this.ptyProcess.kill("SIGINT"); // SIGINT 신호를 보내 실행되고 있는 프로세스 종료
+        }
+        this.subprocesses.forEach((subproc) => subproc.kill()); // 터미널 프로세스 종료 시 모든 subprocess 종료
+        this.subprocesses = [];
     }
     handleInput(data) {
         // arrow key control
@@ -85,11 +89,9 @@ class OdodocTerminal {
         }
         switch (data.charCodeAt(0)) {
             case 13: // Enter key
+                this.writeEmitter.fire("\r\n");
                 this.processCommand();
                 this.cursorPosition = 0;
-                this.writeEmitter.fire("\r\n\n");
-                this.writeEmitter.fire(`\x1b[33m${this.folderPath} \r\n`);
-                this.writeEmitter.fire("\x1b[0m> ");
                 break;
             case 127: // Backspace key
                 if (this.cursorPosition > 0) {
@@ -110,7 +112,29 @@ class OdodocTerminal {
         }
     }
     processCommand() {
-        console.log(this.inputCommand);
+        const command = this.inputCommand.trim().split(" ");
+        const cmd = command[0];
+        const args = command.slice(1);
+        if (this.ptyProcess) {
+            const subprocess = (0, child_process_1.spawn)(cmd, args, {
+                cwd: this.folderPath || process.cwd(),
+                shell: true, // cmd or bash
+            });
+            subprocess.stdout.on("data", (data) => {
+                const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
+                this.writeEmitter.fire(formattedData);
+            });
+            subprocess.stderr.on("data", (data) => {
+                const formattedData = data.toString().replace(/\n/g, "\r\n");
+                this.writeEmitter.fire(formattedData);
+            });
+            subprocess.on("close", (code) => {
+                // this.writeEmitter.fire(`\r\nProcess exited with code ${code}`);
+                this.writeEmitter.fire("\r\n");
+                this.writeEmitter.fire(`\x1b[33m${this.folderPath} \r\n`);
+                this.writeEmitter.fire("\x1b[0m> ");
+            });
+        }
         this.inputCommand = "";
     }
     refreshInputDisplay() {
