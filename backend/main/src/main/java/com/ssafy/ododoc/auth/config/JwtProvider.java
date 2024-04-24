@@ -77,10 +77,11 @@ public class JwtProvider {
                 .compact();
     }
 
-    private String makeAccessToken(String code, Set<Role> roles, OAuthProvider oAuthProvider) {
+    private String makeAccessToken(String code, Set<Role> roles, OAuthProvider oAuthProvider, String nickname) {
         Claims claims = Jwts.claims().setSubject(code);
         claims.put("roles", roles);
         claims.put("provider", oAuthProvider.toString());
+        claims.put("nickname", nickname);
 
         Date now = new Date();
 
@@ -145,7 +146,7 @@ public class JwtProvider {
     }
 
     public JwtTokenResponse makeJwtTokenResponse(Member member) {
-        String accessToken = makeAccessToken(member.getCode(), member.getRoles(), member.getProvider());
+        String accessToken = makeAccessToken(member.getCode(), member.getRoles(), member.getProvider(), member.getNickname());
 
         return JwtTokenResponse.builder()
                 .accessToken(accessToken)
