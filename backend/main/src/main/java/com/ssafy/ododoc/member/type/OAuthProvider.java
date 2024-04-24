@@ -15,7 +15,6 @@ public enum OAuthProvider {
             case "NAVER" -> NAVER;
             case "GOOGLE" -> GOOGLE;
 
-            // TODO : ProviderNotSupportedException 만들어서 처리하기
             default -> throw new ProviderNotSupportedException("지원하지 않는 플랫폼입니다.");
         };
     }
