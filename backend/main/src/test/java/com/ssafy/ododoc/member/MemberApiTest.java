@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.member;
 
 import com.ssafy.ododoc.ApiTest;
+import com.ssafy.ododoc.common.CommonDocument;
 import com.ssafy.ododoc.common.MemberTestUtil;
 import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.repository.MemberRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -93,5 +95,22 @@ public class MemberApiTest extends ApiTest {
                 .andExpect(jsonPath("$.status").value(406))
                 .andDo(document(DEFAULT_RESTDOC_PATH, MemberDocument.providerPathField,
                         MemberDocument.loginRequestField));
+    }
+
+    @Test
+    void 로그아웃_성공_200() throws Exception {
+        String accessToken = memberTestUtil.회원가입_토큰반환(mockMvc);
+        mockMvc.perform(
+                get("/oauth2/logout")
+                        .header(AUTH_HEADER, accessToken)
+
+        )
+                .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("refreshToken",0))
+                .andDo(document(DEFAULT_RESTDOC_PATH, "소셜 로그아웃 처리 API 입니다." +
+                                "<br><br><b>request header에 accessToken을 담아 Get 요청을 해주세요.<b>" +
+                                "<br> - 정상 처리 시 cookie에 있는 maxAge가 0이 되어 refreshToken이 삭제됩니다.",
+                        "소셜 로그아웃", CommonDocument.AccessTokenHeader));
+
     }
 }
