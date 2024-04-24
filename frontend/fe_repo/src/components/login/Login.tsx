@@ -31,7 +31,6 @@ const sendCodeToBackend = async (code: string, provider: string, setAccessToken:
     }
 }
 
-
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const loginBackground = useRef<HTMLDivElement>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
