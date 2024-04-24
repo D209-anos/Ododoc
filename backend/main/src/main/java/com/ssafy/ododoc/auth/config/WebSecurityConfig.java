@@ -47,8 +47,8 @@ public class WebSecurityConfig {
 
                 // Todo : 확인이 필요한 EndPoint 작성
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/directory").hasRole("USER")
                         .anyRequest().permitAll())
-
                 .exceptionHandling(config -> config.authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(jwtAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
