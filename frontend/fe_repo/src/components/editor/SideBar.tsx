@@ -1,4 +1,4 @@
-import React, { useState, useRef, RefObject } from 'react';
+import React, { useState, useRef, RefObject, useEffect } from 'react';
 import Sidebar from '../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../assets/images/pencil.png'
 import FolderImage from '../../assets/images/forder.png'
@@ -9,6 +9,8 @@ import AddButton from '../../assets/images/addbutton.png'
 import TrashButton from '../../assets/images/trashIcon.png'
 import SettingButton from '../../assets/images/settingIcon.png'
 import AddModal from '../../components/editor/AddModal'
+import TrashModal from '../../components/editor/TrashModal'
+import SettingModal from '../../components/editor/SettingModal'
 
 interface IContentItem {
     id: number;
@@ -91,15 +93,13 @@ const dummyData: IContentItem = {
 };
 
 function SideBar() {
-    const [modalActive, setModalActive] = useState<Record<number, boolean>>({});
-
-    const [activeButtonRef, setActiveButtonRef] = useState<RefObject<HTMLImageElement> | null>(null);
+    const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 추가 모달
+    const [isTrashModalOpen, setTrashModalOpen] = useState(false);                      // 휴지통 모달
+    const [isSettingModalOpen, setSettingModalOpen] = useState(false);                  // 설정 모달
 
     const toggleModal = (id: number) => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
     };
-
-    const imgRef = useRef<HTMLImageElement>(null);
 
     const renderContents = (contents: IContentItem[]): JSX.Element[] => {
         return contents.map((item: IContentItem) => {
@@ -145,8 +145,10 @@ function SideBar() {
             {renderContents(dummyData.contents as IContentItem[])}
             <div className={Sidebar.sideButtonWrapper}>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton}/>
-                <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} />
-                <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} />
+                <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} onClick={() => setTrashModalOpen(true)}/>
+                <TrashModal isOpen={isTrashModalOpen} onClose={() => setTrashModalOpen(false)} />
+                <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} onClick={() => setSettingModalOpen(true)}/>
+                <SettingModal isOpen={isSettingModalOpen} onClose={() => setSettingModalOpen(false)}/>
             </div>
         </div>
     )
