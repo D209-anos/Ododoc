@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import { spawn, ChildProcessWithoutNullStreams, exec } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 
 export class OdodocTerminal implements vscode.Pseudoterminal {
   private writeEmitter = new vscode.EventEmitter<string>();
@@ -98,12 +100,65 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
   }
 
   processCommand(): void {
-    const command = this.inputCommand.trim().split(" ");
-    const cmd = command[0];
-    const args = command.slice(1);
+    const inputParts = this.inputCommand.trim().split(" ");
+    const cmd = inputParts[0];
+    const args = inputParts.slice(1);
 
+    switch (cmd.toLowerCase()) {
+      case "ls":
+        this.listDirectory();
+        break;
+      case "cd":
+        this.changeDirectory(args.join(" "));
+        break;
+      default:
+        this.executeSubprocess(cmd, args);
+        break;
+    }
+
+    this.inputCommand = "";
+  }
+
+  listDirectory() {
+    fs.readdir(
+      this.folderPath || ".",
+      { withFileTypes: true },
+      (err, files) => {
+        if (err) {
+          this.writeEmitter.fire(
+            `Error reading directory: ${err.message}\r\n\n`
+          );
+        } else {
+          const output = files
+            .map((dirent) =>
+              dirent.isDirectory() ? `${dirent.name}/` : dirent.name
+            )
+            .join("   ");
+          this.writeEmitter.fire(output + "\r\n\n");
+        }
+        this.writeEmitter.fire(`\x1b[33m${this.folderPath}\r\n\x1b[0m> `);
+      }
+    );
+  }
+
+  changeDirectory(targetPath: string) {
+    const newPath = path.resolve(this.folderPath || ".", targetPath);
+    fs.access(newPath, fs.constants.R_OK, (err) => {
+      if (err) {
+        this.writeEmitter.fire(
+          `cd: ${targetPath}: no such file or directory\r\n\n`
+        );
+      } else {
+        this.folderPath = newPath;
+        this.writeEmitter.fire("\r\n");
+      }
+      this.writeEmitter.fire(`\x1b[33m${this.folderPath}\r\n\x1b[0m> `);
+    });
+  }
+
+  executeSubprocess(command: string, args: string[]) {
     if (this.ptyProcess) {
-      const subprocess = spawn(cmd, args, {
+      const subprocess = spawn(command, args, {
         cwd: this.folderPath || process.cwd(),
         shell: true, // cmd or bash
       });
@@ -125,7 +180,6 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
         this.writeEmitter.fire("\x1b[0m> ");
       });
     }
-    this.inputCommand = "";
   }
 
   refreshInputDisplay(): void {
