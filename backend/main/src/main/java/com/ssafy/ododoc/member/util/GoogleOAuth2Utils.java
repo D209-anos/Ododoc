@@ -52,6 +52,7 @@ public class GoogleOAuth2Utils {
                 .bodyToMono(GoogleMemberInfoResponse.class)
                 .block();
     }
+
     public String getGoogleToken (String code, String redirect) {
         WebClient webClient = WebClient.builder()
                 .baseUrl(googleTokenUrl)
