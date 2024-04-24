@@ -5,6 +5,7 @@ import com.ssafy.ododoc.member.type.OAuthProvider;
 import com.ssafy.ododoc.member.type.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@DynamicInsert
 public class Member extends BaseTime implements UserDetails {
 
     @Id
@@ -44,16 +46,16 @@ public class Member extends BaseTime implements UserDetails {
     @Column(length = 200, nullable = false)
     private String title;
 
-    @Column
+    @Column(columnDefinition = "bigint default 0")
     private Long buildCount;
 
-    @Column
+    @Column(columnDefinition = "bigint default 0")
     private Long errorCount;
 
-    @Column
+    @Column(columnDefinition = "bigint default 0")
     private Long visitCount;
 
-    @Column
+    @Column(columnDefinition = "bigint default 0")
     private Long searchCount;
 
     @Override

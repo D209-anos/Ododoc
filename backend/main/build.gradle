@@ -98,6 +98,9 @@ dependencies {
 
     // google case format
     implementation 'com.google.guava:guava:31.1-jre'
+
+    // Spring Embedded Redis for Test
+    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
 }
 
 openapi3 {
