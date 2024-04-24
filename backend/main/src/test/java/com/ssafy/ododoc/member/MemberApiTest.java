@@ -6,6 +6,7 @@ import com.ssafy.ododoc.common.MemberTestUtil;
 import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.repository.MemberRepository;
 import com.ssafy.ododoc.member.type.OAuthProvider;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -112,5 +113,33 @@ public class MemberApiTest extends ApiTest {
                                 "<br> - 정상 처리 시 cookie에 있는 maxAge가 0이 되어 refreshToken이 삭제됩니다.",
                         "소셜 로그아웃", CommonDocument.AccessTokenHeader));
 
+    }
+
+    @Test
+    void 액세스_토큰_재발급_성공_200() throws Exception {
+        Cookie cookie = memberTestUtil.회원가입_쿠키반환(mockMvc);
+        mockMvc.perform(
+                post("/oauth2/issue/access-token")
+                        .cookie(cookie)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andDo(document(DEFAULT_RESTDOC_PATH,"만료된 액세스 토큰 재발급 API 입니다." +
+                                "<br><br><b>refresh token가 담겨 있는 cookie를 post 요청해주세요.<b>" +
+                                "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 access Token 정보가</b>이 반환됩니다." +
+                                "<br> - <b>유효하지 않은 refresh token 전달 시, <b>401 UnAuthorized</b>가 반환됩니다.",
+                        "액세스 토큰 재발급", MemberDocument.refreshTokenCookieRequestField,
+                        MemberDocument.loginResultResponseField));
+    }
+
+    @Test
+    void 액세스_토큰_토큰없음_401() throws Exception {
+        mockMvc.perform(
+                post("/oauth2/issue/access-token")
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(401))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH));
     }
 }
