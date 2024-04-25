@@ -37,6 +37,8 @@ pipeline {
         stage("Deploy to EC2-BE") {
             steps {
                 echo '백엔드 EC2에 배포 시작!'
+                // 기존 컨테이너 중지 및 제거
+                sh 'docker rm -f backend || true'
                 sh "docker run -d -p 8080:8080 --name backend d209-be"
                 echo '백엔드 EC2에 배포 완료!'
             }
