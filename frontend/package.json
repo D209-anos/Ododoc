@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "animate.css": "^4.1.1"
+    "animate.css": "^4.1.1",
+    "ws": "^8.16.0"
   }
 }

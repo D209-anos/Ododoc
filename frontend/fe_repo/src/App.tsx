@@ -15,7 +15,7 @@ function App() {
           <Menu/>
           <Routes>
             <Route path='/' element={<HomePage/>}/>
-            <Route path='/start' element={<Start/>}/>
+            <Route path='/start/:selectedType' element={<Start/>}/>
             <Route path='/editor' element={<Editor/>}/>
           </Routes>
         </div>

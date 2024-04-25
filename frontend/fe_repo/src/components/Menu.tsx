@@ -19,7 +19,7 @@ function Menu() {
           <ul>
             <li className={menu.loginOpenBtn} onClick={() => setLoginOpen(true)}>Login</li>
             <li><Link to="/" className={menu.clickable}>Home</Link></li>
-            <li><Link to="/start" className={menu.clickable}>Start</Link></li>
+            <li><Link to="/start/vscode" className={menu.clickable}>Start</Link></li>
             <li><Link to="/editor" className={menu.clickable}>Editor</Link></li>
           </ul>
         </div>
