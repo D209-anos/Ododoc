@@ -114,7 +114,7 @@ openapi3 {
     outputFileNamePrefix = 'open-api-3.0.1'
     format = "json"
 
-    outputDirectory = '/var/jenkins_home/workspace/ododoc'
+    outputDirectory = '/var/jenkins_home/workspace/ododoc/backend/main'
     // outputDirectory = 'build/resources/main/static/docs'
 }
 
