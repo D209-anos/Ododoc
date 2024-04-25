@@ -8,7 +8,7 @@ RUN gradle build -x test --parallel --continue
 
 FROM openjdk:21-jdk-slim
 
-COPY --from=builder /app/build/libs/*.jar /app/app.jar
+COPY --from=builder /app/build/libs/*.jar /app/
 
 EXPOSE 8080
 
