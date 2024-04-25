@@ -1,0 +1,10 @@
+.editorContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.editorWrapper{
+    width: 81%;
+    margin-left: 19%;
+}

@@ -1,0 +1,199 @@
+@font-face {
+    font-family: 'BMJUAFont';
+    src: url('../../../assets/fonts/BMJUA_ttf.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'HanbitFont';
+    src: url('../../../assets/fonts/KCC-Hanbit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.bmjuaFont {
+    font-family: 'BMJUAFont', sans-serif;
+}
+
+.hanbitFont {
+    font-family: 'HanbitFont', sans-serif;
+    margin-bottom: 10vh;
+    text-align: right;
+    margin-right: 15%;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 19%;
+    height: 98vh;
+    background-color: rgb(197, 192, 192);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2vh;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: nowrap;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 18px; /* 세로 스크롤바 높이 */
+    height: 18px; /* 가로 스크롤바 높이 */
+    background-color: #f9f9f9;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #ea7515; /* 세로 스크롤바 색상 */
+    border-radius: 10px;
+    border: 2px solid #f9f9f9;
+}
+
+.sidebar::-webkit-scrollbar-thumb:horizontal {
+    background-color: #da7c1f; /* 가로 스크롤바 색상 */
+    border-radius: 10px;
+    border: 2px solid #f9f9f9;
+}
+
+.nicknameSpace {
+    display: flex;
+    flex-direction: row;
+    margin: 3vh 0vh 2vh 0vh;
+    align-items: center;
+    justify-content: center;
+    /* pointer-events: none; */
+    /* user-select: none; */
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    /* pointer-events: none; */
+    /* user-select: none; */
+}
+
+.nickname {
+    font-size: 20px;
+}
+
+.pencil {
+    width: 9%;
+    margin: 0vh 0vh 0vh 2vh;
+}
+
+.line {
+    width: 88%;
+    height: 20px;
+    margin-bottom: 3vh;
+    /* pointer-events: none;
+    user-select: none; */
+}
+
+.forderSpace {
+    display: flex;
+    flex-direction: column;
+    align-items:flex-start;
+    width: 100%;
+    /* user-select: none; */
+}
+
+.folderWrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 0vh 0vh 0.5vh 0vh;
+    align-items: center;
+}
+.forderImage {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 1.5vh;
+    margin-left: 3vh;
+}
+
+.forderImage:hover {
+    cursor: pointer;
+}
+
+.folderName {
+    width: fit-content;
+}
+
+.folderName:hover {
+    cursor: pointer;
+}
+
+.fileSpace {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0vh 0vh 0.5vh 0vh;
+    width: 100%;
+    /* pointer-events: none;
+    user-select: none; */
+}
+
+.fileImage {
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-right: 1.5vh;
+    margin-left: 3vh;
+}
+
+.fileImage:hover {
+    cursor: pointer;
+}
+
+.fileName:hover {
+    cursor: pointer;
+}
+
+.addButton {
+    width: 1rem;
+    height: 1rem;
+    margin-left: 3vh;
+}
+
+.addButton:hover {
+    cursor: pointer;
+}
+
+.sideButtonWrapper {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 3vh;
+    bottom: 5vh;
+    /* pointer-events: none; */
+    /* user-select: none; */
+}
+
+.makeFileButton {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 2.5vh;
+}
+
+.trashButton {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 2.5vh;
+}
+
+.settingButton {
+    width: 2rem;
+    height: 2rem;
+}
+
+.folderWrapper:hover {
+    background-color: gray;
+    color: white;
+    width: 110%;
+}
+
+.fileSpace:hover {
+    background-color: gray;
+    color: white;
+}
