@@ -36,12 +36,12 @@ public class MemberTestUtil extends TestBase {
 
     public String 회원가입_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
-        return getValueFromJSONBody(mvcResult, "$.data.accessToken", "");
+        return getValueFromJSONBody(mvcResult, "$.data.accessToken", String.class);
     }
 
     public String 회원가입_다른유저_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, otherMemberCode);
-        return getValueFromJSONBody(mvcResult, "$.data.accessToken", "");
+        return getValueFromJSONBody(mvcResult, "$.data.accessToken", String.class);
     }
 
     public Cookie 회원가입_쿠키반환(MockMvc mockMvc) throws Exception {
