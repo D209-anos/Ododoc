@@ -12,7 +12,7 @@ pipeline {
 
         stage("Update jasypt.properties") {
             steps {
-                withCredentials([string(credentialsId: 'jasypt-key', variable: 'JASYPT_KEY')]) {
+                withCredentials([string(credentialsId: 'jasypt-text', variable: 'JASYPT_KEY')]) {
                     script {
                         // jasypt.properties 파일의 위치로 이동
                         dir('./backend/main/src/main/resources') {
