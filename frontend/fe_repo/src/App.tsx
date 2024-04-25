@@ -16,7 +16,7 @@ function App() {
           <Menu/>
           <Routes>
             <Route path='/' element={<HomePage/>}/>
-            <Route path='/start' element={<Start/>}/>
+            <Route path='/start/:selectedType' element={<Start/>}/>
             <Route path='/editor' element={<Editor/>}/>
             <Route path='/vscode' element={<VSCode/>}/>
           </Routes>
