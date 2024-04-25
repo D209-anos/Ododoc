@@ -35,7 +35,7 @@ const Editor1 = () => {
             )
           }
         />
-      </BlockNoteView>;
+      </BlockNoteView>
     </>
   )
 

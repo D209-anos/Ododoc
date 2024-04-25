@@ -1,9 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
-import { useNavigate } from 'react-router-dom'
-=======
 import { useNavigate } from 'react-router-dom';
->>>>>>> FE_feature/editor
 import Home5 from '../../css/components/Home5.module.css'
 import VscodeIcon from '../../assets/images/vscodeIcon.png'
 import IntellijIcon from '../../assets/images/intellijIcon.png'
@@ -28,33 +24,21 @@ const carouselElements: CarouselElement[] = [
         label: 'Visual Studio Extension',
         content: '실시간으로 코드에서 발생하는\n 이슈들을 ododoc으로 전송합니다.\n 문서화 작업을 자동화함으로써\n 개발 속도를 가속화해보세요.',
         button: '자세히보기',
-<<<<<<< HEAD
-        path: '/start/vscode'
-=======
         path: 'VSCode'
->>>>>>> FE_feature/editor
     },
     {
         src: IntellijIcon,
         label: 'IntelliJ Plugin',
         content: 'IDE 내에서 발생하는 모든 에러를\n 자동으로 포착하여 해결책을 찾는데\n 소요되는 시간을 줄여보세요.',
         button: '자세히보기',
-<<<<<<< HEAD
-        path: '/start/intellij'
-=======
         path: 'IntelliJ'
->>>>>>> FE_feature/editor
     },
     {
         src: ChromeIcon,
         label: 'Chrome Extension',
         content: '웹 서핑 중 발견한 솔루션과\n 참고 자료들을 ododoc에 저장하세요. \n Editor와 통합하여 검색한 정보를\n 즉각적으로 문서에 반영합니다.',
         button: '자세히보기',
-<<<<<<< HEAD
-        path: '/start/chrome'
-=======
         path: 'Chrome'
->>>>>>> FE_feature/editor
     }
 ];
 
@@ -105,20 +89,12 @@ function HomePage5() {
         setAngle(prevAngle => prevAngle + ratateAngle);
     };
 
-<<<<<<< HEAD
-    const buttonClick = (path: string) => {
-        navigate(path)
-    }
-    
-=======
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const handleNavigate = (type: string) => {
         navigate(`/start/${type}`);
     };
 
-
->>>>>>> FE_feature/editor
     return (
         <div className={Home5.container}>
             <div className={Home5.scene}>
@@ -165,13 +141,8 @@ function HomePage5() {
                                 <button
                                     className={Home5.button}
                                     style={{ fontFamily: 'hanbitFont', opacity: isMain ? 1 : 0 }}
-<<<<<<< HEAD
-                                    onClick={() => buttonClick(element.path)}
-                                    >
-=======
                                     onClick={() => handleNavigate(element.path.replace(" ", ""))}
                                 >
->>>>>>> FE_feature/editor
                                     {element.button}
                                 </button>
                             </div>

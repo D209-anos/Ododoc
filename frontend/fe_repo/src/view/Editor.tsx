@@ -1,18 +1,16 @@
-<<<<<<< HEAD
-import SideBar from '../../src/components/editor/SideBar'
+import Editor1 from '../components/editor/Editor1';
+import SideBar from '../../src/components/editor/SideBar';
+import EditorStyle from '../css/view/Editor.module.css';
 
-function Editor (){
+function Editor() {
     return (
-        <>
+        <div className={EditorStyle.editorContainer}>
             <SideBar />
-        </>
-=======
-import Editor1 from '../components/editor/Editor1'
+            <div className={EditorStyle.editorWrapper}>
+                <Editor1  />
+            </div>
+        </div>
 
-function Editor (){
-    return (
-        <Editor1></Editor1>
->>>>>>> FE_feature/editor
     )
 }
 

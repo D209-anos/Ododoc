@@ -7,21 +7,18 @@ import Editor from './view/Editor';
 import Menu from './components/Menu';
 import VSCode from '../src/components/start/VSCode'
 
-
 function App() {
-  
+
   return (
-      <Router>
-        <div>
-          <Menu/>
-          <Routes>
-            <Route path='/' element={<HomePage/>}/>
-            <Route path='/start/:selectedType' element={<Start/>}/>
-            <Route path='/editor' element={<Editor/>}/>
-            <Route path='/vscode' element={<VSCode/>}/>
-          </Routes>
-        </div>
-      </Router>
+    <Router>
+      <Menu />
+      <Routes>
+        <Route path='/' element={<HomePage />} />
+        <Route path='/start/:selectedType' element={<Start />} />
+        <Route path='/editor' element={<Editor />} />
+        <Route path='/vscode' element={<VSCode />} />
+      </Routes>
+    </Router>
   );
 }
 

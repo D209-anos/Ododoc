@@ -26,11 +26,8 @@
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
-<<<<<<< HEAD
     "axios": "^1.6.8",
-=======
     "@uiw/react-codemirror": "^4.21.25",
->>>>>>> FE_feature/editor
     "hangul-js": "^0.2.6",
     "novel": "^0.3.1",
     "react": "^18.2.0",
