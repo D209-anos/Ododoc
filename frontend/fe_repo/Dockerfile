@@ -6,9 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # 모든 npm 의존성 설치
-RUN npm install
-
-RUN npx patch-package
+RUN npm install && npx patch-package
 
 # 소스 코드 복사
 COPY . .
