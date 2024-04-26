@@ -10,6 +10,7 @@ pipeline {
             }
         }
 
+
         stage("Update jasypt.properties") {
             steps {
                 withCredentials([string(credentialsId: 'jasypt-text', variable: 'JASYPT_KEY')]) {
