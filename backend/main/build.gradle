@@ -116,7 +116,7 @@ openapi3 {
 
 
 //    outputDirectory = '/var/jenkins_home/workspace/ododoc/backend/main'
-     outputDirectory = 'build/resources/main/static/docs'
+     outputDirectory = 'backend/main/build/resources/main/static/docs'
 }
 
 def querydslDir = 'src/main/generated'
