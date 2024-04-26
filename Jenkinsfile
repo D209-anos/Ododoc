@@ -57,6 +57,7 @@ pipeline {
         stage('Deploy to EC2-FE') {
             steps {
                 echo '프론트 EC2에 배포 시작!'
+                sh 'docker rm -f frontend || true'
                 sh "docker run -d -p 3000:3000 --name frontend d209-fe"
                 echo '프론트 EC2에 배포 완료!'
             }
