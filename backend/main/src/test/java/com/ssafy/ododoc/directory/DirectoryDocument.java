@@ -3,8 +3,8 @@ package com.ssafy.ododoc.directory;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Snippet;
 
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static com.ssafy.ododoc.common.DocumentFormatProvider.required;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
 public class DirectoryDocument {
 
@@ -14,5 +14,19 @@ public class DirectoryDocument {
             fieldWithPath("data.errorCount").type(JsonFieldType.NUMBER).description("에러 횟수"),
             fieldWithPath("data.visitCount").type(JsonFieldType.NUMBER).description("방문 횟수"),
             fieldWithPath("data.searchCount").type(JsonFieldType.NUMBER).description("검색 횟수")
+    );
+
+    public static final Snippet createRequestFields = requestFields(
+            fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).attributes(required()).description("상위 폴더의 id를 입력해 주세요. 없다면 null을 입력해 주세요."),
+            fieldWithPath("name").optional().type(JsonFieldType.STRING).attributes(required()).description("폴더/파일 명을 입력해 주세요. 없다면 빈 문자열을 입력해 주세요."),
+            fieldWithPath("type").type(JsonFieldType.STRING).attributes(required()).description("FOLDER 또는 FILE을 입력해 주세요.")
+    );
+
+    public static final Snippet createResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("새로 생성된 폴더/파일의 아이디"),
+            fieldWithPath("data.name").type(JsonFieldType.STRING).description("폴더/파일명"),
+            fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)")
     );
 }
