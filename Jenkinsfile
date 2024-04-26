@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage("Clone Repository") {
             steps {
@@ -8,15 +9,10 @@ pipeline {
                 echo '클론 끝'
             }
         }
-    }
-}
 
-pipeline {
-    agent any
-    stages {
         stage("Update jasypt.properties") {
             steps {
-                withCredentials([string(credentialsId: 'jasypt-key', variable: 'JASYPT_KEY')]) {
+                withCredentials([string(credentialsId: 'jasypt-text', variable: 'JASYPT_KEY')]) {
                     script {
                         // jasypt.properties 파일의 위치로 이동
                         dir('./backend/main/src/main/resources') {
@@ -41,16 +37,13 @@ pipeline {
         stage("Deploy to EC2-BE") {
             steps {
                 echo '백엔드 EC2에 배포 시작!'
+                // 기존 컨테이너 중지 및 제거
+                sh 'docker rm -f backend || true'
                 sh "docker run -d -p 8080:8080 --name backend d209-be"
                 echo '백엔드 EC2에 배포 완료!'
             }
         }
-    }
-}
 
-pipeline {
-    agent any
-    stages {
         stage("Build FE Docker Image") {
             steps {
                 echo '프론트 도커 이미지 빌드 시작!'
@@ -60,12 +53,7 @@ pipeline {
                 echo '프론트 도커 이미지 빌드 완료!'
             }
         }
-    }
-}
 
-pipeline {
-    agent any
-    stages {
         stage('Deploy to EC2-FE') {
             steps {
                 echo '프론트 EC2에 배포 시작!'
