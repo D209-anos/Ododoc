@@ -34,10 +34,12 @@ public class DirectoryService {
     public CreateResponse createDirectory(CreateRequest createRequest, Member member) {
         DirectoryType type = DirectoryType.valueOf(createRequest.getType().toUpperCase());
 
+        // 파일인데 상위 폴더가 없는 경우 예외 처리
         if(type.equals(DirectoryType.FILE) && createRequest.getParentId() == null) {
             throw new FileParentNullException("파일은 상위 폴더 내에 위치해야 합니다.");
         }
 
+        // 폴더/파일 default name 설정
         if(type.equals(DirectoryType.FOLDER) && createRequest.getName().isBlank()) {
             createRequest.setName("새 폴더");
         }
@@ -45,6 +47,7 @@ public class DirectoryService {
             createRequest.setName(LocalDate.now().toString());
         }
 
+        // 폴더이고 상위 폴더가 없을 경우 db에 저장 후 return
         if(createRequest.getParentId() == null) {
             Directory newDirectory = directoryRepository.save(Directory.builder()
                     .name(createRequest.getName())
@@ -60,17 +63,21 @@ public class DirectoryService {
                     .build();
         }
 
+        // 상위 폴더 찾고 없을 경우 예외 처리
         Directory parent = directoryRepository.findById(createRequest.getParentId())
                 .orElseThrow(() -> new ParentNotFoundException("해당하는 폴더를 찾을 수 없습니다."));
 
+        // 찾은 상위 폴더의 member와 로그인 한 member가 다를 경우 예외 처리
         if(!parent.getMember().equals(member)) {
             throw new FolderAccessDeniedException("접근 권한이 없습니다.");
         }
 
+        // 이미 삭제된 폴더/파일 일 경우 예외 처리
         if(parent.getTrashbinTime() != null || parent.getDeletedTime() != null) {
             throw new FolderGoneException("삭제된 폴더입니다.");
         }
 
+        // db에 저장 후 return
         Directory newDirectory = directoryRepository.save(Directory.builder()
                 .name(createRequest.getName())
                 .type(type)
