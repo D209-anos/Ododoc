@@ -9,6 +9,12 @@ interface LoginProps {
     onClose: () => void;
 }
 
+// provider 식별 함수 (카카오, 구글, 네이버)
+const getProvider = (): string | null => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('provider');
+}
+
 // 인가 코드 추출하는 함수
 const getAuthorizationCode = (): string | null => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,7 +24,7 @@ const getAuthorizationCode = (): string | null => {
 // 인가 코드 백엔드로 전송하는 함수
 const sendCodeToBackend = async (code: string, provider: string, setAccessToken: (token: string) => void) => {
     try {
-        const response = await axios.post('http://localhost:8080/oauth2/authorization/${provider}', {
+        const response = await axios.post(`http://localhost:8080/oauth2/authorization/${provider}`, {
             code: code, url: "http://localhost:3000"
         });
         console.log('Access Token:', response.data.data.accessToken);
@@ -31,6 +37,7 @@ const sendCodeToBackend = async (code: string, provider: string, setAccessToken:
     }
 }
 
+
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const loginBackground = useRef<HTMLDivElement>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
@@ -39,9 +46,10 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     useEffect(() => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
-        if (code) {
-            console.log(code)
-            sendCodeToBackend(code, 'kakao', setAccessToken);
+        const provider = getProvider();
+        if (code && provider) {
+            console.log(provider, code)
+            sendCodeToBackend(code, provider, setAccessToken);
         }
     }, [setAccessToken]);
 
@@ -55,15 +63,25 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {
             kakao: "6191bfdbe1eca3b27423c6d9ba50dcc0",
-            google: "your-google-client-id",
-            naver: "your-naver-client-id"
+            google: "795969186389-k543vo7gtb511lhf0mf4on2vihprtuio.apps.googleusercontent.com",
+            naver: "LCOEaj8PPA1CMLVBxViP"
         };
-        const redirectUri = "http://localhost:3000/oauth"
+
+        const redirectUri = {
+            kakao: "http://localhost:3000/oauth",
+            google: "http://localhost:3000/",
+            naver: "http://localhost:3000/"
+        };
+
+        // 네이버 로그인 stateString 부분 - 필요시 교체
+        // const stateString = "SM6HMQOM5D"
+        // naverUrl = `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&response_type=code&redirect_uri=${redirectUri.naver}&state=${stateString}`
+
         // 카카오 로그인 URL
         const loginUrl = {
-            kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri}&response_type=code`,
-            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri}&response_type=code&scope=profile email&access_type=offline`,
-            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri}&response_type=code`
+            kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri.kakao}&response_type=code`,
+            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}&response_type=code&scope=profile email&access_type=offline`,
+            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}&response_type=code`
         }
         
         window.location.href = loginUrl[provider];
@@ -83,8 +101,8 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
                     <CloseIcon className={`${menu.clickable} ${menu.loginCloseBtn}`} onClick={onClose} />
                 </div>
                 <div className={menu.socialLoginBtnWrapper}>
-                    <div className={`${menu.naverBtn} ${menu.socialLoginBtn}`}></div>
-                    <div className={`${menu.googleBtn} ${menu.socialLoginBtn}`}></div>
+                    <div className={`${menu.naverBtn} ${menu.socialLoginBtn}`} onClick={() => handleSocialLogin('naver')}></div>
+                    <div className={`${menu.googleBtn} ${menu.socialLoginBtn}`} onClick={() => handleSocialLogin('google')}></div>
                     <div className={`${menu.kakaoBtn} ${menu.socialLoginBtn}`} onClick={() => handleSocialLogin('kakao')}></div>
                 </div>
             </div>
