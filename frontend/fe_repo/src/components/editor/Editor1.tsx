@@ -5,7 +5,6 @@ import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefault
 import { CodeBlock, insertCode } from "./CodeBlock";
 import { TerminalBlock, insertTerminal } from "./TerminalBlock";
 
-
 const Editor1 = () => {
   const schema = BlockNoteSchema.create({
     blockSpecs: {
