@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Setting from '../../css/components/editor/SettingModal.module.css'
-import ExitButton from '../../assets/images/xbutton.png'
+import Setting from '../../../../css/components/editor/SettingModal.module.css'
+import ExitButton from '../../../../assets/images/mark/xbutton.png'
 
 interface ModalProps {
     isOpen: boolean;

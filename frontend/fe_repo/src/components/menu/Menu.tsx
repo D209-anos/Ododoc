@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import menu from '../css/components/Menu.module.css';
-import Login from '../components/login/Login'
+import menu from '../../css/components/menu/Menu.module.css';
+import Login from '../socialLogin/Login'
 
 function Menu() {
   const [menuOpen, setMenuOpen] = useState(false);

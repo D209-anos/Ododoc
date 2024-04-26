@@ -3,7 +3,7 @@ import "@blocknote/react/style.css";
 import { BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems } from "@blocknote/core";
 import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { CodeBlock, insertCode } from "./CodeBlock";
-import { TerminalBlock, insertTerminal } from "./TerminalBlock";
+import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
 
 
 const Editor1 = () => {

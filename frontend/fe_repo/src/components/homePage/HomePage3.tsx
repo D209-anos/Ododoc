@@ -1,8 +1,8 @@
-import Home3 from '../../css/components/Home3.module.css'
-import EditorErrorPage from '../../assets/images/editorErrorpage.png'
-import ErrorScreen from '../../assets/images/errorScreen.png'
-import SuccessScreen from '../../assets/images/successScreen.png'
-import NextVector from '../../assets/images/nextVector.png'
+import Home3 from '../../css/components/homePage/Home3.module.css'
+import EditorErrorPage from '../../assets/images/homePageImage/editorErrorpage.png'
+import ErrorScreen from '../../assets/images/homePageImage/errorScreen.png'
+import SuccessScreen from '../../assets/images/homePageImage/successScreen.png'
+import NextVector from '../../assets/images/mark/nextVector.png'
 
 interface HomePage3Props {
     backgroundColor: string;

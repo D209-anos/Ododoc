@@ -1,47 +1,30 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
-import menu from '../../css/components/Menu.module.css';
-import axios from 'axios';
+import menu from '../../css/components/menu/Menu.module.css';
+import { sendCodeToBackend } from '../../api/service/user'
 
 interface LoginProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-// provider 식별 함수 (카카오, 구글, 네이버)
-const getProvider = (): string | null => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('provider');
-}
-
-// 인가 코드 추출하는 함수
-const getAuthorizationCode = (): string | null => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('code');
-}
-
-// 인가 코드 백엔드로 전송하는 함수
-const sendCodeToBackend = async (code: string, provider: string, setAccessToken: (token: string) => void) => {
-    try {
-        const response = await axios.post(`http://localhost:8080/oauth2/authorization/${provider}`, {
-            code: code, url: "http://localhost:3000"
-        });
-        console.log('Access Token:', response.data.data.accessToken);
-        // 엑세스 토큰 상태 관리
-        setAccessToken(response.data.data.accessToken);
-        // 로컬 스토리지에 토큰 저장
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-    } catch (error) {
-        console.error('Error sending authorization code:', error)
-    }
-}
-
-
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const loginBackground = useRef<HTMLDivElement>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
     const navigate = useNavigate();          // 리다이렉트
+
+    // 인가 코드 추출하는 함수
+    const getAuthorizationCode = (): string | null => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('code');
+    } 
+
+    // provider 식별 함수 (카카오, 구글, 네이버)
+    const getProvider = (): string | null => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('provider');
+    }
 
     useEffect(() => {
         // 인가 코드 받아옴
@@ -62,15 +45,15 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {
-            kakao: "6191bfdbe1eca3b27423c6d9ba50dcc0",
-            google: "795969186389-k543vo7gtb511lhf0mf4on2vihprtuio.apps.googleusercontent.com",
-            naver: "LCOEaj8PPA1CMLVBxViP"
+            kakao: process.env.REACT_APP_KAKAO_CLIENT_ID,
+            google: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+            naver: process.env.REACT_APP_NAVER_CLIENT_ID
         };
 
         const redirectUri = {
-            kakao: "http://localhost:3000/oauth",
-            google: "http://localhost:3000/",
-            naver: "http://localhost:3000/"
+            kakao: process.env.REACT_APP_KAKAO_REDIRECT_URI,
+            google: process.env.REACT_APP_GOOGLE_REDIRECT_URI,
+            naver: process.env.REACT_APP_NAVER_REDIRECT_URI,
         };
 
         // 네이버 로그인 stateString 부분 - 필요시 교체

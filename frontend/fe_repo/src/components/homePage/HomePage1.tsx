@@ -1,6 +1,6 @@
-import BlackLogoMark from "../../assets/images/ododoc-black.png"
-import Home1 from "../../css/components/Home1.module.css"
-import MainLogo from "../../assets/images/mainLogo.png"
+import BlackLogoMark from "../../assets/images/ododocLogo/ododoc-black.png"
+import Home1 from "../../css/components/homePage/Home1.module.css"
+import MainLogo from "../../assets/images/ododocLogo/mainLogo.png"
 import { ReactTyped } from "react-typed";
 
 

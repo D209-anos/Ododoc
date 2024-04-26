@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Home5 from '../../css/components/Home5.module.css'
-import VscodeIcon from '../../assets/images/vscodeIcon.png'
-import IntellijIcon from '../../assets/images/intellijIcon.png'
-import ChromeIcon from '../../assets/images/chromeIcon.png'
-import PreButton from '../../assets/images/prebutton.png'
-import NextButton from '../../assets/images/nextbutton.png'
+import Home5 from '../../css/components/homePage/Home5.module.css'
+import VscodeIcon from '../../assets/images/logoImage/vscodeIcon.png'
+import IntellijIcon from '../../assets/images/logoImage/intellijIcon.png'
+import ChromeIcon from '../../assets/images/logoImage/chromeIcon.png'
+import PreButton from '../../assets/images/mark/prebutton.png'
+import NextButton from '../../assets/images/mark/nextbutton.png'
 
 interface CarouselElement {
     src: string;
