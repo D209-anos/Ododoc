@@ -122,7 +122,7 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리_파일생성_이름없음_400() throws Exception {
+    void 디렉토리_파일생성_이름null_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
 
@@ -130,7 +130,7 @@ public class DirectoryApiTest extends ApiTest {
                         post("/directory")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_잘못생성_이름없음(parentId)))
+                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_잘못생성_이름null(parentId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
@@ -139,14 +139,14 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리_파일생성_상위없음_400() throws Exception {
+    void 디렉토리_파일생성_상위null_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
 
         mockMvc.perform(
                         post("/directory")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_잘못생성_상위없음()))
+                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_잘못생성_상위null()))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))

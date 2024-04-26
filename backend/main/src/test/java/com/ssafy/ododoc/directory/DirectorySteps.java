@@ -38,7 +38,7 @@ public class DirectorySteps {
                 .build();
     }
 
-    public CreateRequest 파일정보_잘못생성_이름없음(Long parentId) {
+    public CreateRequest 파일정보_잘못생성_이름null(Long parentId) {
         return CreateRequest.builder()
                 .name(null)
                 .parentId(parentId)
@@ -46,7 +46,7 @@ public class DirectorySteps {
                 .build();
     }
 
-    public CreateRequest 파일정보_잘못생성_상위없음() {
+    public CreateRequest 파일정보_잘못생성_상위null() {
         return CreateRequest.builder()
                 .name("")
                 .parentId(null)
