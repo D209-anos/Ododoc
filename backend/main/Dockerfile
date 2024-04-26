@@ -8,8 +8,8 @@ RUN gradle build -x test --parallel --continue
 
 FROM openjdk:21-jdk-slim
 
-COPY --from=builder /app/build/libs/*.jar /app/
+COPY --from=builder /app/ododoc-0.0.1-SNAPSHOT.jar /app/ododoc.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/ododoc.jar"]
