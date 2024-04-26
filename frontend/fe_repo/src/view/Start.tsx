@@ -1,28 +1,47 @@
-import { useState } from 'react';
-import Logo from '../assets/images/ododoc-start.png'
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Logo from '../assets/images/ododoc-start.png';
 import start from '../css/view/Start.module.css';
 import VSCode from '../components/start/VSCode';
 import IntelliJ from '../components/start/IntelliJ';
 import Chrome from '../components/start/Chrome';
 
-// selected의 타입을 명시적으로 선언합니다.
-type SelectedType = 'VSCode' | 'IntelliJ' | 'Chrome' | null;
+type SelectedType = 'VSCode' | 'IntelliJ' | 'Chrome';
+
+function validateSelectedType(type: string | undefined): SelectedType | null {
+  const validTypes: SelectedType[] = ['VSCode', 'IntelliJ', 'Chrome'];
+  return validTypes.find(v => v.toLowerCase() === type?.toLowerCase()) || null;
+}
 
 function Start() {
-    const [selected, setSelected] = useState<SelectedType>(null);  // 현재 선택된 항목을 관리하는 state
+    const { selectedType } = useParams<{ selectedType?: string }>();
+    const [selected, setSelected] = useState<SelectedType | null>(null);
+    const navigate = useNavigate();
 
-    // 선택된 컴포넌트를 렌더링하는 함수
-    function renderComponent() {
-        switch (selected) {
-            case 'VSCode':
-                return <VSCode />;
-            case 'IntelliJ':
-                return <IntelliJ />;
-            case 'Chrome':
-                return <Chrome />;
-            default:
-                return <VSCode/>;
+    useEffect(() => {
+        const validatedType = validateSelectedType(selectedType);
+        if (validatedType) {
+            setSelected(validatedType);
+        } else {
+            setSelected('VSCode'); // Default to VSCode if type is invalid
         }
+    }, [selectedType]);
+
+    function handleSelect(type: SelectedType) {
+        if (type !== selected) {
+            setSelected(type);
+            navigate(`/start/${type.toLowerCase()}`);
+        }
+    }
+
+    const componentMap: { [key in SelectedType]: JSX.Element } = {
+        VSCode: <VSCode />,
+        IntelliJ: <IntelliJ />,
+        Chrome: <Chrome />
+    };
+
+    function renderComponent() {
+        return selected ? componentMap[selected] : <VSCode />;
     }
 
     return (
@@ -31,9 +50,9 @@ function Start() {
                 <img src={Logo} alt="logo" className={start.logo} />
                 <div className={start.list}>
                     <ul>
-                        <li onClick={() => setSelected('VSCode')}>VSCode</li>
-                        <li onClick={() => setSelected('IntelliJ')}>IntelliJ</li>
-                        <li onClick={() => setSelected('Chrome')}>Chrome</li>
+                        <li onClick={() => handleSelect('VSCode')}>VSCode</li>
+                        <li onClick={() => handleSelect('IntelliJ')}>IntelliJ</li>
+                        <li onClick={() => handleSelect('Chrome')}>Chrome</li>
                     </ul>
                 </div>
             </header>
