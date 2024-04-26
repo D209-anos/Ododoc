@@ -5,6 +5,7 @@ COPY build.gradle settings.gradle /app/
 COPY src /app/src
 
 RUN gradle build -x test --parallel --continue
+RUN ls -la /app/build/libs/
 
 FROM openjdk:21-jdk-slim
 
