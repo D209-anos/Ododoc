@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import Trash from '../../css/components/editor/TrashModal.module.css'
-import ExitButton from '../../assets/images/xbutton.png'
+import Trash from '../../../../css/components/editor/TrashModal.module.css'
+import ExitButton from '../../../../assets/images/mark/xbutton.png'
 
 interface ModalProps {
     isOpen: boolean;

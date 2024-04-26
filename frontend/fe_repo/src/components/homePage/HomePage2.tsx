@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
-import VisualScreen from '../../assets/images/visualScreen.png'
-import IntellijScreen from '../../assets/images/intellijScreen.png'
-import EditorScreen from '../../assets/images/editorpage.png'
-import Home2 from '../../css/components/Home2.module.css'
+import VisualScreen from '../../assets/images/homePageImage/visualScreen.png'
+import IntellijScreen from '../../assets/images/homePageImage/intellijScreen.png'
+import EditorScreen from '../../assets/images/editPageImage/editorpage.png'
+import Home2 from '../../css/components/homePage/Home2.module.css'
 
 function HomePage2() {
     const elementRef = useRef(null);

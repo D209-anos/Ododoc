@@ -134,15 +134,15 @@
 }
 
 .naverBtn{
-  background-image: url('../../assets/images/naverLogo.png'); 
+  background-image: url('../../../assets/images/logoImage/naverLogo.png'); 
 }
 
 .googleBtn{
-  background-image: url('../../assets/images/googleLogo.png'); 
+  background-image: url('../../../assets/images/logoImage/googleLogo.png'); 
 }
 
 .kakaoBtn{
-  background-image: url('../../assets/images/kakaologin.png'); 
+  background-image: url('../../../assets/images/logoImage/kakaologin.png'); 
 
 }
 

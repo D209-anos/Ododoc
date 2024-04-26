@@ -1,8 +1,8 @@
 import React, { ReactNode, useRef, useState, useEffect, forwardRef, RefObject } from 'react';
-import Modal from '../../css/components/editor/Modal.module.css'
-import FolderImage from '../../assets/images/forder.png'
-import FileImage from '../../assets/images/file.png'
-import ColumnLine from '../../assets/images/columnLine.png'
+import Modal from '../../../../css/components/editor/Modal.module.css'
+import FolderImage from '../../../../assets/images/icon/forder.png'
+import FileImage from '../../../../assets/images/icon/file.png'
+import ColumnLine from '../../../../assets/images/mark/columnLine.png'
 
 interface ModalProps {
     isOpen: boolean;

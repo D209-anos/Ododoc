@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './view/HomePage';
 import Start from './view/Start';
 import Editor from './view/Editor';
-import Menu from './components/Menu';
+import Menu from './components/menu/Menu';
 import VSCode from '../src/components/start/VSCode'
 
 function App() {
