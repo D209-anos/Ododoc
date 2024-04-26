@@ -24,7 +24,7 @@ public class DirectoryController {
      * 로그인 후 프로필 페이지를 조회하는 api.
      *
      * @param member 로그인 한 사용자
-     * @return 빌드횟수,
+     * @return 빌드횟수, 에러횟수, 검색횟수, 방문횟수
      */
     @GetMapping("")
     public ProfileResponse getProfile(@AuthenticationPrincipal Member member) {
@@ -35,8 +35,8 @@ public class DirectoryController {
      * 디렉토리(폴더/파일)를 생성하는 api.
      *
      * @param createRequest 상위 폴더 아이디, 폴더/파일 명, 타입(FOLDER, FILE)
-     * @param member
-     * @return
+     * @param member 로그인 한 사용자
+     * @return 새로 생성된 폴더/파일 아이디, 폴더/파일 명, 타입(FOLDER, FILE), 상위폴더 아이디
      */
     @PostMapping("")
     public CreateResponse createDirectory(@Valid @RequestBody CreateRequest createRequest,
