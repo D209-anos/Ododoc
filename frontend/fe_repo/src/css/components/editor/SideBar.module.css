@@ -47,13 +47,13 @@
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-    background-color: #ea7515; /* 세로 스크롤바 색상 */
+    background-color: #ff914d; /* 세로 스크롤바 색상 */
     border-radius: 10px;
     border: 2px solid #f9f9f9;
 }
 
 .sidebar::-webkit-scrollbar-thumb:horizontal {
-    background-color: #da7c1f; /* 가로 스크롤바 색상 */
+    background-color: #ff914d; /* 가로 스크롤바 색상 */
     border-radius: 10px;
     border: 2px solid #f9f9f9;
 }
@@ -196,4 +196,73 @@
 .fileSpace:hover {
     background-color: gray;
     color: white;
+}
+
+.contextMenu {
+    width: 150px;
+    background-color: rgb(250, 242, 242);
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    list-style: none;
+    position: fixed;
+    z-index: 1000;
+}
+
+.contextMenu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.contextMenu li:hover {
+    background-color: #f5f5f5;
+}
+
+.editWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 7px;
+    margin-left: 5px;
+}
+
+.editIcon {
+    width: 1.75rem;
+}
+
+.rightClickEdit {
+    margin-left: 5px;
+}
+
+.rightClickEdit:hover {
+    color: #ff914d;
+}
+
+.deleteWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 7px;
+    margin-left: 5px;
+}
+
+.deleteIcon {
+    width: 1.75rem;
+}
+
+.rightClickDelete {
+    margin-left: 5px;
+}
+
+.rightClickDelete:hover {
+    color: #ff914d;
+}
+
+.renderNameField {
+    display: flex;
+    text-align: center;
+    height: 30px;
+    font-size: medium;
+    background-color: rgb(250, 242, 242);
 }
