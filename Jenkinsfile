@@ -46,7 +46,7 @@ pipeline {
             steps {
                 echo '프론트 도커 이미지 빌드 시작!'
                 dir("./frontend/fe_repo") {  // Dockerfile이 있는 프론트엔드 프로젝트 위치
-                    sh "docker build -t d209-fe ."
+                    sh "docker build --no-cache -t d209-fe ."
                 }
                 echo '프론트 도커 이미지 빌드 완료!'
             }
