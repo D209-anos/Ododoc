@@ -23,7 +23,12 @@ public class DirectoryService {
     private final DirectoryRepository directoryRepository;
 
     public ProfileResponse getProfile(Member member) {
-        return ProfileResponse.convertEntityToDto(member);
+        return ProfileResponse.builder()
+                .buildCount(member.getBuildCount())
+                .errorCount(member.getErrorCount())
+                .visitCount(member.getVisitCount())
+                .searchCount(member.getSearchCount())
+                .build();
     }
 
     public CreateResponse createDirectory(CreateRequest createRequest, Member member) {
