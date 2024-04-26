@@ -22,6 +22,14 @@ public class DirectorySteps {
                 .build();
     }
 
+    public CreateRequest 폴더정보_생성_이름_30자이상() {
+        return CreateRequest.builder()
+                .name("가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하")
+                .parentId(null)
+                .type("folder")
+                .build();
+    }
+
     public CreateRequest 파일정보_생성_이름없음(Long parentId) {
         return CreateRequest.builder()
                 .name("")

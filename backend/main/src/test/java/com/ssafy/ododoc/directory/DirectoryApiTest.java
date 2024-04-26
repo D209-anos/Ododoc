@@ -122,6 +122,23 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
+    void 디렉토리_폴더생성_이름_30자이상_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+
+        mockMvc.perform(
+                post("/directory")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성_이름_30자이상()))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.createRequestFields));
+
+    }
+
+    @Test
     void 디렉토리_파일생성_이름null_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
