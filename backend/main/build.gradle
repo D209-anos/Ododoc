@@ -129,7 +129,7 @@ tasks.withType(GenerateSwaggerUI).configureEach {
 
     delete file('src/main/resources/static/docs/')
     copy {
-        from "build/resources/main/static/docs"
+        from "${buildDir}/resources/main/static/docs"
         into "src/main/resources/static/docs/"
     }
 }
@@ -167,7 +167,7 @@ tasks.named("bootJar") {
 
 tasks.register('copyDocument', Copy) {
     dependsOn asciidoctor
-    from file("$buildDir/docs/asciidoc")
+    from file("${buildDir}/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
 
