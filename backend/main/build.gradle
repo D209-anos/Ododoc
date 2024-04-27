@@ -105,7 +105,7 @@ dependencies {
 
 openapi3 {
     servers = [
-        { url = "http://localhost:8080/api" },
+        // { url = "http://localhost:8080/api" },
         { url = "http://k10d209.p.ssafy.io:8080/api" }
     ]
     title = "SSAFY D209 Ododoc API"
