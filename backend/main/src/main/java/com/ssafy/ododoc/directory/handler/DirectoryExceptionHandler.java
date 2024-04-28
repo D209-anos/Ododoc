@@ -2,9 +2,9 @@ package com.ssafy.ododoc.directory.handler;
 
 import com.ssafy.ododoc.common.type.ErrorResponse;
 import com.ssafy.ododoc.directory.exception.FileParentNullException;
-import com.ssafy.ododoc.directory.exception.FolderAccessDeniedException;
-import com.ssafy.ododoc.directory.exception.FolderGoneException;
-import com.ssafy.ododoc.directory.exception.ParentNotFoundException;
+import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
+import com.ssafy.ododoc.directory.exception.DirectoryGoneException;
+import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -15,19 +15,19 @@ import static com.ssafy.ododoc.common.handler.ExceptionHandlerTool.makeErrorResp
 @RestControllerAdvice
 public class DirectoryExceptionHandler {
 
-    @ExceptionHandler(ParentNotFoundException.class)
-    public List<ErrorResponse> parentNotFoundExceptionHandler(ParentNotFoundException e) {
-        return makeErrorResponse(e, "parent");
+    @ExceptionHandler(DirectoryNotFoundException.class)
+    public List<ErrorResponse> directoryNotFoundExceptionHandler(DirectoryNotFoundException e) {
+        return makeErrorResponse(e, "directory");
     }
 
-    @ExceptionHandler(FolderGoneException.class)
-    public List<ErrorResponse> folderGoneExceptionHandler(FolderGoneException e) {
+    @ExceptionHandler(DirectoryGoneException.class)
+    public List<ErrorResponse> folderGoneExceptionHandler(DirectoryGoneException e) {
         return makeErrorResponse(e, "folder");
     }
 
-    @ExceptionHandler(FolderAccessDeniedException.class)
-    public List<ErrorResponse> folderAccessDeniedExceptionHandler(FolderAccessDeniedException e) {
-        return makeErrorResponse(e, "folder");
+    @ExceptionHandler(DirectoryAccessDeniedException.class)
+    public List<ErrorResponse> directoryAccessDeniedExceptionHandler(DirectoryAccessDeniedException e) {
+        return makeErrorResponse(e, "directory");
     }
 
     @ExceptionHandler(FileParentNullException.class)

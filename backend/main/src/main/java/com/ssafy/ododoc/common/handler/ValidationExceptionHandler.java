@@ -28,23 +28,23 @@ public class ValidationExceptionHandler {
                 .toList();
     }
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public List<ErrorResponse> constraintViolationExceptionHandler(ConstraintViolationException e) {
-//        return e.getConstraintViolations().stream()
-//                .map(error ->{
-//                    String[] propertyPath = error.getPropertyPath().toString().split("\\.");
-//                    String fieldName = propertyPath[propertyPath.length - 1];
-//
-//                    return ErrorResponse.builder()
-//                            .message(e.getMessage().split(": ")[1])
-//                            .errorType(e.getClass().getSimpleName())
-//                            .fieldName(fieldName)
-//                            .status(HttpStatus.BAD_REQUEST)
-//                            .build();
-//                })
-//                .toList();
-//    }
-//
+    @ExceptionHandler(ConstraintViolationException.class)
+    public List<ErrorResponse> constraintViolationExceptionHandler(ConstraintViolationException e) {
+        return e.getConstraintViolations().stream()
+                .map(error ->{
+                    String[] propertyPath = error.getPropertyPath().toString().split("\\.");
+                    String fieldName = propertyPath[propertyPath.length - 1];
+
+                    return ErrorResponse.builder()
+                            .message(e.getMessage().split(": ")[1])
+                            .errorType(e.getClass().getSimpleName())
+                            .fieldName(fieldName)
+                            .status(HttpStatus.BAD_REQUEST)
+                            .build();
+                })
+                .toList();
+    }
+
 //    @ExceptionHandler(MissingServletRequestPartException.class)
 //    public List<ErrorResponse> missingServletRequestPartExceptionHandler(MissingServletRequestPartException e) {
 //        return List.of(ErrorResponse.builder()
