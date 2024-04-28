@@ -5,6 +5,8 @@ import org.springframework.restdocs.snippet.Snippet;
 
 import static com.ssafy.ododoc.common.DocumentFormatProvider.required;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
 public class DirectoryDocument {
 
@@ -27,6 +29,20 @@ public class DirectoryDocument {
             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("새로 생성된 폴더/파일의 아이디"),
             fieldWithPath("data.name").type(JsonFieldType.STRING).description("폴더/파일명"),
             fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
-            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)")
+            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)"),
+            fieldWithPath("data.path").optional().type(JsonFieldType.STRING).description("폴더/파일 경로 (null 가능)")
+    );
+
+    public static final Snippet deletePathFields = pathParameters(
+            parameterWithName("option").attributes(required()).description("휴지통 삭제(trashbin) 또는 영구 삭제(delete)"),
+            parameterWithName("directoryId").attributes(required()).description("삭제할 폴더/파일 아이디")
+    );
+
+    public static final Snippet deleteResponseFileds = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("삭제된 폴더/파일 아이디"),
+            fieldWithPath("data.trashbinTime").type(JsonFieldType.STRING).description("휴지통 삭제된 시간"),
+            fieldWithPath("data.deletedTime").optional().type(JsonFieldType.STRING).description("영구 삭제된 시간"),
+            fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE")
     );
 }

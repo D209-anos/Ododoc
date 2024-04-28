@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,5 +36,14 @@ public class DirectoryTestUtil extends TestBase {
                 .andReturn();
 
         return getValueFromJSONBody(mvcResult, "$.data.id", Long.class);
+    }
+
+    public void 폴더_삭제(String token, Long directoryId, MockMvc mockMvc) throws Exception {
+        mockMvc.perform(
+                delete("/directory/{option}/{directoryId}", "trashbin", directoryId)
+                        .header(ApiTest.AUTH_HEADER, token)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200));
     }
 }

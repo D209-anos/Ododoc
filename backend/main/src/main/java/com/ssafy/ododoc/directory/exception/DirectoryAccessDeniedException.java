@@ -3,9 +3,9 @@ package com.ssafy.ododoc.directory.exception;
 import com.ssafy.ododoc.common.exception.CustomException;
 import org.springframework.http.HttpStatus;
 
-public class FolderAccessDeniedException extends CustomException {
+public class DirectoryAccessDeniedException extends CustomException {
 
-    public FolderAccessDeniedException(String message) {
+    public DirectoryAccessDeniedException(String message) {
         super(message, HttpStatus.FORBIDDEN);
     }
 }

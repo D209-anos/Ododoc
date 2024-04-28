@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.directory.dto.request;
 
 import com.ssafy.ododoc.directory.dto.annotation.CheckDirectory;
+import com.ssafy.ododoc.directory.dto.annotation.CheckParent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class CreateRequest {
 
+    @CheckParent
     private Long parentId;
 
     @NotNull(message = "폴더/파일 명 입력은 필수입니다. 입력된 값이 없다면 빈 문자열을 보내주세요.")

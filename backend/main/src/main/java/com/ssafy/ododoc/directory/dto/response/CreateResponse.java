@@ -12,4 +12,5 @@ public class CreateResponse {
     private String name;
     private DirectoryType type;
     private Long parentId;
+    private String path;
 }

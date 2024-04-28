@@ -4,10 +4,7 @@ import com.ssafy.ododoc.common.util.BaseTime;
 import com.ssafy.ododoc.directory.type.DirectoryType;
 import com.ssafy.ododoc.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class Directory extends BaseTime {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,9 +35,8 @@ public class Directory extends BaseTime {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
     private Directory parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
-    private List<Directory> children = new ArrayList<>();
+    @Column(length = 512)
+    private String path;
 }
