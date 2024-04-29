@@ -1,9 +1,9 @@
 FROM gradle:8.7-jdk21 as builder
 WORKDIR /app
-COPY build.gradle settings.gradle /app/
+COPY build.gradle settings.gradle gradlew /app/
 COPY src /app/src
 COPY . /app/
-# RUN gradle build -x test --parallel --continue
+RUN gradle build -x test --parallel --continue
 RUN chmod +x ./gradlew && \ 
     ./gradlew clean build
 RUN ls -la /app/build/libs/  # 확인 용도
