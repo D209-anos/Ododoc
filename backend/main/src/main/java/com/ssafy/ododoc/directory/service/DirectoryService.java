@@ -1,8 +1,10 @@
 package com.ssafy.ododoc.directory.service;
 
 import com.ssafy.ododoc.directory.dto.request.CreateRequest;
+import com.ssafy.ododoc.directory.dto.request.EditRequest;
 import com.ssafy.ododoc.directory.dto.response.CreateResponse;
 import com.ssafy.ododoc.directory.dto.response.DeleteResponse;
+import com.ssafy.ododoc.directory.dto.response.EditResponse;
 import com.ssafy.ododoc.directory.dto.response.ProfileResponse;
 import com.ssafy.ododoc.directory.entity.Directory;
 import com.ssafy.ododoc.directory.exception.FileParentNullException;
@@ -149,6 +151,27 @@ public class DirectoryService {
                 .trashbinTime(directory.getTrashbinTime())
                 .deletedTime(directory.getDeletedTime())
                 .type(directory.getType())
+                .build();
+    }
+
+    @Transactional
+    public EditResponse editDirectory(EditRequest editRequest, Member member) {
+        Directory directory = directoryRepository.findById(editRequest.getId())
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        if(!directory.getMember().equals(member)) {
+            throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
+        }
+
+        if(directory.getTrashbinTime() != null || directory.getDeletedTime() != null) {
+            throw new DirectoryGoneException("이미 삭제된 디렉토리입니다.");
+        }
+
+        directory.setName(editRequest.getName());
+
+        return EditResponse.builder()
+                .id(directory.getId())
+                .name(directory.getName())
                 .build();
     }
 }
