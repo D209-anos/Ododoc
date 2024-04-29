@@ -14,6 +14,27 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ododoc",
+          "title": "Ododoc",
+          "icon": "images/logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "ododoc": [
+        {
+          "id": "accounts",
+          "name": "연결된 계정"
+        },
+        {
+          "id": "documents",
+          "name": "문서"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "ododoc.runCommand",
