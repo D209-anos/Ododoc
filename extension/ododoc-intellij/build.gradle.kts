@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
   implementation("org.openjfx:javafx:21.0.3")
+  implementation("com.googlecode.json-simple:json-simple:1.1.1")
 }
 
 javafx {
