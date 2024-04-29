@@ -7,6 +7,8 @@
   },
   "servers" : [ {
     "url" : "http://localhost:8080/api"
+  }, {
+    "url" : "http://k10d209.p.ssafy.io:8080/api"
   } ],
   "tags" : [ ],
   "paths" : {
@@ -24,7 +26,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MDMxNjAyLCJleHAiOjE3MTQwNDI0MDJ9.ZsQhPbFXj5bntrvqR71rsGDLvEwFDQq4kienUg8uCQ0"
+          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY0LCJleHAiOjE3MTQyMzg2NjR9.rPoCrh3q0oirdpsfSXAZRdV8zkgkyMWdXWwGQij9MXg"
         } ],
         "responses" : {
           "200" : {
@@ -69,7 +71,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MDMxNjAyLCJleHAiOjE3MTQwNDI0MDJ9.ZsQhPbFXj5bntrvqR71rsGDLvEwFDQq4kienUg8uCQ0"
+          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY1LCJleHAiOjE3MTQyMzg2NjV9.pc-bY1UM1Hk_SV1Dh1exGjiOyrcm95E0D_YDAvGHE0g"
         } ],
         "responses" : {
           "200" : {
@@ -126,7 +128,7 @@
                 },
                 "examples" : {
                   "member_api_test/로그인_성공_200" : {
-                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MDMxNjAyLCJleHAiOjE3MTQwNDI0MDJ9.ZsQhPbFXj5bntrvqR71rsGDLvEwFDQq4kienUg8uCQ0\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
+                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY1LCJleHAiOjE3MTQyMzg2NjV9.pc-bY1UM1Hk_SV1Dh1exGjiOyrcm95E0D_YDAvGHE0g\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
                   },
                   "member_api_test/로그인_없는유저_404" : {
                     "value" : "{\"status\":404,\"data\":[{\"errorType\":\"OAuthInfoNullException\",\"message\":\"존재하지않는 유저입니다.\",\"fieldName\":\"null\"}]}"
@@ -160,7 +162,7 @@
                 },
                 "examples" : {
                   "member_api_test/액세스_토큰_재발급_성공_200" : {
-                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MDMxNjAzLCJleHAiOjE3MTQwNDI0MDN9.ikelFH6Ofv3SwdH7QLFv4yq35GOz4SrGbqgF0TO0Ur8\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
+                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY2LCJleHAiOjE3MTQyMzg2NjZ9.F1qozthvEP6PzL3ICVJKJvC7TdLH6295oO087lOiaCE\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
                   },
                   "member_api_test/액세스_토큰_토큰없음_401" : {
                     "value" : "{\"status\":401,\"data\":[{\"errorType\":\"TokenInvalidException\",\"message\":\"refresh token 이 유효하지 않습니다.\",\"fieldName\":\"invalid\"}]}"

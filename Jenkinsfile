@@ -12,7 +12,7 @@ pipeline {
 
         stage("Update jasypt.properties") {
             steps {
-                withCredentials([string(credentialsId: 'jasypt-text', variable: 'JASYPT_KEY')]) {
+                withCredentials([string(credentialsId: 'jasypt-key', variable: 'JASYPT_KEY')]) {
                     script {
                         // jasypt.properties 파일의 위치로 이동
                         dir('./backend/main/src/main/resources') {
@@ -28,6 +28,7 @@ pipeline {
             steps {
                 echo '백엔드 도커 이미지 빌드 시작!'
                 dir("./backend/main") {  // Dockerfile이 있는 백엔드 프로젝트 위치
+                    sh './gradlew clean build'
                     sh "docker build -t d209-be ."
                 }
                 echo '백엔드 도커 이미지 빌드 완료!'
