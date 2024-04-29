@@ -45,4 +45,15 @@ public class DirectoryDocument {
             fieldWithPath("data.deletedTime").optional().type(JsonFieldType.STRING).description("영구 삭제된 시간"),
             fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE")
     );
+
+    public static final Snippet editRequestFields = requestFields(
+            fieldWithPath("id").type(JsonFieldType.NUMBER).description("변경할 디렉토리 아이디"),
+            fieldWithPath("name").type(JsonFieldType.STRING).description("변경할 이름")
+    );
+
+    public static final Snippet editResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("변경된 디렉토리 아이디"),
+            fieldWithPath("data.name").type(JsonFieldType.STRING).description("변경된 이름")
+    );
 }
