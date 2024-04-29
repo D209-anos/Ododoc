@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.directory;
 
 import com.ssafy.ododoc.directory.dto.request.CreateRequest;
+import com.ssafy.ododoc.directory.dto.request.EditRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -59,6 +60,20 @@ public class DirectorySteps {
                 .name("")
                 .parentId(null)
                 .type("file")
+                .build();
+    }
+
+    public EditRequest 변경디렉토리_생성(Long directoryId) {
+        return EditRequest.builder()
+                .id(directoryId)
+                .name("변경된 이름")
+                .build();
+    }
+
+    public EditRequest 변경디렉토리_이름없음(Long directoryId) {
+        return EditRequest.builder()
+                .id(directoryId)
+                .name("")
                 .build();
     }
 }
