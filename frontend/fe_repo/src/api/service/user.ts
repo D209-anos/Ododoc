@@ -3,9 +3,9 @@ import api from '../instances/api'
 // 인가 코드 백엔드로 전송
 export const sendCodeToBackend = async(code: string, provider: string, setAccessToken: (token: string) => void) => {
     try {
-        const response = await api.post(`/oauth2/authorization/${provider}`, {
+        const response = await api.post(`api/oauth2/authorization/${provider}`, {
             code: code,
-            url: "http://localhost:3000/"
+            url: "http://k10d209.p.ssafy.io:8080"
         });
         console.log('Access Token:', response.data.data.accessToken);
         

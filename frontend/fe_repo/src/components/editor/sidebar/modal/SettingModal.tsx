@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import Setting from '../../../../css/components/editor/SettingModal.module.css'
 import ExitButton from '../../../../assets/images/mark/xbutton.png'
+import useHandleClickOutside from '../../../../hooks/useHandleClickOutside';
 
 interface ModalProps {
     isOpen: boolean;
@@ -10,21 +11,7 @@ interface ModalProps {
 
 const SettingModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [isOpen, onClose]);
+    useHandleClickOutside(modalRef, onClose);
 
     const clickExitButton = () => {
         onClose();

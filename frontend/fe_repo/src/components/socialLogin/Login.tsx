@@ -30,6 +30,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
         const provider = getProvider();
+        console.log(code, provider)
         if (code && provider) {
             console.log(provider, code)
             sendCodeToBackend(code, provider, setAccessToken);
@@ -66,7 +67,6 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
             google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}&response_type=code&scope=profile email&access_type=offline`,
             naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}&response_type=code`
         }
-        
         window.location.href = loginUrl[provider];
     }
 

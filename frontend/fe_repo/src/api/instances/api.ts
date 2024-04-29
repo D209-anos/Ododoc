@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // axios 인스턴스 생성
 const api = axios.create({
-    baseURL: process.env.PUBLIC_BASE_URL,
+    baseURL: process.env.REACT_APP_PUBLIC_BASE_URL,
     headers: { "Content-Type": "application/json" }
 });
 
