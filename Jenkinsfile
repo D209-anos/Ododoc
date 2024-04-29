@@ -28,6 +28,7 @@ pipeline {
             steps {
                 echo '백엔드 도커 이미지 빌드 시작!'
                 dir("./backend/main") {  // Dockerfile이 있는 백엔드 프로젝트 위치
+                    sh 'chmod +x ./gradlew'
                     sh './gradlew clean build'
                     sh "docker build -t d209-be ."
                 }
