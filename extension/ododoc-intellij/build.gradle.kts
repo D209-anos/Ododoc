@@ -1,6 +1,7 @@
 plugins {
   id("java")
   id("org.jetbrains.intellij") version "1.16.1"
+  id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "com.ssafy"
@@ -8,6 +9,15 @@ version = "1.0-SNAPSHOT"
 
 repositories {
   mavenCentral()
+}
+
+dependencies {
+  implementation("org.openjfx:javafx:21.0.3")
+}
+
+javafx {
+  version = "21.0.3"
+  modules = listOf("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
 // Configure Gradle IntelliJ Plugin
