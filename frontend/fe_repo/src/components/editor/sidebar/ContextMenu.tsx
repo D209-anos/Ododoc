@@ -9,7 +9,7 @@ interface ContextMenuProps {
     y: number;
 }
 
-// forwardRef를 사용하여 ref와 props를 받음
+// 오른쪽 마우스 옵션
 const ContextMenu = forwardRef<HTMLUListElement, ContextMenuProps>(({ visible, x, y }, ref) => {
     if (!visible) return null;
 

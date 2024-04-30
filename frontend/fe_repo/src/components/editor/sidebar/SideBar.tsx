@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../../assets/images/icon/pencil.png'
-import FolderImage from '../../../assets/images/icon/forder.png'
-import FileImage from '../../../assets/images/icon/file.png'
 import Line from '../../../assets/images/mark/line.png'
 import MakeFileImage from '../../../assets/images/mark/plusbutton.png'
-import AddButton from '../../../assets/images/mark/addbutton.png'
 import TrashButton from '../../../assets/images/icon/trashIcon.png'
 import SettingButton from '../../../assets/images/icon/settingIcon.png'
-import FileAddModal from '../sidebar/modal/FileAddModal'
 import TrashModal from '../../editor/sidebar/modal/TrashModal'
 import SettingModal from './modal/SettingModal'
 import ContextMenu from './ContextMenu';
 import useHandleClickOutside from '../../../hooks/useHandleClickOutside';
 import useContextMenu from '../../../hooks/useContextMenu';
+import FolderItem from './FolderItem';
+import FileItem from './FileItem';
+import NameEditor from './NameEditor';
 
 
 interface IContentItem {
@@ -101,7 +100,7 @@ const SideBar: React.FC = () => {
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 수정 여부
-    const [folderName, setFolderName] = useState<string>(dummyData.name);               // 폴더 이름 저장
+    const [folderName, setFolderName] = useState<string>(dummyData.name);
 
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();
     const contextMenuRef = useRef<HTMLUListElement>(null);
@@ -110,89 +109,53 @@ const SideBar: React.FC = () => {
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
     };
-
-    const saveName = () => {
+    
+    const saveName = (objectId: number) => {
         setIsEditing(false);
         // 사용자 이름 수정 API 호출 코드 작성
-    };
-
-    const handleNameSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-        event.preventDefault();
-        saveName();
-    };
-
-    const handlePencilClick = (): void => {
-        setIsEditing(true);
-    };
-
-    const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
-        saveName();
-    };
-
-    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        setFolderName(event.target.value);
     };
 
     // 폴더명 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isEditing) {
             return (
-                <form onSubmit={handleNameSubmit}>
-                    <input
-                        type="text"
-                        value={folderName}
-                        onChange={handleNameChange}
-                        onBlur={handleBlur}
-                        autoFocus
-                        className={Sidebar.renderNameField}
-                        style={{ fontFamily: 'hanbitFont'}}
+                <div>
+                    <NameEditor 
+                        objectId={dummyData.id} 
+                        name={folderName} 
+                        setName={setFolderName} 
+                        saveName={saveName}
                     />
-                </form>
+                </div>
             );
         }
-        return <div className={Sidebar.nickname} style={{ fontFamily: 'hanbitFont' }}>{folderName}</div>;
+        return (
+            <div onClick={() => setIsEditing(true)} className={Sidebar.nickname}>
+                {folderName}
+                <img src={PencilImage} alt="pencil-image" className={Sidebar.pencil} onClick={() => setIsEditing(true)} />
+            </div>
+        );
     };
 
-    const renderContents = (contents: IContentItem[]): JSX.Element[] => {
+    // 폴더 및 파일 하위 구조
+    const renderContents = (contents: IContentItem[] | undefined): JSX.Element[] => {
+        if (!contents) return [];
+
         return contents.map((item: IContentItem) => {
-            if (item.type === 'FOLDER') {
-                // FOLDER 타입일 경우 하위 항목 추가
-                return (
-                    <div key={item.id} style={{ marginLeft: '20px' }} className={Sidebar.forderSpace} onContextMenu={(e) => handleContextMenu(e, item.id)}>
-                    <div className={Sidebar.folderWrapper}>
-                        <img src={FolderImage} alt="folder-image" className={Sidebar.forderImage} />
-                        <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.folderName}>{item.name}</div>
-                        <div>
-                            <img src={AddButton} alt="add-button" className={Sidebar.addButton} onClick={() => toggleModal(item.id)} />
-                            {modalActive[item.id] && (
-                                <FileAddModal isOpen={modalActive[item.id]} onClose={() => toggleModal(item.id)}>
-                                    <h2>Modal Title</h2>
-                                    <p>This is modal content!</p>
-                                </FileAddModal>
-                            )}
-                        </div>
-                    </div>
-                    {item.contents && Array.isArray(item.contents) && renderContents(item.contents)}
-                </div>
-                );
-            } else {
-                // FILE 타입일 경우 contents를 문자열로 취급
-                return (
-                    <div key={item.name} style={{ marginLeft: '20px' }} className={Sidebar.fileSpace} onContextMenu={(e) => handleContextMenu(e, item.id)}>
-                        <img src={FileImage} alt="file-image" className={Sidebar.fileImage} />
-                        <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.fileName}>{item.name}</div>
-                    </div>
-                );
-            }
-        });
-    }
+        if (item.type === 'FOLDER') {
+            return <FolderItem key={item.id} item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={renderContents} handleContextMenu={handleContextMenu} />;
+        } else {
+            return <FileItem key={item.id} item={item} handleContextMenu={handleContextMenu} />;
+        }
+    });
+    };
 
     return (
+        // 사이드바
         <div className={Sidebar.sidebar}>
-            <span className={Sidebar.nicknameSpace}>
+            <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
                 {renderNameField()}
-                <img src={PencilImage} alt="pencil-image" className={Sidebar.pencil}  onClick={handlePencilClick}/>
-            </span>
+            </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
             {renderContents(dummyData.contents as IContentItem[])}
             {menuState.visible && (

@@ -1,37 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import VisualScreen from '../../assets/images/homePageImage/visualScreen.png'
 import IntellijScreen from '../../assets/images/homePageImage/intellijScreen.png'
 import EditorScreen from '../../assets/images/editPageImage/editorpage.png'
 import Home2 from '../../css/components/homePage/Home2.module.css'
 
 function HomePage2() {
-    const elementRef = useRef(null);
+    const elementRef = useRef<HTMLElement>(null);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                const target = entry.target as HTMLElement;
-                if (entry.isIntersecting) {
-                    target.style.opacity = '1';
-                } else {
-                    target.style.opacity = '0';
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        if (elementRef.current) {
-            observer.observe(elementRef.current);
-        }
-
-        return () => {
+    useIntersectionObserver({
+        ref: elementRef,
+        onIntersect: () => {
             if (elementRef.current) {
-                observer.disconnect();
+                elementRef.current.style.opacity = '1';
             }
-        };
-    }, []);
-
+        },
+        onExit: () => {
+            if (elementRef.current) {
+                elementRef.current.style.opacity = '0';
+            }
+        },
+    });
 
     return (
         <section className={Home2.container} ref={elementRef}>
