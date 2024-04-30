@@ -13,7 +13,7 @@ import useContextMenu from '../../../hooks/useContextMenu';
 import FolderItem from './FolderItem';
 import FileItem from './FileItem';
 import NameEditor from './NameEditor';
-
+import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 
 interface IContentItem {
     id: number;
@@ -162,6 +162,7 @@ const SideBar: React.FC = () => {
                 <ContextMenu ref={contextMenuRef} visible={menuState.visible} x={menuState.x} y={menuState.y} />
             )}
             <div className={Sidebar.sideButtonWrapper}>
+                <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton}/>
                 <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} onClick={() => setTrashModalOpen(true)}/>
                 <TrashModal isOpen={isTrashModalOpen} onClose={() => setTrashModalOpen(false)} />

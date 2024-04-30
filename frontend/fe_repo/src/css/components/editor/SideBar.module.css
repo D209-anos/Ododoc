@@ -83,6 +83,12 @@
 .pencil {
     width: 9%;
     margin: 0vh 0vh 0vh 2vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.pencil:hover {
+    transform: scale(1.2);
 }
 
 .line {
@@ -171,21 +177,51 @@
     /* user-select: none; */
 }
 
+.profileImage {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.profileImage:hover {
+    transform: scale(1.2);
+}
+
 .makeFileButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.makeFileButton:hover {
+    transform: scale(1.2);
 }
 
 .trashButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.trashButton:hover {
+    transform: scale(1.2);
 }
 
 .settingButton {
     width: 2rem;
     height: 2rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.settingButton:hover {
+    transform: scale(1.2);
 }
 
 .folderWrapper:hover {
