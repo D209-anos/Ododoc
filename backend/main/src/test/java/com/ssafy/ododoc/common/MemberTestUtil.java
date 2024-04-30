@@ -50,13 +50,6 @@ public class MemberTestUtil extends TestBase {
     }
 
     private MvcResult 회원가입_및_로그인(MockMvc mockMvc, String code) throws Exception {
-        memberRepository.save(Member.builder()
-                .code(memberCode)
-                .provider(OAuthProvider.GOOGLE)
-                .nickname(memberNickName)
-                .title(memberNickName + "님의 정리공간")
-                .build());
-
         return mockMvc.perform(
                 post("/oauth2/authorization/{provider}", "google")
                         .contentType(MediaType.APPLICATION_JSON)
