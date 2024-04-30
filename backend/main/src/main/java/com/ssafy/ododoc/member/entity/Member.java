@@ -44,9 +44,6 @@ public class Member extends BaseTime implements UserDetails {
     @Column(length = 100, nullable = false)
     private String nickname;
 
-    @Column(length = 200, nullable = false)
-    private String title;
-
     @Column(columnDefinition = "bigint default 0")
     private Long buildCount;
 
