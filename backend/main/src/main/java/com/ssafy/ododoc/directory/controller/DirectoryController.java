@@ -3,10 +3,8 @@ package com.ssafy.ododoc.directory.controller;
 import com.ssafy.ododoc.directory.dto.annotation.CheckOption;
 import com.ssafy.ododoc.directory.dto.request.CreateRequest;
 import com.ssafy.ododoc.directory.dto.request.EditRequest;
-import com.ssafy.ododoc.directory.dto.response.CreateResponse;
-import com.ssafy.ododoc.directory.dto.response.DeleteResponse;
-import com.ssafy.ododoc.directory.dto.response.EditResponse;
-import com.ssafy.ododoc.directory.dto.response.ProfileResponse;
+import com.ssafy.ododoc.directory.dto.request.MoveRequest;
+import com.ssafy.ododoc.directory.dto.response.*;
 import com.ssafy.ododoc.directory.service.DirectoryService;
 import com.ssafy.ododoc.member.entity.Member;
 import jakarta.validation.Valid;
@@ -67,13 +65,13 @@ public class DirectoryController {
     }
 
     /**
-     * 폴더/파일 명 수정
+     * 폴더/파일 명 수정 api.
      *
      * @param editRequest 변경할 디렉토리 아이디, 변경할 이름
      * @param member 로그인 한 멤버
      * @return 변경된 디렉토리 아이디, 변경된 이름
      */
-    @PutMapping("")
+    @PutMapping("/edit")
     public EditResponse editDirectory(@Valid @RequestBody EditRequest editRequest,
                                       @AuthenticationPrincipal Member member) {
         return directoryService.editDirectory(editRequest, member);

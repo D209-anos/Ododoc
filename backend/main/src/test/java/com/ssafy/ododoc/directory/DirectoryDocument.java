@@ -29,8 +29,7 @@ public class DirectoryDocument {
             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("새로 생성된 폴더/파일의 아이디"),
             fieldWithPath("data.name").type(JsonFieldType.STRING).description("폴더/파일명"),
             fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
-            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)"),
-            fieldWithPath("data.path").optional().type(JsonFieldType.STRING).description("폴더/파일 경로 (null 가능)")
+            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)")
     );
 
     public static final Snippet deletePathFields = pathParameters(

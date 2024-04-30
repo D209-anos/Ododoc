@@ -2,20 +2,13 @@ package com.ssafy.ododoc.directory;
 
 import com.ssafy.ododoc.directory.dto.request.CreateRequest;
 import com.ssafy.ododoc.directory.dto.request.EditRequest;
+import com.ssafy.ododoc.directory.dto.request.MoveRequest;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DirectorySteps {
 
-    public CreateRequest 폴더정보_생성_이름_상위_없음() {
-        return CreateRequest.builder()
-                .name("")
-                .parentId(null)
-                .type("folder")
-                .build();
-    }
-
-    public CreateRequest 폴더정보_생성_이름_상위_있음(Long parentId) {
+    public CreateRequest 폴더정보_생성(Long parentId) {
         return CreateRequest.builder()
                 .name("폴더명")
                 .parentId(parentId)
@@ -23,10 +16,10 @@ public class DirectorySteps {
                 .build();
     }
 
-    public CreateRequest 폴더정보_생성_이름_30자이상() {
+    public CreateRequest 폴더정보_생성_이름_30자이상(Long parentId) {
         return CreateRequest.builder()
                 .name("가나다라마바사아자차카타파하가나다라마바사아자차카타파하가나다라마바사아자차카타파하")
-                .parentId(null)
+                .parentId(parentId)
                 .type("folder")
                 .build();
     }
