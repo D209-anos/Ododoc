@@ -51,24 +51,24 @@ const dummyData: IContentItem = {
                         "contents": "13번입니다."
                     },
                     {
-                        "id": 13,
+                        "id": 17,
                         "type": "FOLDER",
                         "name": "file13",
                         "contents": [
                             {
-                                "id": 13,
+                                "id": 10,
                                 "type": "FILE",
                                 "name": "file13",
                                 "contents": "13번입니다."
                             },
                             {
-                                "id": 13,
+                                "id": 1445,
                                 "type": "FILE",
                                 "name": "fileSDFSDFWDFSFSDFSDFSD",
                                 "contents": "13번입니다."
                             },
                             {
-                                "id": 13,
+                                "id": 1348,
                                 "type": "FILE",
                                 "name": "file13",
                                 "contents": "13번입니다."
