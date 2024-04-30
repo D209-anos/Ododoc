@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ododoc-intellij"
+rootProject.name = "ododoc-intelliJ"
