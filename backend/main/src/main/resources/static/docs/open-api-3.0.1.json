@@ -9,6 +9,8 @@
     "url" : "http://localhost:8080/api"
   }, {
     "url" : "http://k10d209.p.ssafy.io:8080/api"
+  }, {
+    "url" : "https://k10d209.p.ssafy.io/api"
   } ],
   "tags" : [ ],
   "paths" : {
