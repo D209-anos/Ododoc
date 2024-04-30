@@ -1,21 +1,15 @@
 import * as vscode from "vscode";
 import { TerminalManager } from "./terminal/TerminalManager";
-import AccountsProvider from "./treeview/AccountsProvider";
-import DocumentsProvider from "./treeview/DocumentsProvider";
+import OdodocTreeProvider from "./treeview/OdodocTreeProvider";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('"ododoc" 활성화.');
   vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
 
   // extension view 생성
-  const accountsProvider = new AccountsProvider();
-  vscode.window.createTreeView("accounts", {
-    treeDataProvider: accountsProvider,
-  });
-
-  const documentsProvider = new DocumentsProvider();
-  vscode.window.createTreeView("directory", {
-    treeDataProvider: documentsProvider,
+  const ododocTreeProvider = new OdodocTreeProvider();
+  vscode.window.createTreeView("ododoc", {
+    treeDataProvider: ododocTreeProvider,
   });
 
   // 터미널 생성

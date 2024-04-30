@@ -29,6 +29,15 @@ const TerminalManager_1 = require("./terminal/TerminalManager");
 function activate(context) {
     console.log('"ododoc" 활성화.');
     vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
+    // extension view 생성
+    // const accountsProvider = new AccountsProvider();
+    // vscode.window.createTreeView("accounts", {
+    //   treeDataProvider: accountsProvider,
+    // });
+    // const documentsProvider = new DocumentsProvider(context);
+    // vscode.window.createTreeView("documents", {
+    //   treeDataProvider: documentsProvider,
+    // });
     // 터미널 생성
     const terminalManager = new TerminalManager_1.TerminalManager();
     let ododocTerminal = terminalManager.createTerminal();
