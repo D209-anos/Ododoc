@@ -132,12 +132,17 @@
     cursor: pointer;
 }
 
+.fileName {
+    font-family: 'hanbitFont';
+}
+
 .fileSpace {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin: 0vh 0vh 0.5vh 0vh;
     width: 100%;
+    cursor: pointer;
     /* pointer-events: none;
     user-select: none; */
 }
@@ -228,6 +233,7 @@
     background-color: gray;
     color: white;
     width: 110%;
+    border-radius: 8px;
 }
 
 .fileSpace:hover {

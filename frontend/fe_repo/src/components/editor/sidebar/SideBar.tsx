@@ -14,6 +14,7 @@ import FolderItem from './FolderItem';
 import FileItem from './FileItem';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
+import { useNavigate } from 'react-router-dom';
 
 interface IContentItem {
     id: number;
@@ -96,11 +97,13 @@ const dummyData: IContentItem = {
 };
 
 const SideBar: React.FC = () => {
+    const navigate = useNavigate();
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 수정 여부
     const [folderName, setFolderName] = useState<string>(dummyData.name);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
 
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();
     const contextMenuRef = useRef<HTMLUListElement>(null);
@@ -114,6 +117,12 @@ const SideBar: React.FC = () => {
         setIsEditing(false);
         // 사용자 이름 수정 API 호출 코드 작성
     };
+
+    // 항목 클릭
+    const handleItemClick = (id: number): void => {
+        navigate(`/editor/${id}`)
+        setSelectedId(id);
+    }
 
     // 폴더명 수정 함수
     const renderNameField = (): JSX.Element => {
@@ -145,7 +154,7 @@ const SideBar: React.FC = () => {
         if (item.type === 'FOLDER') {
             return <FolderItem key={item.id} item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={renderContents} handleContextMenu={handleContextMenu} />;
         } else {
-            return <FileItem key={item.id} item={item} handleContextMenu={handleContextMenu} />;
+            return <FileItem key={item.id} item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={handleItemClick}/>;
         }
     });
     };

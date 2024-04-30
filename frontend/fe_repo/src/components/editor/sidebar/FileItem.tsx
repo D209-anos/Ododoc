@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FileImage from '../../../assets/images/icon/file.png';
+import { useNavigate } from 'react-router-dom';
 
 interface IContentItem {
     id: number;
@@ -11,14 +12,49 @@ interface IContentItem {
 
 interface FileItemProps {
     item: IContentItem;
+    selected: boolean;
+    handleItemClick: (id: number) => void;
     handleContextMenu: (event: React.MouseEvent<HTMLDivElement>, id: number) => void;
 }
 
-const FileItem: React.FC<FileItemProps> = ({ item, handleContextMenu }) => {
+const FileItem: React.FC<FileItemProps> = ({ item, selected, handleItemClick, handleContextMenu }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const navigate = useNavigate();
+
+    // rou
+    const handleClick = () => {
+        navigate(`/editor/${item.id}`)
+    }
+
+    // 파일 배경색
+    const getBackgroundColor = () => {
+        if (selected) return '#ff914d';
+        if (isHovered) return 'gray';
+        return 'transparent'
+    }
+
+    // 파일 글자 색상
+    const color = () => {
+        if (selected) return 'white';
+        if (isHovered) return 'white';
+        return 'black'
+    }
+
     return (
-        <div key={item.name} style={{ marginLeft: '20px' }} className={Sidebar.fileSpace} onContextMenu={(e) => handleContextMenu(e, item.id)}>
-            <img src={FileImage} alt="file-image" className={Sidebar.fileImage} />
-            <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.fileName}>{item.name}</div>
+        <div
+            style={{ 
+                backgroundColor: getBackgroundColor(), 
+                color: color(), 
+                borderRadius: '8px'
+            }}
+            className={Sidebar.fileSpace}
+            onClick={() => handleItemClick(item.id)}
+            onContextMenu={(e) => handleContextMenu(e, item.id)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <img src={FileImage} alt="file-icon" className={Sidebar.fileImage} />
+            <div className={Sidebar.fileName}>{item.name}</div>
         </div>
     );
 };
