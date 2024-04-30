@@ -18,8 +18,8 @@ const getAuthorizationCode = (): string | null => {
 // 인가 코드 백엔드로 전송하는 함수
 const sendCodeToBackend = async (code: string, provider: string, setAccessToken: (token: string) => void) => {
     try {
-        const response = await axios.post('http://k10d209.p.ssafy.io:8080/oauth2/authorization/${provider}', {
-            code: code, url: "http://k10d209.p.ssafy.io:3000"
+        const response = await axios.post('https://k10d209.p.ssafy.io/api/oauth2/authorization/${provider}', {
+            code: code, url: "https://k10d209.p.ssafy.io"
         });
         console.log('Access Token:', response.data.data.accessToken);
         // 엑세스 토큰 상태 관리
@@ -58,7 +58,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
             google: "your-google-client-id",
             naver: "your-naver-client-id"
         };
-        const redirectUri = "http://k10d209.p.ssafy.io:3000/oauth"
+        const redirectUri = "https://k10d209.p.ssafy.io/oauth"
         // 카카오 로그인 URL
         const loginUrl = {
             kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri}&response_type=code`,

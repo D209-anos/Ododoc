@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = __importStar(require("vscode"));
 require("dotenv/config");
-const URL = "http://k10d209.p.ssafy.io:8080";
+const URL = "https://k10d209.p.ssafy.io/api";
 exports.default = vscode.debug.onDidTerminateDebugSession((session) => {
     console.log("session.configuration: ", session.configuration);
     console.log("session.id: ", session.id);
