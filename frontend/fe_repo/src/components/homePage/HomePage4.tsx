@@ -1,4 +1,4 @@
-import Home4 from '../../css/components/Home4.module.css'
+import Home4 from '../../css/components/homePage/Home4.module.css'
 
 
 function HomePage4 (){

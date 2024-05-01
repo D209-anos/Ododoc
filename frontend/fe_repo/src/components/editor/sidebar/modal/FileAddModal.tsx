@@ -1,8 +1,10 @@
 import React, { ReactNode, useRef, useState, useEffect, forwardRef, RefObject } from 'react';
-import Modal from '../../css/components/editor/Modal.module.css'
-import FolderImage from '../../assets/images/forder.png'
-import FileImage from '../../assets/images/file.png'
-import ColumnLine from '../../assets/images/columnLine.png'
+import Modal from '../../../../css/components/editor/Modal.module.css'
+import FolderImage from '../../../../assets/images/icon/forder.png'
+import FileImage from '../../../../assets/images/icon/file.png'
+import ColumnLine from '../../../../assets/images/mark/columnLine.png'
+import useHandleClickOutside from '../../../../hooks/useHandleClickOutside';
+import useModalStyle from '../../../../hooks/useSetModal'
 
 interface ModalProps {
     isOpen: boolean;
@@ -10,48 +12,20 @@ interface ModalProps {
     children: ReactNode;
 }
 
-const AddModal = forwardRef<HTMLImageElement, ModalProps>(({ isOpen, onClose, children }, ref) => {
-    const modalRef = useRef<HTMLDivElement>(null);
+const FileAddModal = forwardRef<HTMLImageElement, ModalProps>(({ isOpen, onClose, children }, ref) => {
+    const modalRef = useRef<HTMLDivElement>(null);          // 모달 외부 클릭 감지
+    useHandleClickOutside(modalRef, onClose);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
-    }, [isOpen, onClose]);
-
-    // 내부 useRef 항상 생성
+    // 이미지 선택 및 모달 스타일
     const internalRef = useRef<HTMLImageElement>(null);
     const [selected, setSelected] = useState<string | null>(null);
-
-    // ref가 RefObject인지 확인 후 사용
     const effectiveRef = (ref as RefObject<HTMLImageElement>) || internalRef;
-    
     const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
 
     const handleImageClick = (imageName: string) => {
         setSelected(selected === imageName ? null : imageName);
     };
-
-    useEffect(() => {
-        if (isOpen && effectiveRef.current) {
-            const imgRect = effectiveRef.current.getBoundingClientRect();
-            const scrollOffset = window.pageYOffset || document.documentElement.scrollTop;
-            setModalStyle({
-                position: 'absolute',
-                 top: `${imgRect.top + scrollOffset}px`,
-                left: `${imgRect.right + 10}px`,
-            });
-        }
-    }, [isOpen, effectiveRef]);
+    useModalStyle(isOpen, effectiveRef, setModalStyle);
 
     if (!isOpen) return null;
 
@@ -73,4 +47,4 @@ const AddModal = forwardRef<HTMLImageElement, ModalProps>(({ isOpen, onClose, ch
     );
 });
 
-export default AddModal
+export default FileAddModal
