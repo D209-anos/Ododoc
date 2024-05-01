@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        jdk("OpenJDK 21")
+    }
+
     stages {
         stage("Clone Repository") {
             steps {
