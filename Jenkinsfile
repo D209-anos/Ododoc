@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/usr/local/openjdk-21'
+        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'
     }
 
     stages {
