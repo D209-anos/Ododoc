@@ -44,7 +44,7 @@ const dummyData: IContentItem = {
                     "name": "sub-folder22",
                     "contents": [
                         {
-                        "id": 13,
+                        "id": 11,
                         "type": "FILE",
                         "name": "file13",
                         "contents": "13번입니다."
@@ -55,19 +55,19 @@ const dummyData: IContentItem = {
                         "name": "file13",
                         "contents": [
                             {
-                                "id": 13,
+                                "id": 12,
                                 "type": "FILE",
                                 "name": "file13",
                                 "contents": "13번입니다."
                             },
                             {
-                                "id": 13,
+                                "id": 14,
                                 "type": "FILE",
                                 "name": "fileSDFSDFWDFSFSDFSDFSD",
                                 "contents": "13번입니다."
                             },
                             {
-                                "id": 13,
+                                "id": 15,
                                 "type": "FILE",
                                 "name": "file13",
                                 "contents": "13번입니다."

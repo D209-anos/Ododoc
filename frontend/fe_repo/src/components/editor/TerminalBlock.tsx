@@ -33,7 +33,7 @@ export const TerminalBlock = createReactBlockSpec(
         <ReactCodeMirror
           id={block?.id}
           autoFocus
-          placeholder={"Write your mermaid code here..."}
+          placeholder={"Write your terminal code here..."}
           style={{ width: "100%", resize: "vertical" }}
           //@ts-ignore
           extensions={[langs[data?.language ? data?.language : "javascript"]()]}
