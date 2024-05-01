@@ -1,8 +1,9 @@
 pipeline {
     agent any
 
-    tools {
-        jdk('OpenJDK 21')
+    environment {
+        JAVA_HOME = '/opt/jdk-21'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
