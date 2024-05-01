@@ -23,33 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AccountsItems = void 0;
 const vscode = __importStar(require("vscode"));
-const AccountsItem_1 = require("./tree_items/AccountsItem");
-class OdodocTreeProvider {
-    secretStorage;
-    // 데이터 변경이 발생했을 때 TreeView를 새로 고침하도록 vscode에 알리는 데에 사용
-    onDidChangeTreeData;
-    constructor(context) {
-        this.secretStorage = context.secrets;
-        this.onDidChangeTreeData = new vscode.EventEmitter().event;
-    }
-    // 각 노드를 어떻게 표시할 것인지 정의
-    getTreeItem(element) {
-        return element;
-    }
-    // 트리 뷰에 표시할 노드들
-    getChildren(element) {
-        if (this.isLogin()) {
-            return [AccountsItem_1.AccountsItem];
-        }
-        return [];
-    }
-    isLogin() {
-        const token = this.secretStorage.get("authToken");
-        console.log(token);
-        // return token !== undefined && token !== null;
-        return false;
-    }
-}
-exports.default = OdodocTreeProvider;
-//# sourceMappingURL=OdodocTreeProvider.js.map
+exports.AccountsItems = new vscode.TreeItem("hello hello?", vscode.TreeItemCollapsibleState.None);
+//# sourceMappingURL=NoAccountsItem.js.map

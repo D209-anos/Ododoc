@@ -22,22 +22,25 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
 const TerminalManager_1 = require("./terminal/TerminalManager");
+const OdodocTreeProvider_1 = __importDefault(require("./treeview/OdodocTreeProvider"));
+const LoginWebView_1 = require("./authentication/LoginWebView");
 function activate(context) {
     console.log('"ododoc" 활성화.');
     vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
+    // command 등록
+    context.subscriptions.push(vscode.commands.registerCommand("ododoc.showLoginWebView", () => (0, LoginWebView_1.showLoginWebViewCommand)(context)));
     // extension view 생성
-    // const accountsProvider = new AccountsProvider();
-    // vscode.window.createTreeView("accounts", {
-    //   treeDataProvider: accountsProvider,
-    // });
-    // const documentsProvider = new DocumentsProvider(context);
-    // vscode.window.createTreeView("documents", {
-    //   treeDataProvider: documentsProvider,
-    // });
+    const ododocTreeProvider = new OdodocTreeProvider_1.default(context);
+    vscode.window.createTreeView("ododoc.main", {
+        treeDataProvider: ododocTreeProvider,
+    });
     // 터미널 생성
     const terminalManager = new TerminalManager_1.TerminalManager();
     let ododocTerminal = terminalManager.createTerminal();

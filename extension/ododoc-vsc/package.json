@@ -25,26 +25,22 @@
     },
     "viewsWelcome": [
       {
-        "view": "documents",
-        "contents": "ododoc에 로그인하여 서비스를 이용해 보세요! \n[ododoc 바로가기](http://k10d209.p.ssafy.io:3000/). \n[😊Ododoc Login](command:ododoc.login)"
+        "view": "ododoc.main",
+        "contents": "ododoc에 로그인하여 서비스를 이용해 보세요! \n[ododoc 바로가기](http://k10d209.p.ssafy.io:3000/). \n[😊Ododoc Login](command:ododoc.showLoginWebView)"
       }
     ],
     "views": {
       "ododoc": [
         {
-          "id": "accounts",
-          "name": "accounts"
-        },
-        {
-          "id": "documents",
-          "name": "documents"
+          "id": "ododoc.main",
+          "name": ""
         }
       ]
     },
     "commands": [
       {
-        "command": "ododoc.login",
-        "title": "Login"
+        "command": "ododoc.showLoginWebView",
+        "title": "Show Webview: Login"
       }
     ],
     "terminal": {
