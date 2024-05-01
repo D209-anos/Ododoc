@@ -1,0 +1,352 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "SSAFY D209 Ododoc API",
+    "description" : "SSAFY 자율프로젝트 Ododoc 에서 사용할 API 문서입니다.",
+    "version" : "0.0.1"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080/api"
+  }, {
+    "url" : "https://k10d209.p.ssafy.io/api"
+  } ],
+  "tags" : [ ],
+  "paths" : {
+    "/directory" : {
+      "get" : {
+        "tags" : [ "directory" ],
+        "summary" : "프로필 조회",
+        "description" : "프로필을 조회하는 API 입니다.<br><br><b>header에 올바른 JWT accessToken을 담아 get 요청</b> 해주세요.<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 프로필 관련 정보들</b>이 반환됩니다.<br> - <b>header에 JWT accessToken을 입력하지 않으면</b>, <b>401 Unauthorized</b>가 반환됩니다.",
+        "operationId" : "directory_api_test/프로필_조회_",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "access token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY0LCJleHAiOjE3MTQyMzg2NjR9.rPoCrh3q0oirdpsfSXAZRdV8zkgkyMWdXWwGQij9MXg"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/directory-1698223099"
+                },
+                "examples" : {
+                  "directory_api_test/프로필_조회_성공_200" : {
+                    "value" : "{\"status\":200,\"data\":{\"buildCount\":0,\"errorCount\":0,\"visitCount\":0,\"searchCount\":0}}"
+                  }
+                }
+              },
+              "application/json;charset=UTF-8" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/directory486549215"
+                },
+                "examples" : {
+                  "directory_api_test/프로필_조회_토큰없음_401" : {
+                    "value" : "{\"status\":401,\"data\":{\"errorType\":\"TokenInvalidException\",\"message\":\"토큰이 유효하지 않습니다.\",\"fieldName\":\"\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/logout" : {
+      "get" : {
+        "tags" : [ "oauth2" ],
+        "summary" : "소셜 로그아웃",
+        "description" : "소셜 로그아웃 처리 API 입니다.<br><br><b>request header에 accessToken을 담아 Get 요청을 해주세요.<b><br> - 정상 처리 시 cookie에 있는 maxAge가 0이 되어 refreshToken이 삭제됩니다.",
+        "operationId" : "member_api_test/로그아웃_성공_200",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "access token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY1LCJleHAiOjE3MTQyMzg2NjV9.pc-bY1UM1Hk_SV1Dh1exGjiOyrcm95E0D_YDAvGHE0g"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200"
+          }
+        }
+      }
+    },
+    "/oauth2/authorization/{provider}" : {
+      "post" : {
+        "tags" : [ "oauth2" ],
+        "summary" : "소셜 로그인",
+        "description" : "소셜 로그인 처리 API 입니다.<br><br><b>소셜 로그인에서 받아온 정상적인 code와 타겟으로 하는 provider, 현재 처리하고 있는 redirect url</b>을<br>request body에 담아 post 요청 해주세요.<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 JWT Access Token 관련 정보들</b>이 반환됩니다.<br> - 추가로 <b>refresh token이 cookie에 반환</b>됩니다.<br> - <b>유효하지 않은 code나 redirect url</b>을 입력 시, <b>403 Forbidden</b>이 반환됩니다.<br> - <b>올바른 code와 redirect url</b>을 입력했지만, 사용자의 정보를 불러오는 데 실패했다면 <b>404 Not Found</b>가 반환됩니다.<br> - <b>google, naver, kakao</b> 이외 다른 provider 입력 시, <b>406 Not Acceptable</b>이 반환됩니다.",
+        "operationId" : "member_api_test/로그인_",
+        "parameters" : [ {
+          "name" : "provider",
+          "in" : "path",
+          "description" : "path에 들어가는 provider(google, naver, kakao)",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/oauth2-authorization-provider1323162843"
+              },
+              "examples" : {
+                "member_api_test/로그인_성공_200" : {
+                  "value" : "{\"code\":\"3450180654\",\"url\":\"http://localhost:8080/api/oauth2/authorization/google\"}"
+                },
+                "member_api_test/로그인_없는유저_404" : {
+                  "value" : "{\"code\":\"123456\",\"url\":\"http://localhost:8080/api/oauth2/authorization/google\"}"
+                },
+                "member_api_test/로그인_유효하지않음_403" : {
+                  "value" : "{\"code\":\"123456\",\"url\":\"http://localhost:8080/api/oauth2/authorization/google\"}"
+                },
+                "member_api_test/로그인_잘못된_플랫폼_406" : {
+                  "value" : "{\"code\":\"3450180654\",\"url\":\"http://localhost:8080/api/oauth2/authorization/google\"}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/oauth2-authorization-provider-1427580187"
+                },
+                "examples" : {
+                  "member_api_test/로그인_성공_200" : {
+                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY1LCJleHAiOjE3MTQyMzg2NjV9.pc-bY1UM1Hk_SV1Dh1exGjiOyrcm95E0D_YDAvGHE0g\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
+                  },
+                  "member_api_test/로그인_없는유저_404" : {
+                    "value" : "{\"status\":404,\"data\":[{\"errorType\":\"OAuthInfoNullException\",\"message\":\"존재하지않는 유저입니다.\",\"fieldName\":\"null\"}]}"
+                  },
+                  "member_api_test/로그인_유효하지않음_403" : {
+                    "value" : "{\"status\":403,\"data\":[{\"errorType\":\"OAuthDeniedException\",\"message\":\"유효하지 않은 정보입니다.\",\"fieldName\":\"invalid\"}]}"
+                  },
+                  "member_api_test/로그인_잘못된_플랫폼_406" : {
+                    "value" : "{\"status\":406,\"data\":[{\"errorType\":\"ProviderNotSupportedException\",\"message\":\"지원하지 않는 플랫폼입니다.\",\"fieldName\":\"invalid\"}]}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth2/issue/access-token" : {
+      "post" : {
+        "tags" : [ "oauth2" ],
+        "summary" : "액세스 토큰 재발급",
+        "description" : "만료된 액세스 토큰 재발급 API 입니다.<br><br><b>refresh token가 담겨 있는 cookie를 post 요청해주세요.<b><br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 access Token 정보가</b>이 반환됩니다.<br> - <b>유효하지 않은 refresh token 전달 시, <b>401 UnAuthorized</b>가 반환됩니다.",
+        "operationId" : "member_api_test/액세스_토큰_",
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/oauth2-authorization-provider-1427580187"
+                },
+                "examples" : {
+                  "member_api_test/액세스_토큰_재발급_성공_200" : {
+                    "value" : "{\"status\":200,\"data\":{\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzNDUwMTgwNjU0Iiwicm9sZXMiOlsiVVNFUiJdLCJwcm92aWRlciI6IkdPT0dMRSIsIm5pY2tuYW1lIjoi7JWE64W47JOwIiwiaWF0IjoxNzE0MjI3ODY2LCJleHAiOjE3MTQyMzg2NjZ9.F1qozthvEP6PzL3ICVJKJvC7TdLH6295oO087lOiaCE\",\"tokenType\":\"Bearer\",\"oAuthProvider\":\"GOOGLE\"}}"
+                  },
+                  "member_api_test/액세스_토큰_토큰없음_401" : {
+                    "value" : "{\"status\":401,\"data\":[{\"errorType\":\"TokenInvalidException\",\"message\":\"refresh token 이 유효하지 않습니다.\",\"fieldName\":\"invalid\"}]}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test/hello/{name}" : {
+      "get" : {
+        "tags" : [ "test" ],
+        "summary" : "Swagger 검증",
+        "description" : "Swagger 기본 기능을 검증합니다.",
+        "operationId" : "test_api_test/hello_test",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/directory486549215"
+                },
+                "examples" : {
+                  "test_api_test/hello_test" : {
+                    "value" : "{\"status\":200,\"data\":{\"value\":\"Hello D209\"}}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test/querydsl/{name}" : {
+      "get" : {
+        "tags" : [ "test" ],
+        "summary" : "Swagger 설명",
+        "description" : "여기에 설명을 적습니다.<br>br 태그를 통해 한 칸 띄워적을 수 있습니다.<br>지금 내용처럼 설명을 쭉쭉 이어나가면 됩니다.<br>아래에는, Document 라는 클래스를 새로 만들고, static 으로 만들어 주면 됩니다. <br>pathField 에 들어가는 required() 는 필요할 때만 넣어 주고, required 가 아닐 경우<br> 뒤에 .optional() 과 같이 써서 반드시 받는 것은 아니라고 표기해 줄 수 있습니다.<br>'[]' 는 배열을 표시할 때 사용할 수 있습니다. 배열이 아니라면 그냥 'data.abc' 와 같이<br>기술해 주면 됩니다.<br>Header, Query String, Path Parameter, Response 다 따로 나눠 적어줍니다.<br>구현이 모두 완료된 것을 처리하는 것이므로, 200, 400, 401, 403, 404, 409.... 등<br>입력을 처리할 때 본인이 상상할 수 있는 모든 케이스를 기술해 주시고, 어떤 케이스에서 어떤<br>Negative Code 가 나가는 지 기술해 주시기 바랍니다.",
+        "operationId" : "test_api_test/query_dsl__test",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "path",
+          "description" : "path 에 들어가는 이름",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/test-querydsl-name2002753879"
+                },
+                "examples" : {
+                  "test_api_test/query_dsl__test" : {
+                    "value" : "{\"status\":200,\"data\":[{\"id\":1,\"name\":\"D209\",\"address\":\"Gumi JinPeong\"}]}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "directory-1698223099" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "visitCount" : {
+                "type" : "number",
+                "description" : "방문 횟수"
+              },
+              "searchCount" : {
+                "type" : "number",
+                "description" : "검색 횟수"
+              },
+              "buildCount" : {
+                "type" : "number",
+                "description" : "빌드 횟수"
+              },
+              "errorCount" : {
+                "type" : "number",
+                "description" : "에러 횟수"
+              }
+            }
+          },
+          "status" : {
+            "type" : "number",
+            "description" : "HTTP 상태 코드"
+          }
+        }
+      },
+      "oauth2-authorization-provider1323162843" : {
+        "required" : [ "code", "url" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "OAuth 공급자로부터 오는 code"
+          },
+          "url" : {
+            "type" : "string",
+            "description" : "redirect url"
+          }
+        }
+      },
+      "test-querydsl-name2002753879" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "address" : {
+                  "type" : "string",
+                  "description" : "주소"
+                },
+                "name" : {
+                  "type" : "string",
+                  "description" : "이름"
+                },
+                "id" : {
+                  "type" : "number",
+                  "description" : "테스트 엔티티 ID"
+                }
+              }
+            }
+          },
+          "status" : {
+            "type" : "number",
+            "description" : "HTTP 상태 코드"
+          }
+        }
+      },
+      "oauth2-authorization-provider-1427580187" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "oAuthProvider" : {
+                "type" : "string",
+                "description" : "OAuth 제공자"
+              },
+              "tokenType" : {
+                "type" : "string",
+                "description" : "JWT 토큰 타입"
+              },
+              "accessToken" : {
+                "type" : "string",
+                "description" : "JWT 액세스 토큰"
+              }
+            }
+          },
+          "status" : {
+            "type" : "number",
+            "description" : "HTTP 상태 코드"
+          }
+        }
+      },
+      "directory486549215" : {
+        "type" : "object"
+      }
+    }
+  }
+}
