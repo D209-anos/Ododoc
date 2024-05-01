@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -31,6 +32,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'echo $JAVA_HOME'
+                sh 'echo $PATH'
                 sh 'java -version'
             }
         }
