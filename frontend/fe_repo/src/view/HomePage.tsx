@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import HomePage1 from '../components/homePage/HomePage1';
 import HomePage2 from '../components/homePage/HomePage2';
 import HomePage3 from '../components/homePage/HomePage3';
@@ -22,7 +22,7 @@ function HomePage() {
         const colorValue = Math.floor(255 * newOpacity);
         setBackgroundColor(`rgb(${colorValue}, ${colorValue}, ${colorValue})`);
       }
-    
+
       // 시작하는 지점에서 노란색
       if (scrollPosition >= 300 * windowHeight && scrollPosition < 400 * windowHeight) {
         const transitionProgress = 300;
@@ -50,6 +50,34 @@ function HomePage() {
     };
   }, []);
 
+  const [currentSection, setCurrentSection] = useState(0);
+  const sectionCount = 7;
+
+  useEffect(() => {
+    const handleScroll = (event : any) => {
+      event.preventDefault();
+      const { deltaY } = event;
+      if (deltaY > 0) { // 스크롤 다운
+        setCurrentSection(prev => Math.min(prev + 1, sectionCount - 1));
+      } else if (deltaY < 0) { // 스크롤 업
+        setCurrentSection(prev => Math.max(prev - 1, 0));
+      }
+    };
+
+    window.addEventListener('wheel', handleScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener('wheel', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    // 섹션으로 스크롤 이동
+    window.scrollTo({
+      top: window.innerHeight * currentSection,
+      behavior: 'smooth' // 스크롤 애니메이션 추가
+    });
+  }, [currentSection]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
