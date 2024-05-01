@@ -1,37 +1,26 @@
-import { useEffect, useRef } from 'react';
-import VisualScreen from '../../assets/images/visualScreen.png'
-import IntellijScreen from '../../assets/images/intellijScreen.png'
-import EditorScreen from '../../assets/images/editorpage.png'
-import Home2 from '../../css/components/Home2.module.css'
+import { useRef } from 'react';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import VisualScreen from '../../assets/images/homePageImage/visualScreen.png'
+import IntellijScreen from '../../assets/images/homePageImage/intellijScreen.png'
+import EditorScreen from '../../assets/images/homePageImage/editorScreen.png'
+import Home2 from '../../css/components/homePage/Home2.module.css'
 
 function HomePage2() {
-    const elementRef = useRef(null);
+    const elementRef = useRef<HTMLElement>(null);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                const target = entry.target as HTMLElement;
-                if (entry.isIntersecting) {
-                    target.style.opacity = '1';
-                } else {
-                    target.style.opacity = '0';
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        if (elementRef.current) {
-            observer.observe(elementRef.current);
-        }
-
-        return () => {
+    useIntersectionObserver({
+        ref: elementRef,
+        onIntersect: () => {
             if (elementRef.current) {
-                observer.disconnect();
+                elementRef.current.style.opacity = '1';
             }
-        };
-    }, []);
-
+        },
+        onExit: () => {
+            if (elementRef.current) {
+                elementRef.current.style.opacity = '0';
+            }
+        },
+    });
 
     return (
         <section className={Home2.container} ref={elementRef}>
@@ -39,9 +28,12 @@ function HomePage2() {
                 <p className={Home2.bmjuaFont}>빌드 감지, 문서 정리를<br/> 자동으로</p>
             </div>
             <div className={`${Home2.halfContainerSide} ${Home2.imageSide}`}>
-                <img src={VisualScreen} alt="VisualScreen" className={Home2.visualImage} />
-                <img src={IntellijScreen} alt="IntellijScreen" className={Home2.intellijImage} />
-                <img src={EditorScreen} alt="EditorScreen" className={Home2.editorImage} />
+                <div style={{ backgroundImage: `url(${VisualScreen})` }} className={Home2.visualImage} />
+                <div style={{ backgroundImage: `url(${IntellijScreen})` }} className={Home2.intellijImage} />
+                <div>
+                    <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage} />
+                    <p>IntelliJ와 Visual Studio Code에서 빌드만 하면, 깔끔히 정리된 문서를 제공해 드려요.</p>
+                </div>
             </div>
         </section>
     )

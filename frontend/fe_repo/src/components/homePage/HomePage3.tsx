@@ -1,20 +1,21 @@
-import Home3 from '../../css/components/Home3.module.css'
-import EditorErrorPage from '../../assets/images/editorErrorpage.png'
-import ErrorScreen from '../../assets/images/errorScreen.png'
-import SuccessScreen from '../../assets/images/successScreen.png'
-import NextVector from '../../assets/images/nextVector.png'
+import Home3 from '../../css/components/homePage/Home3.module.css'
+import EditorErrorPage from '../../assets/images/homePageImage/editorErrorpage.png'
+import ErrorScreen from '../../assets/images/homePageImage/errorScreen.png'
+import SuccessScreen from '../../assets/images/homePageImage/successScreen.png'
+import NextVector from '../../assets/images/mark/nextVector.png'
 
 interface HomePage3Props {
     backgroundColor: string;
+    opacity: number;
     textColor: string;
 }
 
 function HomePage3 (props: HomePage3Props) {
     return (
-        <section className={Home3.container} style={{ backgroundColor: props.backgroundColor }}>
+        <section className={Home3.container}>
             <div className={Home3.textArea}>
                 <p className={`${Home3.bmjuaFont} ${Home3.heading}`}>어떤 코드로 성공 실패했는지 한눈에</p>
-                <p className={`${Home3.hanbitFont} ${Home3.subheading}`} style={{ color: props.textColor}}>모든 트러블 슈팅 코드를 확인할 수 있어요.</p>
+                <p className={`${Home3.hanbitFont} ${Home3.subheading}`}>모든 트러블 슈팅 코드를 확인할 수 있어요.</p>
             </div>
             <div className={Home3.splitContainer}>
                 <div className={Home3.leftHalf}>

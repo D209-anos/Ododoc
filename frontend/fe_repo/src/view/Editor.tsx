@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import Editor1 from '../components/editor/Editor1';
 import { Route, Link, Routes } from 'react-router-dom';
 import SideBar from '../../src/components/editor/SideBar';
 import EditorStyle from '../css/view/Editor.module.css';
 import Mypage from '../components/editor/Mypage';
+=======
+import Editor1 from '../components/editor/editor/Editor1';
+import SideBar from '../components/editor/sidebar/SideBar';
+import EditorStyle from '../css/view/editor/Editor.module.css';
+>>>>>>> a8d6191e9d35ebefa3504f5f8e308f4284681418
 
 function Editor() {
     return (
