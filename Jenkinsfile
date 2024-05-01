@@ -44,6 +44,18 @@ pipeline {
             }
         }
 
+        stage("Prepare FE Environment") {
+            steps {
+                echo '프론트엔드 환경 설정 시작!'
+                withCredentials([file(credentialsId: 'ododoc-front-env', variable: 'ENV_FILE')]) {
+                    dir("./frontend/fe_repo") {
+                        sh "cp ${ENV_FILE} ./.env"
+                    }
+                }
+                echo '프론트엔드 환경 설정 완료!'
+            }
+        }
+
         stage("Build FE Docker Image") {
             steps {
                 echo '프론트 도커 이미지 빌드 시작!'
