@@ -1,8 +1,7 @@
-import BlackLogoMark from "../../assets/images/ododoc-black.png"
-import Home1 from "../../css/components/Home1.module.css"
-import MainLogo from "../../assets/images/mainLogo.png"
+import BlackLogoMark from "../../assets/images/ododocLogo/ododoc-black.png"
+import Home1 from "../../css/components/homePage/Home1.module.css"
+import MainLogo from "../../assets/images/ododocLogo/mainLogo.png"
 import { ReactTyped } from "react-typed";
-
 
 interface HomePage1Props {
     backgroundColor: string;
@@ -13,6 +12,7 @@ interface HomePage1Props {
 function HomePage1(props: HomePage1Props) {
     return (
         <>
+            {/* logo */}
             <header className={Home1.nav} style={{ background: props.backgroundColor }}>
                 <img src={BlackLogoMark} alt="black-logo-mark" className={Home1.logo} />
             </header>
@@ -21,10 +21,12 @@ function HomePage1(props: HomePage1Props) {
             }}>
 
                 <div className={Home1.main}>
+                    {/* ododoc 시그니처 이미지 */}
                     <div className={Home1.mainImg}>
                         <img src={MainLogo} alt="black-logo-mark" className={Home1.mainlogoPosition} />
                     </div>
                     <div className={`${Home1.bmjuaFont} ${Home1.mainText} ${Home1.fontWhiteColor}`}>
+                        {/* 타이핑 애니메이션 */}
                         <ReactTyped
                             strings={['번거롭게 정리에 시간쓰지 마세요', '개발과 정리를 한 번에 해보세요', '개발기록과 검색결과를 요약해드립니다', '에디터로 직접 문서 정리 가능해요', '여러분은 개발에 더 집중하세요']}
                             typeSpeed={40}
