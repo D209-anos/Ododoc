@@ -6,6 +6,15 @@ pipeline {
     }
 
     stages {
+        stage('Test') {
+            steps {
+                sh 'echo $JAVA_HOME'
+                sh 'java -version'
+            }
+        }
+    }
+
+    stages {
         stage("Clone Repository") {
             steps {
                 echo '클론 시작'
