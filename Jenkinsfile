@@ -1,8 +1,8 @@
 pipeline {
     agent any
 
-    tools {
-        jdk("OpenJDK 21")
+    environment {
+        JAVA_HOME = '/usr/local/openjdk-21'
     }
 
     stages {
