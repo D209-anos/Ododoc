@@ -83,7 +83,7 @@
 }
 
 .textTitle{
-    font-size: 5rem;
+    font-size: 4rem;
     height: 50%;
     display: flex;
     justify-content: flex-end;
@@ -92,14 +92,31 @@
 
 .textTitle p{
     margin-top: 0;
-    margin-bottom: 5%;
+    margin-bottom: 10%;
 }
+
 .textContent{
     font-size: 1.7rem;
     height: 50%;
+    text-align: center;
+}
+
+.serviceIntroduction {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .nav{
     height: 80px;
     z-index: 1;
+}
+
+.ManTypingGIF {
+    width: 520px;
+    height: auto;
+    position: absolute;
+    bottom: -90%;
+    right: 7%;
 }
