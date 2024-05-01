@@ -2,9 +2,10 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
 import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock } from "@blocknote/core";
 import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
-import { CodeBlock, insertCode } from "./CodeBlock";
+import { CodeBlock, insertCode } from "./editor/CodeBlock";
+import { TerminalBlock, insertTerminal } from "./editor/TerminalBlock";
 import React, { useState, useEffect } from 'react';
-import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
+
 
 const Editor1 = () => {
   const [title, setTitle] = useState('제목입니다22');

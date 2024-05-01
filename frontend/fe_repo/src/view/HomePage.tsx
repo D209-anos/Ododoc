@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+
 import { useState, useEffect } from 'react';
-=======
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
->>>>>>> a8d6191e9d35ebefa3504f5f8e308f4284681418
 import HomePage1 from '../components/homePage/HomePage1';
 import HomePage2 from '../components/homePage/HomePage2';
 import HomePage3 from '../components/homePage/HomePage3';
@@ -11,7 +9,6 @@ import HomePage5 from '../components/homePage/HomePage5';
 import HomePage6 from '../components/homePage/HomePage6';
 
 function HomePage() {
-<<<<<<< HEAD
   const [backgroundColor, setBackgroundColor] = useState('black');
   const [opacity, setOpacity] = useState(1);
   const [textColor, setTextColor] = useState('white');
@@ -83,9 +80,7 @@ function HomePage() {
       behavior: 'smooth' // 스크롤 애니메이션 추가
     });
   }, [currentSection]);
-=======
-  const { backgroundColor, opacity, textColor } = useScrollAnimation();
->>>>>>> a8d6191e9d35ebefa3504f5f8e308f4284681418
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
