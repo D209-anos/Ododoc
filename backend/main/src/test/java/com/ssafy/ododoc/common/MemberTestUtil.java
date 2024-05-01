@@ -32,7 +32,7 @@ public class MemberTestUtil extends TestBase {
     public static String memberNickName = "아노쓰";
     public static String otherMemberCode = "3449714270";
     public static String otherMemberNickName = "다른닉네임";
-    public static String googleRedirectUrl = "http://k10d209.p.ssafy.io:8080/api/oauth2/authorization/google";
+    public static String googleRedirectUrl = "https://k10d209.p.ssafy.io/api/oauth2/authorization/google";
 
     public String 회원가입_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
