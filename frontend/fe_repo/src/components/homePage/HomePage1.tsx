@@ -2,7 +2,6 @@ import BlackLogoMark from "../../assets/images/ododocLogo/ododoc-black.png";
 import Home1 from "../../css/components/homePage/Home1.module.css";
 import MainLogo from "../../assets/images/ododocLogo/mainLogo.png";
 import { ReactTyped } from "react-typed";
-import CodeArrange from '../../assets/images/homePageImage/codeArrangement.gif'
 import ManTypingGIF from '../../assets/images/homePageImage/happyBoy2.gif'
 
 interface HomePage1Props {
@@ -44,13 +43,12 @@ function HomePage1(props: HomePage1Props) {
                             <p>개발과 정리를 한 번에</p>
                         </span>
                         <span className={Home1.textContent}>
-                                개발 기록은 저희에게 맡기고 개발에만 집중하세요 <br />
-                                검색 결과, 코드, 오류 정보를 정확히 추출해 드립니다 <br />
+                                기록은 저희에게 맡기고 개발에만 집중하세요 <br />
+                                검색 결과, 코드, 오류 정보를 정리해 드립니다 <br />
                                 기록이 번거로웠던 당신을 위한 서비스 <br />
                                 개발도 정리도, 이제는 한 번에 해결하세요
                         </span>
                     </div>
-                    {/* <img src={CodeArrange} alt=""className={Home1.CodeArrange}/> */}
                     <img src={ManTypingGIF} alt="man-typing" className={Home1.ManTypingGIF}/>
                 </div>
             </section>
