@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
 import menu from '../../css/components/menu/Menu.module.css';
-import { sendCodeToBackend } from '../../api/service/user'
+import { sendCodeToBackend } from '../../api/service/user';
+import 'animate.css';
 
 interface LoginProps {
     isOpen: boolean;
@@ -13,6 +14,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const loginBackground = useRef<HTMLDivElement>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
     const navigate = useNavigate();          // 리다이렉트
+    const [animation, setAnimation] = useState('animate__backInDown');
 
     // 인가 코드 추출하는 함수
     const getAuthorizationCode = (): string | null => {
@@ -30,9 +32,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
         const provider = getProvider();
-        console.log(code, provider)
         if (code && provider) {
-            console.log(provider, code)
             sendCodeToBackend(code, provider, setAccessToken);
         }
     }, [setAccessToken]);
@@ -70,6 +70,14 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         window.location.href = loginUrl[provider];
     }
 
+    const handleCloseClick = () => {
+        setAnimation('animate__backOutUp');
+        setTimeout(() => {
+            onClose();
+            setAnimation('animate__backInDown')
+        }, 500); // 500ms 후에 onClose 콜백 실행, 애니메이션 지속 시간과 일치시켜야 함
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -78,10 +86,10 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
                 onClose();
             }
         }}>
-            <div className={menu.loginContent}>
+            <div className={`${menu.loginContent} animate__animated ${animation} ${menu.customFaster}`}>
+                <CloseIcon className={`${menu.clickable} ${menu.loginCloseBtn}`} onClick={handleCloseClick} />
                 <div className={menu.loginTitleWrapper}>
                     <p className={menu.loginTitle}>Login</p>
-                    <CloseIcon className={`${menu.clickable} ${menu.loginCloseBtn}`} onClick={onClose} />
                 </div>
                 <div className={menu.socialLoginBtnWrapper}>
                     <div className={`${menu.naverBtn} ${menu.socialLoginBtn}`} onClick={() => handleSocialLogin('naver')}></div>

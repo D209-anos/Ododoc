@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FileImage from '../../../assets/images/icon/file.png';
-import { useNavigate } from 'react-router-dom';
 
 interface IContentItem {
     id: number;
@@ -19,12 +18,6 @@ interface FileItemProps {
 
 const FileItem: React.FC<FileItemProps> = ({ item, selected, handleItemClick, handleContextMenu }) => {
     const [isHovered, setIsHovered] = useState(false);
-    const navigate = useNavigate();
-
-    // rou
-    const handleClick = () => {
-        navigate(`/editor/${item.id}`)
-    }
 
     // 파일 배경색
     const getBackgroundColor = () => {
