@@ -11,7 +11,7 @@ ENV TZ=Asia/Seoul
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && apt-get install -y redis-server && \
     rm -rf /var/lib/apt/lists/* && \
-    sed -i 's/^bind 127.0.0.1 -::1$/bind 127.0.0.1/' /etc/redis/redis.conf && \
+    sed -i 's/^bind 127.0.0.1 -::1$/bind 0.0.0.0/' /etc/redis/redis.conf && \
     echo "daemonize no" >> /etc/redis/redis.conf
 COPY --from=builder /app/build/libs/ododoc-0.0.1-SNAPSHOT.jar /app/ododoc.jar
 EXPOSE 8080 6379
