@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Home3 from '../../css/components/homePage/Home3.module.css'
 import EditorErrorPage from '../../assets/images/homePageImage/editorErrorpage.png'
 import NextVector from '../../assets/images/mark/nextVector.png'
@@ -21,37 +21,66 @@ function HomePage3({ backgroundColor, opacity, textColor }: HomePage3Props) {
         </div>
     `;
     const [displayedHTML, setDisplayedHTML] = useState('');         // 타이핑 출력 문자
-    const [index, setIndex] = useState(0);                          // 타이핑 글자 인덱스
+    const indexRef = useRef(0);                          // 타이핑 글자 인덱스
+    const ref = useRef(null);
 
-    useEffect(() => {
+    
+    const startTyping = useCallback(() => {
         const timer = setInterval(() => {
-            if (index >= initialHTML.length) {
+            if (indexRef.current >= initialHTML.length) {
                 clearInterval(timer);
                 return;
             }
 
-            const nextChar = initialHTML.charAt(index);
+            const nextChar = initialHTML.charAt(indexRef.current);
             if (nextChar === '<') {
                 // 태그 시작을 감지
-                const endIndex = initialHTML.indexOf('>', index);
+                const endIndex = initialHTML.indexOf('>', indexRef.current);
                 if (endIndex !== -1) {
                     // 태그의 끝을 찾음
-                    const fullTag = initialHTML.slice(index, endIndex + 1);
+                    const fullTag = initialHTML.slice(indexRef.current, endIndex + 1);
                     setDisplayedHTML(prev => prev + fullTag);
-                    setIndex(endIndex + 1);
+                    indexRef.current = endIndex + 1;
                 }
             } else {
                 // 일반 텍스트
                 setDisplayedHTML(prev => prev + nextChar);
-                setIndex(prev => prev + 1);
+                indexRef.current++;
             }
         }, 10);
+    }, [initialHTML]);
 
-        return () => clearInterval(timer);
-    }, [index, initialHTML]);
+    const resetTyping = useCallback(() => {
+        setDisplayedHTML('');
+        indexRef.current = 0;
+    }, []);
     
+    useEffect(() => {
+        const element = ref.current;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    startTyping();
+                } else {
+                    resetTyping();  // 다른 곳 보면 reset 되게 함
+                }
+            });
+        });
+
+        if (element) {
+            observer.observe(element);
+        }
+
+        return () => {
+            if (element) {
+                observer.unobserve(element);
+            }
+        };
+    }, [startTyping, resetTyping]);
+
     return (
-        <section className={Home3.container}>
+        <section className={Home3.container} ref={ref}>
             <div className={Home3.textArea}>
                 <p className={`${Home3.bmjuaFont} ${Home3.heading}`}>어떤 코드로 성공 실패했는지 한눈에</p>
                 <p className={`${Home3.hanbitFont} ${Home3.subheading}`}>모든 트러블 슈팅 코드를 확인할 수 있어요.</p>

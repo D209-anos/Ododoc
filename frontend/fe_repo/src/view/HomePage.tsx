@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import HomePage1 from '../components/homePage/HomePage1';
 import HomePage2 from '../components/homePage/HomePage2';
