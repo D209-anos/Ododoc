@@ -55,6 +55,7 @@ public class StartUpActivity implements ProjectActivity {
         return null;
     }
 
+    // 로그인되어 있지 않으면 로그인 창 띄우기
     private void runActivity(TokenManager tokenManager, ProjectProvider projectProvider){
         if(tokenManager.getAccessToken() == null || tokenManager.getRefreshToken() == null){
             new MainLoginFrame();

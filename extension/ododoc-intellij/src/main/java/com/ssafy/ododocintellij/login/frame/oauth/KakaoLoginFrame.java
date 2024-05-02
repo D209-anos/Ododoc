@@ -7,6 +7,7 @@ import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.token.TokenManager;
 import com.ssafy.ododocintellij.tracker.CodeListener;
 import com.ssafy.ododocintellij.tracker.project.ProjectProvider;
+import com.ssafy.ododocintellij.tracker.project.ProjectTracker;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
@@ -31,6 +32,7 @@ public class KakaoLoginFrame extends Stage {
 
     private final String CLIENT_ID = "a23282fc18f2b445d559dfe93fa96e6b";
     private final String REDIRECT_URI = "http://localhost:8080/api/oauth2/authorization/kakao";
+//    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/kakao";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;
@@ -150,10 +152,12 @@ public class KakaoLoginFrame extends Stage {
     // Queue에 있는 project 객체에 codeListener 추가해주기.
     private void addCodeListener(ProjectProvider projectProvider){
         int size = projectProvider.getProjects().size();
+        ProjectTracker projectTracker = ProjectTracker.getInstance();
         Project tempProject = null;
         for(int i = 0; i < size; i++){
             tempProject = projectProvider.getProjects().poll();
             tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+            projectTracker.initHashStatus(tempProject);
         }
     }
 }

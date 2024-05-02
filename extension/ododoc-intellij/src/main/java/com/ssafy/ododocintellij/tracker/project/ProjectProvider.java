@@ -17,7 +17,7 @@ public class ProjectProvider {
     }
 
     public static ProjectProvider getInstance() {
-        return ProjectProvider.ProjectProviderHolder.INSTANCE;
+        return ProjectProviderHolder.INSTANCE;
     }
 
     public Queue<Project> getProjects() {

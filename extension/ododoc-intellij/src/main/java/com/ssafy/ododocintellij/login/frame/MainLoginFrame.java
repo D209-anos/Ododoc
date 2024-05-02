@@ -30,7 +30,7 @@ public class MainLoginFrame extends Stage {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Ododoc IntelliJ Plugin");
                 alert.setHeaderText("로그인 필요");
-                alert.setContentText("Ododoc 서비스를 이용하려면 로그인이 필요합니다. 정말 종료하시겠습니까?");
+                alert.setContentText("Ododoc 서비스를 이용하려면 로그인이 필요합니다.\n정말 종료하시겠습니까?");
 
                 Optional<ButtonType> result = alert.showAndWait();
                 if(result.isPresent() && result.get() != ButtonType.OK) {
