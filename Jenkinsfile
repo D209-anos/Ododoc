@@ -42,10 +42,10 @@ pipeline {
                 withCredentials([string(credentialsId: 'jasypt-key', variable: 'JASYPT_KEY')]) {
                     echo '백엔드 도커 이미지 빌드 시작!'
                     dir("./backend/main") {  // Dockerfile이 있는 백엔드 프로젝트 위치
-                        sh 'chmod +x ./gradlew'
-                        sh './gradlew clean build'
-                        sh 'chmod +x ./docker_install.sh'
-                        sh './docker_install.sh'
+                        // sh 'chmod +x ./gradlew'
+                        // sh './gradlew clean build'
+                        // sh 'chmod +x ./docker_install.sh'
+                        // sh './docker_install.sh'
                         sh "docker build --build-arg JASYPT_KEY=${JASYPT_KEY} -t d209-be ."
                     }
                     echo '백엔드 도커 이미지 빌드 완료!'
