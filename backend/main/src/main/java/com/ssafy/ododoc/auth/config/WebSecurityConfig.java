@@ -72,7 +72,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:8080", "http://localhost:5173"
+                "https://k10d209.p.ssafy.io/api", "https://k10d209.p.ssafy.io"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
