@@ -16,7 +16,7 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/start/:selectedType' element={<Start />} />
         <Route path='/editor' element={<Editor />} />
-        <Route path='/editor/:id' element={<Editor />} />
+        <Route path='editor/:id' element={<Editor />} />
         <Route path='/vscode' element={<VSCode />} />
       </Routes>
     </Router>
