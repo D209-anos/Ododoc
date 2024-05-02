@@ -4,7 +4,8 @@ import HomePage from './view/HomePage';
 import Start from './view/Start';
 import Editor from './view/Editor';
 import Menu from './components/menu/Menu';
-import VSCode from './components/startPage/VSCode'
+import LoginLoading from '../src/components/socialLogin/LoginLoading'
+
 
 function App() {
 
@@ -15,9 +16,8 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/start/:selectedType' element={<Start />} />
-        <Route path='/editor' element={<Editor />} />
-        <Route path='/editor/:id' element={<Editor />} />
-        <Route path='/vscode' element={<VSCode />} />
+        <Route path='/editor/*' element={<Editor />}></Route>
+        <Route path='/oauth' element={<LoginLoading />}></Route>
       </Routes>
     </Router>
   );

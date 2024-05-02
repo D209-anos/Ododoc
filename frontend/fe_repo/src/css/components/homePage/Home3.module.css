@@ -1,6 +1,5 @@
 .container {
     height: 100vh;
-    margin-top: 30vh;
     position: relative;
 }
 
@@ -23,6 +22,7 @@
     font-size: 60px;
     text-align: right;
     margin-right: 15%;
+    margin-bottom: 15px;
 }
 
 .hanbitFont {
@@ -31,6 +31,17 @@
     margin-bottom: 10vh;
     text-align: right;
     margin-right: 15%;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+.heading{
+    margin-bottom: 15px;
+}
+
+.subheading{
+    margin-top: 15px;
+    margin-bottom: 25px;
 }
 
 .EditorErrorPage {

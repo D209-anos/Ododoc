@@ -1,13 +1,19 @@
-import Editor1 from '../components/editor/editor/Editor1';
-import SideBar from '../components/editor/sidebar/SideBar';
+import { Route, Link, Routes } from 'react-router-dom';
+import SideBar from '../../src/components/editor/SideBar';
 import EditorStyle from '../css/view/editor/Editor.module.css';
+import Mypage from '../components/editor/Mypage';
+import Editor1 from '../components/editor/editor/Editor1';
 
 function Editor() {
     return (
         <div className={EditorStyle.editorContainer}>
             <SideBar />
             <div className={EditorStyle.editorWrapper}>
-                <Editor1  />
+            <Routes>
+                <Route path="/mypage" element={<Mypage/>} />
+                <Route path="/" element={<Editor1 />} />
+                {/* <Route path={`/${id}`} element={<Editor1 />} /> */}
+            </Routes>
             </div>
         </div>
 
