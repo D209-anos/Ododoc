@@ -1,15 +1,17 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
-import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock } from "@blocknote/core";
+import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock, Block } from "@blocknote/core";
 import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { CodeBlock, insertCode } from "./CodeBlock";
 import React, { useState, useEffect } from 'react';
 import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
 
 const Editor1 = () => {
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [title, setTitle] = useState('제목입니다22');
   const titleId = "title-id"; // 제목 블록의 고유 ID
 
+  //기본 에디터 스키마 설정
   const schema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
@@ -115,12 +117,38 @@ const Editor1 = () => {
     }
   };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <>
       <BlockNoteView
         editor={editor}
         slashMenu={false}
-        onChange={handleEditorChange}
+        onChange={() => {
+          // Saves the document JSON to state.
+          setBlocks(editor.document as unknown as Block[]);
+        }}
       >
         {/* @ts-ignore */}
         <SuggestionMenuController
@@ -133,6 +161,12 @@ const Editor1 = () => {
           }
         />
       </BlockNoteView>
+      <div>Document JSON:</div>
+      <div className={"item bordered"}>
+        <pre>
+          <code>{JSON.stringify(blocks, null, 2)}</code>
+        </pre>
+      </div>
     </>
   )
 
