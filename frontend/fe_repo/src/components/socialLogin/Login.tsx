@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import { sendCodeToBackend } from '../../api/service/user';
 import menu from '../../css/components/menu/Menu.module.css';
-// import { sendCodeToBackend } from '../../api/service/user';
 import 'animate.css';
 
 interface LoginProps {
@@ -33,9 +32,9 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
         const provider = getProvider();
-        console.log(code, provider)
         if (code && provider) {
             sendCodeToBackend(code, provider, setAccessToken);
+            console.log(code, provider)
         }
     }, [setAccessToken]);
 
@@ -47,7 +46,6 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     }, [accessToken, navigate]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
-        console.log(provider)
         const clientId = {
             kakao: process.env.REACT_APP_KAKAO_CLIENT_ID,
             google: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -55,7 +53,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         };
 
         const redirectUri = {
-            kakao: `${process.env.REACT_APP_KAKAO_REDIRECT_URI}?provider=kakao`,
+            kakao: process.env.REACT_APP_KAKAO_REDIRECT_URI,
             google: process.env.REACT_APP_GOOGLE_REDIRECT_URI,
             naver: process.env.REACT_APP_NAVER_REDIRECT_URI,
         };

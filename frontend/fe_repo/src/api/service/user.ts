@@ -5,9 +5,9 @@ export const sendCodeToBackend = async(code: string, provider: string, setAccess
     try {
         const response = await api.post(`api/oauth2/authorization/${provider}`, {
             code: code,
-            url: "http://localhost:3000/oauth/kakao"
+            url: "https://k10d209.p.ssafy.io/oauth?provider=kakao"
         });
-        console.log('Access Token:', response.data.data.accessToken);
+        console.log('Access Token:', response.data);
         
         // 엑세스 토큰 상태 관리
         setAccessToken(response.data.data.accessToken);

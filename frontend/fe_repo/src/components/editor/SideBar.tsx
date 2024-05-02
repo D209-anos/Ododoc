@@ -128,7 +128,6 @@ const SideBar: React.FC = () => {
         setFolderName(event.target.value);
     };
 
-
     // 폴더명 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isEditing) {
