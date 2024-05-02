@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface DirectoryClosureRepository extends JpaRepository<DirectoryClosure, Directory> {
+public interface DirectoryClosureRepository extends JpaRepository<DirectoryClosure, Directory>, DirectoryClosureCustomRepository {
 
     List<DirectoryClosure> findAllByDescendant(Directory directory);
     List<DirectoryClosure> findAllByAncestor(Directory directory);

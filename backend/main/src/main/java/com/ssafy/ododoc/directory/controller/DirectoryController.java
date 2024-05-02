@@ -76,4 +76,17 @@ public class DirectoryController {
                                       @AuthenticationPrincipal Member member) {
         return directoryService.editDirectory(editRequest, member);
     }
+
+    /**
+     * 폴더/파일 위치 변경 api.
+     *
+     * @param moveRequest 변경할 디렉토리 아이디, 변경할 위치의 상위 폴더 아이디
+     * @param member 로그인 한 멤버
+     * @return 변경된 디렉토리 아이디, 변경된 상위 폴더 아이디
+     */
+    @PutMapping("/move")
+    public MoveResponse moveDirectory(@Valid @RequestBody MoveRequest moveRequest,
+                                      @AuthenticationPrincipal Member member) {
+        return directoryService.moveDirectory(moveRequest, member);
+    }
 }

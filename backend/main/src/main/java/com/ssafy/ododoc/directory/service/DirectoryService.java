@@ -6,10 +6,7 @@ import com.ssafy.ododoc.directory.dto.request.MoveRequest;
 import com.ssafy.ododoc.directory.dto.response.*;
 import com.ssafy.ododoc.directory.entity.Directory;
 import com.ssafy.ododoc.directory.entity.DirectoryClosure;
-import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
-import com.ssafy.ododoc.directory.exception.DirectoryAlreadyDeletedException;
-import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
-import com.ssafy.ododoc.directory.exception.RootDirectoryDeletionException;
+import com.ssafy.ododoc.directory.exception.*;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
 import com.ssafy.ododoc.directory.repository.DirectoryRepository;
 import com.ssafy.ododoc.directory.type.DirectoryType;
@@ -53,6 +50,9 @@ public class DirectoryService {
 
         // 찾은 상위 폴더의 member와 로그인 한 member가 다를 경우 예외 처리
         checkAccess(parent, member);
+
+        // 파일인지 확인
+        checkFile(parent);
 
         // 이미 삭제된 폴더/파일 일 경우 예외 처리
         checkIfDeleted(parent);
@@ -145,9 +145,64 @@ public class DirectoryService {
                 .build();
     }
 
+    @Transactional
+    public MoveResponse moveDirectory(MoveRequest moveRequest, Member member) {
+        Directory directory = directoryRepository.findById(moveRequest.getId())
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        checkAccess(directory, member);
+        checkIfDeleted(directory);
+
+        // 상위 폴더 찾기
+        Directory newParent = directoryRepository.findById(moveRequest.getParentId())
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        // 접근 권한 예외 처리
+        checkAccess(newParent, member);
+
+        // 파일인지 확인
+        checkFile(newParent);
+
+        // 이미 삭제된 경우 예외 처리
+        checkIfDeleted(newParent);
+
+        // 이동시킬 디렉토리의 모든 하위 디렉토리와 연관된 부모 관계 삭제
+        directoryClosureRepository.deleteClosure(directory);
+
+        // 이동할 디렉토리에 이동시킬 디렉토리와 모든 하위 디렉토리 연결
+        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestor(directory);
+        List<DirectoryClosure> newParentList = directoryClosureRepository.findAllByDescendant(newParent);
+
+        List<DirectoryClosure> newList = new ArrayList<>();
+        for(DirectoryClosure parent : newParentList) {
+            for(DirectoryClosure child : children) {
+                newList.add(DirectoryClosure.builder()
+                        .ancestor(parent.getAncestor())
+                        .descendant(child.getDescendant())
+                        .depth(parent.getDepth() + 1)
+                        .build());
+            }
+        }
+
+        directoryClosureRepository.saveAll(newList);
+
+        directory.setParent(newParent);
+
+        return MoveResponse.builder()
+                .id(directory.getId())
+                .newParentId(newParent.getId())
+                .build();
+    }
+
     private void checkAccess(Directory directory, Member member) {
         if(!directory.getMember().equals(member)) {
             throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
+        }
+    }
+
+    private void checkFile(Directory directory) {
+        if(directory.getType().equals(DirectoryType.FILE)) {
+            throw new CannotCreateDirectoryException("파일에는 하위 디렉토리를 생성할 수 없습니다.");
         }
     }
 

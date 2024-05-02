@@ -31,4 +31,9 @@ public class DirectoryExceptionHandler {
     public List<ErrorResponse> rootDirectoryDeletionExceptionHandler(RootDirectoryDeletionException e) {
         return makeErrorResponse(e, "directory");
     }
+
+    @ExceptionHandler(CannotCreateDirectoryException.class)
+    public List<ErrorResponse> cannotCreateDirectoryExceptionHandler(CannotCreateDirectoryException e) {
+        return makeErrorResponse(e, "directory");
+    }
 }
