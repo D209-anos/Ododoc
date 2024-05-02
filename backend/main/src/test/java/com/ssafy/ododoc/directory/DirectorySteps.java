@@ -69,4 +69,11 @@ public class DirectorySteps {
                 .name("")
                 .build();
     }
+
+    public MoveRequest 디렉토리이동_생성(Long id, Long parentId) {
+        return MoveRequest.builder()
+                .id(id)
+                .parentId(parentId)
+                .build();
+    }
 }
