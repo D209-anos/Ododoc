@@ -409,12 +409,12 @@ public class DirectoryApiTest extends ApiTest {
                                 "<br><br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>put 요청</b> 해주세요." +
                                 "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 변경된 폴더/파일 정보</b>가 반환됩니다." +
                                 "<br> - id는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
-                                "<br> - name은 비어있을 수 없습니다. <b>null, '', ' '</b>을 입력하면, <b>400 Bad Request</b>가 반환됩니다." +
+                                "<br> - name은 <b>비어있을 수 없습니다.</b> <b>null, '', ' '</b>을 입력하면, <b>400 Bad Request</b>가 반환됩니다." +
                                 "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
-                                "<br> - id에 해당하는 폴더/파일에 접근 권한이 없을 경우, <b>403 Forbidden</b>이 반환됩니다." +
-                                "<br> - id에 해당하는 폴더/파일을 찾을 수 없을 경우, <b>404 Not Found</b>가 반환됩니다." +
-                                "<br> - id에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>409 Conflict</b>가 반환됩니다.",
-                        "디렉토리명 변경", CommonDocument.AccessTokenHeader,
+                                "<br> - id에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                                "<br> - id에 해당하는 폴더/파일을 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
+                                "<br> - id에 해당하는 폴더/파일이 <b>이미 삭제(휴지통, 영구삭제) 되었다면</b>, <b>409 Conflict</b>가 반환됩니다.",
+                        "디렉토리(폴더/파일)명 변경", CommonDocument.AccessTokenHeader,
                         DirectoryDocument.editRequestFields, DirectoryDocument.editResponseFields
                         ));
     }
@@ -522,5 +522,145 @@ public class DirectoryApiTest extends ApiTest {
                 .andExpect(jsonPath("$.status").value(409))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         DirectoryDocument.editRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_성공_200() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, "디렉토리를 이동하는 API 입니다." +
+                                "<br><br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>put 요청</b> 해주세요." +
+                                "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 이동된 폴더/파일 정보</b>가 반환됩니다." +
+                                "<br> - id와 parentId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                                "<br> - parentId에 해당하는 디렉토리가 <b>파일인 경우</b> 이동할 수 없습니다. <b>400 Bad Request</b>가 반환됩니다." +
+                                "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
+                                "<br> - id 또는 parentId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                                "<br> - id 또는 parentId에 해당하는 폴더/파일을 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
+                                "<br> - id 또는 parentId에 해당하는 폴더/파일이 <b>이미 삭제(휴지통, 영구삭제) 되었다면</b>, <b>409 Conflict</b>가 반환됩니다.",
+                        "디렉토리(폴더/파일) 이동", CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields, DirectoryDocument.moveResponseFields
+                        ));
+    }
+
+    @Test
+    void 디렉토리_이동_잘못된아이디_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = -1L;
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_상위파일_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.파일_생성(token, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_토큰없음_401() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(401))
+                .andDo(document(DEFAULT_RESTDOC_PATH,
+                        DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_권한없음_403() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        String otherToken = memberTestUtil.회원가입_다른유저_토큰반환(mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, otherToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(403))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_없는파일_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = 99999L;
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_이동_삭제폴더_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.폴더_생성(token, mockMvc);
+
+        directoryTestUtil.폴더_삭제(token, parentId, mockMvc);
+
+        mockMvc.perform(
+                put("/directory/move")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(409))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.moveRequestFields));
     }
 }
