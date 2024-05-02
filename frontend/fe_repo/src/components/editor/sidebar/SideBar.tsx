@@ -120,7 +120,7 @@ const SideBar: React.FC = () => {
 
     // 항목 클릭
     const handleItemClick = (id: number): void => {
-        navigate(`/editor/${id}`)
+        navigate(`/editor/${id}`, {state: id})
         setSelectedId(id);
     }
 
