@@ -29,14 +29,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                sh 'echo $JAVA_HOME'
-                sh 'echo $PATH'
-                sh 'java -version'
-            }
-        }
-
         stage("Build BE Docker Image") {
             steps {
                 withCredentials([string(credentialsId: 'jasypt-key', variable: 'JASYPT_KEY')]) {
