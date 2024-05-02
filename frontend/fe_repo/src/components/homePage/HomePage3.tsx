@@ -3,6 +3,7 @@ import EditorErrorPage from '../../assets/images/homePageImage/editorErrorpage.p
 import ErrorScreen from '../../assets/images/homePageImage/errorScreen.png'
 import SuccessScreen from '../../assets/images/homePageImage/successScreen.png'
 import NextVector from '../../assets/images/mark/nextVector.png'
+import Terminal from '../../assets/images/homePageImage/terminal.png'
 
 interface HomePage3Props {
     backgroundColor: string;
@@ -19,6 +20,7 @@ function HomePage3 (props: HomePage3Props) {
             </div>
             <div className={Home3.splitContainer}>
                 <div className={Home3.leftHalf}>
+                    <div style={{ backgroundImage: `url(${Terminal})` }}></div>
                     <img src={ErrorScreen} alt="error-screen" className={Home3.ErrorScreen}/>
                     <img src={SuccessScreen} alt="success-screen" className={Home3.SuccessScreen}/>
                 </div>
