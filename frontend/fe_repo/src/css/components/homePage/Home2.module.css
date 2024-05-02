@@ -1,0 +1,65 @@
+@font-face {
+    font-family: 'BMJUAFont';
+    src: url('../../../../src/assets/fonts/BMJUA_ttf.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.bmjuaFont {
+    font-family: 'BMJUAFont', sans-serif; 
+    color: black;
+    font-size: 50px;
+    line-height: 1.8;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 2;
+    position: relative;
+}
+
+.halfContainerSide {
+    flex: 1;
+}
+
+.textSide{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ImageSide {
+    position: relative;
+}
+
+.visualImage {
+    position: absolute;
+    right: 0;
+    top: 40px;
+    width: 42%;
+    z-index: 1;
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.6);
+}
+
+.intellijImage {
+    position: absolute;
+    right: 7%;
+    top: 120px;
+    width: 47%;
+    z-index: 2;
+}
+
+.editorImage {
+    position: absolute;
+    top: 270px;
+    bottom: 40px;
+    right: 5%;
+    height: 65%;
+    z-index: 3;
+    border-radius: 8px;
+    box-shadow: 5px 5px 35px rgba(0, 0, 0, 0.6);
+}
+
