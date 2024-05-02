@@ -1,8 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
-import menu from '../../css/components/menu/Menu.module.css';
 import { sendCodeToBackend } from '../../api/service/user';
+import menu from '../../css/components/menu/Menu.module.css';
+// import { sendCodeToBackend } from '../../api/service/user';
 import 'animate.css';
 
 interface LoginProps {
@@ -32,6 +33,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
         const provider = getProvider();
+        console.log(code, provider)
         if (code && provider) {
             sendCodeToBackend(code, provider, setAccessToken);
         }
@@ -45,6 +47,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     }, [accessToken, navigate]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
+        console.log(provider)
         const clientId = {
             kakao: process.env.REACT_APP_KAKAO_CLIENT_ID,
             google: process.env.REACT_APP_GOOGLE_CLIENT_ID,
@@ -52,7 +55,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         };
 
         const redirectUri = {
-            kakao: process.env.REACT_APP_KAKAO_REDIRECT_URI,
+            kakao: `${process.env.REACT_APP_KAKAO_REDIRECT_URI}?provider=kakao`,
             google: process.env.REACT_APP_GOOGLE_REDIRECT_URI,
             naver: process.env.REACT_APP_NAVER_REDIRECT_URI,
         };
@@ -64,8 +67,8 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 카카오 로그인 URL
         const loginUrl = {
             kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri.kakao}&response_type=code`,
-            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}&response_type=code&scope=profile email&access_type=offline`,
-            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}&response_type=code`
+            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}?provider=&response_type=code&scope=profile email&access_type=offline`,
+            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}?provider=&response_type=code`
         }
         window.location.href = loginUrl[provider];
     }

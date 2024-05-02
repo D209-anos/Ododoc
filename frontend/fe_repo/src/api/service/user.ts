@@ -5,7 +5,7 @@ export const sendCodeToBackend = async(code: string, provider: string, setAccess
     try {
         const response = await api.post(`api/oauth2/authorization/${provider}`, {
             code: code,
-            url: "http://k10d209.p.ssafy.io:8080"
+            url: "http://localhost:3000/oauth/kakao"
         });
         console.log('Access Token:', response.data.data.accessToken);
         
@@ -19,23 +19,23 @@ export const sendCodeToBackend = async(code: string, provider: string, setAccess
 }
 
 // 로그아웃
-export const logout = async() => {
-    try {
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-            throw new Error('엑세스 토큰을 찾을 수 없네욤..');
-        }
+// export const logout = async() => {
+//     try {
+//         const accessToken = localStorage.getItem('accessToken');
+//         if (!accessToken) {
+//             throw new Error('엑세스 토큰을 찾을 수 없네욤..');
+//         }
 
-        const response = await api.post('/oauth2/logout', {}, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
-        console.log('성공적으로 로그인 되었음!', response.data);
+//         const response = await api.post('/oauth2/logout', {}, {
+//             headers: {
+//                 Authorization: `Bearer ${accessToken}`
+//             }
+//         });
+//         console.log('성공적으로 로그인 되었음!', response.data);
 
-        // 로그아웃 후 local storage 토큰 제거
-        localStorage.removeItem('accessToken');
-    } catch (error) {
-        console.error('로그아웃 도중 문제 발생!!!', error);
-    }
-}
+//         // 로그아웃 후 local storage 토큰 제거
+//         localStorage.removeItem('accessToken');
+//     } catch (error) {
+//         console.error('로그아웃 도중 문제 발생!!!', error);
+//     }
+// }
