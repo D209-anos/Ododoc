@@ -31,8 +31,7 @@ import static java.net.CookiePolicy.ACCEPT_ALL;
 public class KakaoLoginFrame extends Stage {
 
     private final String CLIENT_ID = "a23282fc18f2b445d559dfe93fa96e6b";
-    private final String REDIRECT_URI = "http://localhost:8080/api/oauth2/authorization/kakao";
-//    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/kakao";
+    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/kakao";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;

@@ -62,11 +62,11 @@ public class CodeListener implements ExecutionListener {
         String allBeforeProjectStatus = projectTracker.getAllBeforeProjectStatus();
         String allCurrentProjectStatus = projectTracker.getAllCurrentProjectStatus();
 
-        // 파일을 추가히거나 삭제하지 않은 경우
-        if(allBeforeProjectStatus.equals(allCurrentProjectStatus)){
-            String before, current= "";
-            boolean isChange = false; // 변경된 파일이 있는지 확인
+        String before, current= "";
+        boolean isChange = false; // 변경된 파일이 있는지 확인
 
+        // 파일을 추가하거나 삭제하지 않은 경우
+        if(allBeforeProjectStatus.equals(allCurrentProjectStatus)){
             for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
                 before = entry.getValue().getHash();
                 current = currentProjectStatus.get(entry.getKey()).getHash();
@@ -77,28 +77,81 @@ public class CodeListener implements ExecutionListener {
                     System.out.println(currentProjectStatus.get(entry.getKey()).getPsiFile().getText());
                 }
             }
-
-            // 변경된 파일이 있을 경우 현재 상태를 전 상태로 돌리기 (깊은 복사 )
-            if (isChange){
-                projectTracker.setBeforeProjectStatus(
-                        currentProjectStatus.entrySet().stream()
-                                .collect(Collectors.toMap(e -> e.getKey(), e-> {
-                                    try {
-                                        return (ProjectInfo) e.getValue().clone();
-                                    } catch (CloneNotSupportedException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
-                                }))
-                );
-
-            }
         }
 
         // 파일을 추가하거나 삭제한 경우
         else{
+            int beforeSize = beforeProjectStatus.size();
+            int currentSize = currentProjectStatus.size();
 
+            // 추가한 경우
+            if(beforeSize <= currentSize){
+                for(Map.Entry<String, ProjectInfo> entry : currentProjectStatus.entrySet()){
+
+                    // 추가된 파일이 아닐 경우
+                    if(beforeProjectStatus.containsKey(entry.getKey())){
+                        before = beforeProjectStatus.get(entry.getKey()).getHash();
+                        current = entry.getValue().getHash();
+
+                        // 바뀐 파일이라면 해당 파일 저장
+                        if(!before.equals(current)){
+                            isChange = true;
+                            System.out.println(entry.getValue().getPsiFile().getText());
+                        }
+                    }
+
+                    // 추가된 파일일 경우
+                    else{
+                        isChange = true;
+                        System.out.println(entry.getValue().getPsiFile().getText());
+                    }
+
+                }
+            }
+            // 삭제한 경우
+            else if(beforeSize > currentSize){
+                for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
+
+                    // 삭제된 파일이 아닐 경우
+                    if(currentProjectStatus.containsKey(entry.getKey())){
+                        before = entry.getValue().getHash();
+                        current = currentProjectStatus.get(entry.getKey()).getHash();
+
+                        // 바뀐 파일이라면 해당 파일 저장
+                        if(!before.equals(current)){
+                            isChange = true;
+                            System.out.println(currentProjectStatus.get(entry.getKey()).getPsiFile().getText());
+                        }
+                    }
+
+                    // 삭제된 파일일 경우
+                    else{
+                        isChange = true;
+                        System.out.println("삭제되었습니다: " + entry.getValue().getPsiFile().getName());
+                    }
+
+                }
+            }
         }
 
+        // 변경된 파일이 있을 경우 현재 상태를 전 상태로 돌리기 (깊은 복사 )
+        if (isChange){
+            deepCopy(currentProjectStatus);
+        }
     }
 
+    private void deepCopy(Map<String, ProjectInfo> currentProjectStatus){
+        ProjectTracker projectTracker = ProjectTracker.getInstance();
+        projectTracker.setBeforeProjectStatus(
+                currentProjectStatus.entrySet().stream()
+                        .collect(Collectors.toMap(e -> e.getKey(), e-> {
+                            try {
+                                return (ProjectInfo) e.getValue().clone();
+                            } catch (CloneNotSupportedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }))
+        );
+    }
+    
 }
