@@ -1,7 +1,7 @@
 import { Route, Link, Routes } from 'react-router-dom';
-import SideBar from '../../src/components/editor/SideBar';
+import SideBar from '../../src/components/editor/sidebar/SideBar';
 import EditorStyle from '../css/view/editor/Editor.module.css';
-import Mypage from '../components/editor/Mypage';
+import Mypage from '../components/editor/mypage/Mypage';
 import Editor1 from '../components/editor/editor/Editor1';
 
 function Editor() {

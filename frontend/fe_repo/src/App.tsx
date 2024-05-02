@@ -5,6 +5,7 @@ import Start from './view/Start';
 import Editor from './view/Editor';
 import Menu from './components/menu/Menu';
 import LoginLoading from '../src/components/socialLogin/LoginLoading'
+import Mypage from './components/editor/mypage/Mypage';
 
 
 function App() {
