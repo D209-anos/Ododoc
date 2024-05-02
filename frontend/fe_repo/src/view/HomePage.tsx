@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
+=======
+import React, { useState, useEffect } from 'react';
+>>>>>>> FE_feature/homepage
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import HomePage1 from '../components/homePage/HomePage1';
 import HomePage2 from '../components/homePage/HomePage2';
@@ -7,6 +11,7 @@ import HomePage4 from '../components/homePage/HomePage4';
 import HomePage5 from '../components/homePage/HomePage5';
 import HomePage6 from '../components/homePage/HomePage6';
 
+<<<<<<< HEAD
 function HomePage() {
   const [backgroundColor, setBackgroundColor] = useState('black');
   const [opacity, setOpacity] = useState(1);
@@ -51,11 +56,20 @@ function HomePage() {
       window.removeEventListener('scroll', handleScroll)
     };
   }, []);
+=======
+const HomePage: React.FC = () => {
+  const { backgroundColor, opacity, textColor } = useScrollAnimation();
+  const [isTypingCompletedPage2, setIsTypingCompletedPage2] = useState(false);
+>>>>>>> FE_feature/homepage
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <HomePage1 backgroundColor={backgroundColor} opacity={opacity} textColor={textColor} />
+<<<<<<< HEAD
       <HomePage2 setTypingCompleted={setIsTypingCompleted}></HomePage2>
+=======
+      <HomePage2 setTypingCompleted={setIsTypingCompletedPage2}></HomePage2>
+>>>>>>> FE_feature/homepage
       <HomePage3 backgroundColor={backgroundColor} opacity={opacity} textColor={textColor}></HomePage3>
       <HomePage4></HomePage4>
       <HomePage5></HomePage5>

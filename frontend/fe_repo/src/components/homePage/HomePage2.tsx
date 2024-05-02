@@ -9,6 +9,26 @@ import Home2 from '../../css/components/homePage/Home2.module.css'
 interface HomePage2Props {
   setTypingCompleted: (completed: boolean) => void;
 }
+<<<<<<< HEAD
+
+const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
+    const elementRef = useRef<HTMLElement>(null);
+    const [text, setText] = useState<string>('');
+    const fullText: string = "IntelliJ와 Visual Studio Code에서 빌드만 하면,\n깔끔히 정리된 문서를 제공해 드려요.\n개발 과정 중에 만난 이슈가 자동으로 정리됩니다.";
+    const textLength = fullText.length;
+
+    // 글자 엔터 기능
+    const textLines = text.split('\n').map((line, index) => (
+        <React.Fragment key={index}>
+        {line}
+        <br />
+        </React.Fragment>
+    ));
+
+    // 스크롤 타이핑 애니메이션
+    useScrollTrigger({ setText, setTypingCompleted, fullText, textLength, elementRef });
+=======
+>>>>>>> FE_feature/homepage
 
 const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
     const elementRef = useRef<HTMLElement>(null);
@@ -27,6 +47,7 @@ const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
     // 스크롤 타이핑 애니메이션
     useScrollTrigger({ setText, setTypingCompleted, fullText, textLength, elementRef });
 
+    // 스크롤 opacity
     useIntersectionObserver({
         ref: elementRef,
         onIntersect: () => {
@@ -49,12 +70,19 @@ const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
             <div className={`${Home2.halfContainerSide} ${Home2.imageSide}`}>
                 <div style={{ backgroundImage: `url(${VisualScreen})` }} className={Home2.visualImage} />
                 <div style={{ backgroundImage: `url(${IntellijScreen})` }} className={Home2.intellijImage} />
+<<<<<<< HEAD
                 <div>
                     <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage}>
                         <p className={Home2.editorOverlayText}>
                             {textLines}
                         </p>
                     </div>
+=======
+                <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage} >
+                    <p className={Home2.editorOverlayText}>
+                        {textLines}
+                    </p>
+>>>>>>> FE_feature/homepage
                 </div>
             </div>
         </section>

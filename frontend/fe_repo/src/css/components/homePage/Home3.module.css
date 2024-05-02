@@ -1,5 +1,9 @@
 .container {
     height: 100vh;
+<<<<<<< HEAD
+=======
+    /* margin-top: 1vh; */
+>>>>>>> FE_feature/homepage
     position: relative;
 }
 
@@ -44,9 +48,31 @@
     margin-bottom: 25px;
 }
 
+.heading {
+    font-size: 50px;
+    margin: 0;
+}
+
+.Terminal {
+    width: 630px;
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    position: absolute;
+    top: 36%;
+    left: 10vh;
+}
+
+.subheading {
+    font-size: 30px;
+    margin-top: 20px;
+}
+
 .EditorErrorPage {
-    width: 70%;
-    border-radius: 10px;
+    width: 550px;
+    height: 500px;
+    border-radius: 5px;
 }
 
 .splitContainer {
@@ -83,9 +109,46 @@
 
 .NextVector {
     position: absolute;
-    top: 62%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100px;
     z-index: 10;
+}
+
+.error {
+    color: #fa512f;
+}
+
+.TS2741 {
+    color: white;
+}
+
+.info {
+    color: white;
+}
+
+.code {
+    color: #ce9178;
+}
+
+.yellowText {
+    color: yellow;
+}
+
+.terminalErrorMessageWrapper {
+    position: absolute;
+    top: 19%;
+    left: 4%;
+    line-height: 1;
+    font-family: 'hanbitFont';
+    font-size: 16px;
+}
+
+.redWaveUnderline {
+    text-decoration: none;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 10 Q 2.5 0, 5 10 Q 7.5 0, 10 10" fill="none" stroke="red"/></svg>');
+    background-size: 10px 10px;
+    background-repeat: repeat-x;
+    background-position: 0 100%;
 }
