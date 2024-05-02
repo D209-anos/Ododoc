@@ -12,13 +12,4 @@ public class ProfileResponse {
     private Long errorCount;
     private Long visitCount;
     private Long searchCount;
-
-    public static ProfileResponse convertEntityToDto(Member member) {
-        return ProfileResponse.builder()
-                .buildCount(member.getBuildCount())
-                .errorCount(member.getErrorCount())
-                .visitCount(member.getVisitCount())
-                .searchCount(member.getSearchCount())
-                .build();
-    }
 }

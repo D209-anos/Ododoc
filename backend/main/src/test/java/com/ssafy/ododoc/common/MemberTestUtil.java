@@ -36,12 +36,12 @@ public class MemberTestUtil extends TestBase {
 
     public String 회원가입_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
-        return getValueFromJSONBody(mvcResult, "$.data.accessToken", "");
+        return getValueFromJSONBody(mvcResult, "$.data.accessToken", String.class);
     }
 
     public String 회원가입_다른유저_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, otherMemberCode);
-        return getValueFromJSONBody(mvcResult, "$.data.accessToken", "");
+        return getValueFromJSONBody(mvcResult, "$.data.accessToken", String.class);
     }
 
     public Cookie 회원가입_쿠키반환(MockMvc mockMvc) throws Exception {
@@ -50,13 +50,6 @@ public class MemberTestUtil extends TestBase {
     }
 
     private MvcResult 회원가입_및_로그인(MockMvc mockMvc, String code) throws Exception {
-        memberRepository.save(Member.builder()
-                .code(memberCode)
-                .provider(OAuthProvider.GOOGLE)
-                .nickname(memberNickName)
-                .title(memberNickName + "님의 정리공간")
-                .build());
-
         return mockMvc.perform(
                 post("/oauth2/authorization/{provider}", "google")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -3,9 +3,6 @@ package com.ssafy.ododoc.member;
 import com.ssafy.ododoc.ApiTest;
 import com.ssafy.ododoc.common.CommonDocument;
 import com.ssafy.ododoc.common.MemberTestUtil;
-import com.ssafy.ododoc.member.entity.Member;
-import com.ssafy.ododoc.member.repository.MemberRepository;
-import com.ssafy.ododoc.member.type.OAuthProvider;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class MemberApiTest extends ApiTest {
 
     @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private MemberSteps memberSteps;
 
     @Autowired
@@ -29,13 +23,6 @@ public class MemberApiTest extends ApiTest {
 
     @Test
     void 로그인_성공_200() throws Exception {
-        memberRepository.save(Member.builder()
-                .code(MemberTestUtil.memberCode)
-                .provider(OAuthProvider.GOOGLE)
-                .nickname(MemberTestUtil.memberNickName)
-                .title(MemberTestUtil.memberNickName + "님의 정리공간")
-                .build());
-
         mockMvc.perform(
                 post("/oauth2/authorization/{provider}", "google")
                         .contentType(MediaType.APPLICATION_JSON)
