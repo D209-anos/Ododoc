@@ -32,65 +32,51 @@ const dummyData: IContentItem = {
         {
             "id": 2,
             "type": "FOLDER",
-            "name": "sub-folder1",
+            "name": "ododoc 프로젝트",
             "contents": [
-                {
-                    "id": 3,
-                    "type": "FILE",
-                    "name": "file55",
-                    "contents": "글글글글글"
-                },
                 {
                     "id": 7,
                     "type": "FOLDER",
-                    "name": "sub-folder22",
+                    "name": "프로젝트 이슈 모음집",
                     "contents": [
                         {
                         "id": 13,
                         "type": "FILE",
-                        "name": "file13",
+                        "name": "2024-04-20",
                         "contents": "13번입니다."
-                    },
-                    {
-                        "id": 17,
-                        "type": "FOLDER",
-                        "name": "file13",
-                        "contents": [
-                            {
-                                "id": 10,
-                                "type": "FILE",
-                                "name": "file13",
-                                "contents": "13번입니다."
-                            },
-                            {
-                                "id": 1445,
-                                "type": "FILE",
-                                "name": "fileSDFSDFWDFSFSDFSDFSD",
-                                "contents": "13번입니다."
-                            },
-                            {
-                                "id": 1348,
-                                "type": "FILE",
-                                "name": "file13",
-                                "contents": "13번입니다."
-                            },
-
-                        ]
-                    },
+                        },
+                        {
+                        "id": 144,
+                        "type": "FILE",
+                        "name": "2024-04-22",
+                        "contents": "13번입니다."
+                        },
+                        {
+                        "id": 155,
+                        "type": "FILE",
+                        "name": "2024-04-25",
+                        "contents": "13번입니다."
+                        },
+                        {
+                        "id": 166,
+                        "type": "FILE",
+                        "name": "2024-05-03",
+                        "contents": "13번입니다."
+                        },
                     ]
                 },
             ]
         },
         {
             "id": 4,
-            "type": "FILE",
-            "name": "file11",
+            "type": "FOLDER",
+            "name": "밀정윷놀이 프로젝트",
             "contents": "안녕 글 내용이야 이렇고 저렇고"
         },
         {
             "id": 5,
-            "type": "FILE",
-            "name": "file22",
+            "type": "FOLDER",
+            "name": "vodle 프로젝트",
             "contents": "글글글글"
         }
     ]
