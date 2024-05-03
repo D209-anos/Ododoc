@@ -89,4 +89,11 @@ public class DirectoryController {
                                       @AuthenticationPrincipal Member member) {
         return directoryService.moveDirectory(moveRequest, member);
     }
+
+
+    @GetMapping("/{rootId}")
+    public DirectoryResponse getDirectory(@PathVariable @Min(value = 1, message = "Directory ID는 1 이상이어야 합니다.") Long rootId,
+                                          @AuthenticationPrincipal Member member) {
+        return directoryService.getDirectory(rootId, member);
+    }
 }
