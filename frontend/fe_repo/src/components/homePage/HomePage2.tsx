@@ -32,7 +32,6 @@ function HomePage2() {
                 <div style={{ backgroundImage: `url(${IntellijScreen})` }} className={Home2.intellijImage} />
                 <div>
                     <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage} />
-                    <p>IntelliJ와 Visual Studio Code에서 빌드만 하면, 깔끔히 정리된 문서를 제공해 드려요.</p>
                 </div>
             </div>
         </section>
