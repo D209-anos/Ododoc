@@ -53,6 +53,29 @@ pipeline {
             }
         }
 
+        stage("Build Process Docker Image") {
+            steps {
+                echo '처리 서버 도커 이미지 빌드 시작!'
+                dir("./backend/process") {  // Dockerfile이 있는 백엔드 프로젝트 위치
+                    sh 'chmod +x ./gradlew'
+                    sh './gradlew clean build'
+                    sh "docker build -t d209-pro ."
+                }
+                echo '처리 서버 도커 이미지 빌드 완료!'
+                
+            }
+        }
+
+        stage("Deploy to EC2-Process") {
+            steps {
+                echo '처리 서버 EC2에 배포 시작!'
+                // 기존 컨테이너 중지 및 제거
+                sh 'docker rm -f process || true'
+                sh "docker run -d -p 18080:8080 --name process d209-pro"
+                echo '처리 서버 EC2에 배포 완료!'
+            }
+        }
+
         stage("Prepare FE Environment") {
             steps {
                 echo '프론트엔드 환경 설정 시작!'

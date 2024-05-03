@@ -1,5 +1,5 @@
-import { createReactBlockSpec } from "@blocknote/react";
-import { BlockNoteEditor, defaultBlockSpecs, insertOrUpdateBlock } from "@blocknote/core";
+import { createReactBlockSpec, ToolbarButton, useBlockNoteEditor  } from "@blocknote/react";
+import { BlockNoteEditor, defaultBlockSpecs, insertOrUpdateBlock  } from "@blocknote/core";
 import { MdCode } from "react-icons/md";
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { langs } from "@uiw/codemirror-extensions-langs";
