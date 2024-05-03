@@ -1,5 +1,6 @@
 package com.ssafy.ododocintellij.tracker.manager;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -63,7 +64,7 @@ public class ProjectTracker {
 
     private void getProjectFileList(Project project){
 
-        ReadAction.run(() -> {
+        ApplicationManager.getApplication().runReadAction(() -> {
             GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
             Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, "java", scope);
 

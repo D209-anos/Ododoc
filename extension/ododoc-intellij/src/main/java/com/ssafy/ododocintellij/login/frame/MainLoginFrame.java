@@ -1,6 +1,7 @@
 package com.ssafy.ododocintellij.login.frame;
 
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
+import com.ssafy.ododocintellij.login.frame.oauth.GoogleLoginFrame;
 import com.ssafy.ododocintellij.login.frame.oauth.KakaoLoginFrame;
 import com.ssafy.ododocintellij.login.frame.oauth.NaverLoginFrame;
 import com.ssafy.ododocintellij.login.token.TokenManager;
@@ -47,7 +48,7 @@ public class MainLoginFrame extends Stage {
         });
 
         // 카카오 로그인 버튼
-        ImageView kakaoBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/kakao_login_medium_narrow.png")));
+        ImageView kakaoBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/kakao_login.png")));
         kakaoBtnImageView.setFitWidth(183);
         kakaoBtnImageView.setFitHeight(45);
         Button kakaoLoginBtn = new Button("", kakaoBtnImageView);
@@ -80,7 +81,24 @@ public class MainLoginFrame extends Stage {
             }
         });
 
-        layout.getChildren().addAll(kakaoLoginBtn, naverLoginBtn);
+        // 구글 로그인 버튼
+        ImageView googleBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/google_login.png")));
+        googleBtnImageView.setFitWidth(183);
+        googleBtnImageView.setFitHeight(45);
+        Button googleLoginBtn = new Button("", googleBtnImageView);
+        googleLoginBtn.setStyle("-fx-background-color: transparent; -fx-padding: 3, 3, 3, 3;");
+
+        googleLoginBtn.setOnAction(e -> {
+            try {
+                onLogin("google");
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        layout.getChildren().addAll(kakaoLoginBtn, naverLoginBtn, googleLoginBtn);
 
         Scene scene = new Scene(layout, 300, 400);
         setScene(scene);
@@ -94,6 +112,9 @@ public class MainLoginFrame extends Stage {
             }
             case "naver" -> {
                 new NaverLoginFrame(this);
+            }
+            case "google" -> {
+                new GoogleLoginFrame(this);
             }
         }
     }

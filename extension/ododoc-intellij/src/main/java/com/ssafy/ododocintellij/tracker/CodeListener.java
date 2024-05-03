@@ -62,6 +62,7 @@ public class CodeListener implements ExecutionListener {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
                     String output = objectMapper.writeValueAsString(buildResultInfo);
+                    System.out.println(output);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
