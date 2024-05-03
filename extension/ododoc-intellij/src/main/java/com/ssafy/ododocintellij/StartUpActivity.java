@@ -42,7 +42,8 @@ public class StartUpActivity implements ProjectActivity {
                             Alert.AlertType.WARNING,
                             "Ododoc IntelliJ Plugin",
                             "로그인 필요",
-                            "자동 정리 기능을 사용하려면 로그인이 필요합니다."
+                            "자동 정리 기능을 사용하려면 로그인이 필요합니다.",
+                            "/image/button/icon.png"
                     );
                 });
             } else{
