@@ -7,7 +7,7 @@ import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.token.TokenManager;
 import com.ssafy.ododocintellij.tracker.CodeListener;
-import com.ssafy.ododocintellij.tracker.project.ProjectProvider;
+import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import kotlin.Unit;
@@ -23,8 +23,6 @@ public class StartUpActivity implements ProjectActivity {
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         TokenManager tokenManager = TokenManager.getInstance();
         ProjectProvider projectProvider = ProjectProvider.getInstance();
-
-        System.out.println("추가 완료 : " + project);
         projectProvider.getProjects().offer(project);
 
         // JavaFX 플랫폼 초기화 상태 체크 및 조건부 초기화

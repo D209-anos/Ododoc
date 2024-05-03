@@ -1,4 +1,4 @@
-package com.ssafy.ododocintellij.tracker.project;
+package com.ssafy.ododocintellij.tracker.manager;
 
 import com.intellij.openapi.project.Project;
 

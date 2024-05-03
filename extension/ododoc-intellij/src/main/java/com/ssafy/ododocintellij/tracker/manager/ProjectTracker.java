@@ -1,4 +1,4 @@
-package com.ssafy.ododocintellij.tracker.project;
+package com.ssafy.ododocintellij.tracker.manager;
 
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
@@ -7,6 +7,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

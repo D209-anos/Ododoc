@@ -1,4 +1,4 @@
-package com.ssafy.ododocintellij.tracker.project;
+package com.ssafy.ododocintellij.tracker.entity;
 
 import com.intellij.psi.PsiFile;
 
