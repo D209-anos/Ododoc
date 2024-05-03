@@ -30,10 +30,9 @@ import java.util.concurrent.TimeUnit;
 
 import static java.net.CookiePolicy.ACCEPT_ALL;
 
-public class KakaoLoginFrame extends Stage {
-
-    private final String CLIENT_ID = "a23282fc18f2b445d559dfe93fa96e6b";
-    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/kakao";
+public class NaverLoginFrame extends Stage {
+    private final String CLIENT_ID = "DRnVNgGzq_x_6Q4apfhJ";
+    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/naver";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;
@@ -41,11 +40,11 @@ public class KakaoLoginFrame extends Stage {
     private ProgressIndicator loadingIndicator;
     private Alert alert;
 
-    public KakaoLoginFrame(MainLoginFrame mainLoginFrame) {
+    public NaverLoginFrame(MainLoginFrame mainLoginFrame) {
         this.mainLoginFrame = mainLoginFrame;
 
-        setTitle(" KAKAO");
-        Image windowIcon = new Image(getClass().getResourceAsStream("/image/button/kakao_icon.png"));
+        setTitle(" NAVER");
+        Image windowIcon = new Image(getClass().getResourceAsStream("/image/button/naver_icon.png"));
         getIcons().add(windowIcon);
 
         StackPane layout = new StackPane();
@@ -60,17 +59,18 @@ public class KakaoLoginFrame extends Stage {
         show();
 
         alert = AlertHelper.makeAlert(
-                Alert.AlertType.WARNING,
-                " KAKAO",
+                Alert.AlertType.CONFIRMATION,
+                " NAVER",
                 "로그인 실패",
                 "다시 로그인 해주세요.",
-                "/image/button/kakao_icon.png");
+                "/image/button/naver_icon.png"
+        );
 
-        doKakaoLogin(webEngine);
+        doNaverLogin(webEngine);
     }
 
-    private void doKakaoLogin(WebEngine webEngine) {
-        
+    private void doNaverLogin(WebEngine webEngine) {
+
         CookieManager cookieManager = new CookieManager();
         cookieManager.setCookiePolicy(ACCEPT_ALL);
         CookieHandler.setDefault(cookieManager);
@@ -96,13 +96,13 @@ public class KakaoLoginFrame extends Stage {
             if (newState == Worker.State.SUCCEEDED) {
 
                 // 로그인 응답 시간 스케쥴러 등록, 로딩 스피너 작동
-                if (webEngine.getLocation().contains("kakaossotokenlogin.do")){
+                if (webEngine.getLocation().contains("oauth_token")){
                     scheduler.schedule(timeoutTask, TIME_OUT, TimeUnit.SECONDS);
                     loadingIndicator.setVisible(true);
                 }
 
                 // 응답을 받을 화면이 나온다면
-                if (webEngine.getLocation().contains(REDIRECT_URI)) {
+                if (webEngine.getLocation().contains(REDIRECT_URI) && !webEngine.getLocation().contains("nid")) {
 
                     scheduler.shutdownNow();
                     loadingIndicator.setVisible(false);
@@ -151,7 +151,7 @@ public class KakaoLoginFrame extends Stage {
         });
 
         webEngine.load(
-                "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="
+                "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id="
                         + CLIENT_ID
                         + "&redirect_uri="
                         + REDIRECT_URI);
@@ -169,4 +169,3 @@ public class KakaoLoginFrame extends Stage {
         }
     }
 }
-
