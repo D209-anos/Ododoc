@@ -1,7 +1,13 @@
 package com.ssafy.ododocintellij.login.frame.oauth;
 
+import com.intellij.execution.ExecutionManager;
+import com.intellij.openapi.project.Project;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
+import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.token.TokenManager;
+import com.ssafy.ododocintellij.tracker.CodeListener;
+import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
+import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
@@ -25,12 +31,15 @@ import static java.net.CookiePolicy.ACCEPT_ALL;
 public class KakaoLoginFrame extends Stage {
 
     private final String CLIENT_ID = "a23282fc18f2b445d559dfe93fa96e6b";
-    private final String REDIRECT_URI = "http://localhost:8080/api/oauth2/authorization/kakao";
+    private final String REDIRECT_URI = "https://k10d209.p.ssafy.io/api/oauth2/authorization/kakao";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;
+    private MainLoginFrame mainLoginFrame = null;
 
-    public KakaoLoginFrame() {
+    public KakaoLoginFrame(MainLoginFrame mainLoginFrame) {
+        this.mainLoginFrame = mainLoginFrame;
+
         setTitle("Login with Kakao");
 
         VBox layout = new VBox();
@@ -122,8 +131,11 @@ public class KakaoLoginFrame extends Stage {
                         }
                     });
 
-                    close();
+                    // 지금 현재 등록되어 있는 모든 프로젝트들에게 codeListener 추가하기
+                    addCodeListener(ProjectProvider.getInstance());
 
+                    mainLoginFrame.close();
+                    close();
                 }
             }
 
@@ -134,6 +146,18 @@ public class KakaoLoginFrame extends Stage {
                         + CLIENT_ID
                         + "&redirect_uri="
                         + REDIRECT_URI);
+    }
+
+    // Queue에 있는 project 객체에 codeListener 추가해주기.
+    private void addCodeListener(ProjectProvider projectProvider){
+        int size = projectProvider.getProjects().size();
+        ProjectTracker projectTracker = ProjectTracker.getInstance();
+        Project tempProject = null;
+        for(int i = 0; i < size; i++){
+            tempProject = projectProvider.getProjects().poll();
+            tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+            projectTracker.initHashStatus(tempProject);
+        }
     }
 }
 
