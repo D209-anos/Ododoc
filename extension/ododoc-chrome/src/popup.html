@@ -2,27 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ododoc</title>
-    <link rel="stylesheet" href="popup.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension Popup</title>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="app">
-    <h1 class="counter-label">오도독</h1>
-    <div id="counter" class="counter"></div>
-    <div class="button-container">
-      <button id="startTracking" class="button">시작하기</button>
-      <button id="stopTracking" class="button">중지하기</button>
+    <div class="container">
+        <h1>Ododoc</h1>
+        <button id="startButton">Start</button>
+        <button id="stopButton">Stop</button>
+        <button id="loginButton">Login</button>
+        <div id="loginModal" class="modal">
+          <div class="modal-content">
+              <span class="close">&times;</span>
+              <button id="kakaoLogin">카카오</button>
+              <button id="naverLogin">네이버</button>
+              <button id="googleLogin">구글</button>
+          </div>
+      </div>
     </div>
-    <hr class="divider" />
- </div>
-
-  <script src="popup.js"></script>
-
-  <!--
-    This HTML file opens when you click on icon from the toolbar.
-
-    To begin the development, run `npm run watch`.
-    To create a production bundle, use `npm run build`.
-  -->
+    <script src="popup.js"></script>
 </body>
 </html>
