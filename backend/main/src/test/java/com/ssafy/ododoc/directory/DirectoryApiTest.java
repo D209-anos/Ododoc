@@ -56,13 +56,12 @@ public class DirectoryApiTest extends ApiTest {
     @Test
     void 디렉토리_폴더생성_성공_200() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = 1L;
 
         mockMvc.perform(
                 post("/directory")
                         .header(AUTH_HEADER, token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(directoryId)))
+                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(directoryTestUtil.rootId)))
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -105,13 +104,12 @@ public class DirectoryApiTest extends ApiTest {
     @Test
     void 디렉토리_폴더생성_이름_30자이상_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = 1L;
 
         mockMvc.perform(
                 post("/directory")
                         .header(AUTH_HEADER, token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성_이름_30자이상(directoryId)))
+                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성_이름_30자이상(directoryTestUtil.rootId)))
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
@@ -189,12 +187,10 @@ public class DirectoryApiTest extends ApiTest {
 
     @Test
     void 디렉토리_생성_토큰없음_401() throws Exception {
-        Long directoryId = 1L;
-
         mockMvc.perform(
                 post("/directory")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(directoryId)))
+                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(directoryTestUtil.rootId)))
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(401))
@@ -379,10 +375,9 @@ public class DirectoryApiTest extends ApiTest {
     @Test
     void 디렉토리_삭제_최상위디렉토리_409() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = 1L;
 
         mockMvc.perform(
-                        delete("/directory/{option}/{directoryId}", "trashbin", directoryId)
+                        delete("/directory/{option}/{directoryId}", "trashbin", directoryTestUtil.rootId)
                                 .header(AUTH_HEADER, token)
                 )
                 .andExpect(status().isOk())
@@ -575,7 +570,7 @@ public class DirectoryApiTest extends ApiTest {
     void 디렉토리_이동_상위파일_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long id = directoryTestUtil.폴더_생성(token, mockMvc);
-        Long parentId = directoryTestUtil.파일_생성(token, mockMvc);
+        Long parentId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
 
         mockMvc.perform(
                 put("/directory/move")
@@ -662,5 +657,103 @@ public class DirectoryApiTest extends ApiTest {
                 .andExpect(jsonPath("$.status").value(409))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         DirectoryDocument.moveRequestFields));
+    }
+
+    @Test
+    void 디렉토리_조회_성공_200() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        directoryTestUtil.파일_생성(token, id, mockMvc);
+        directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+
+        mockMvc.perform(
+                get("/directory/{rootId}", directoryTestUtil.rootId)
+                        .header(AUTH_HEADER, token)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, "디렉토리를 조회하는 API 입니다." +
+                        "<br><br><b>header에 올바른 JWT accessToken</b>을, <b>path에 올바른 rootId</b>를 담아 <b>get 요청</b> 해주세요." +
+                        "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 디렉토리 정보</b>가 반환됩니다." +
+                        "<br> - rootId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
+                        "<br> - rootId에 해당하는 디렉토리에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                        "<br> - rootId에 해당하는 디렉토리를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다.",
+                        "디렉토리 조회", CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.getPathFields, DirectoryDocument.getResponseFields));
+    }
+
+    @Test
+    void 디렉토리_조회_잘못된아이디_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = -1L;
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        directoryTestUtil.파일_생성(token, id, mockMvc);
+        directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+
+        mockMvc.perform(
+                        get("/directory/{rootId}", rootId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.getPathFields));
+    }
+
+    @Test
+    void 디렉토리_조회_토큰없음_401() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        directoryTestUtil.파일_생성(token, id, mockMvc);
+        directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+
+        mockMvc.perform(
+                        get("/directory/{rootId}", directoryTestUtil.rootId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(401))
+                .andDo(document(DEFAULT_RESTDOC_PATH,
+                        DirectoryDocument.getPathFields));
+    }
+
+    @Test
+    void 디렉토리_조회_권한없음_403() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        directoryTestUtil.파일_생성(token, id, mockMvc);
+        directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+
+        String otherToken = memberTestUtil.회원가입_다른유저_토큰반환(mockMvc);
+
+        mockMvc.perform(
+                        get("/directory/{rootId}", directoryTestUtil.rootId)
+                                .header(AUTH_HEADER, otherToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(403))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.getPathFields));
+    }
+
+    @Test
+    void 디렉토리_조회_없는디렉토리_404() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = 99999L;
+        Long id = directoryTestUtil.폴더_생성(token, mockMvc);
+        directoryTestUtil.파일_생성(token, id, mockMvc);
+        directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+
+        mockMvc.perform(
+                        get("/directory/{rootId}", rootId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        DirectoryDocument.getPathFields));
     }
 }
