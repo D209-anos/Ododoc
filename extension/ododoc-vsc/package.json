@@ -50,7 +50,12 @@
           "id": "myterminal.my-custom-terminal"
         }
       ]
-    }
+    },
+    "uriHandlers": [
+      {
+        "uri": "ododoc-vsc"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
