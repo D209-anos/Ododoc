@@ -1,5 +1,5 @@
 .container {
-    height: 100vh;
+    height: 170vh;
     position: relative;
 }
 
@@ -32,43 +32,44 @@
     text-align: right;
     margin-right: 15%;
     margin-top: 15px;
-    margin-bottom: 25px;
-}
-
-.heading{
     margin-bottom: 15px;
 }
 
 .subheading{
-    margin-top: 15px;
-    margin-bottom: 25px;
+    margin: 0;
+    margin-right: 100px;
+    font-size: 30px;
+    margin-top: 10px;
+    margin-bottom: 60px;
 }
 
 .heading {
     font-size: 50px;
     margin: 0;
+    margin-right: 100px;
 }
 
 .Terminal {
-    width: 630px;
-    height: 260px;
+    width: 655px;
+    height: 280px;
     background-size: cover;
     background-position: center;
     border-radius: 5px;
     position: absolute;
-    top: 36%;
-    left: 10vh;
-}
-
-.subheading {
-    font-size: 30px;
-    margin-top: 20px;
+    top: 43%;
+    left: 5vh;
 }
 
 .EditorErrorPage {
     width: 550px;
-    height: 500px;
+    height: 580px;
+    background-size: cover;
+    background-position: left;
     border-radius: 5px;
+    position: absolute;
+    top: 22.5%;
+    left: 107vh;
+    border: 2px solid rgb(199, 196, 196);
 }
 
 .splitContainer {
@@ -105,8 +106,8 @@
 
 .NextVector {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 54%;
+    left: 50.8%;
     transform: translate(-50%, -50%);
     width: 100px;
     z-index: 10;
@@ -114,6 +115,7 @@
 
 .error {
     color: #fa512f;
+    font-size: 17px;
 }
 
 .TS2741 {
@@ -137,14 +139,94 @@
     top: 19%;
     left: 4%;
     line-height: 1;
-    font-family: 'hanbitFont';
     font-size: 16px;
 }
 
 .redWaveUnderline {
     text-decoration: none;
     background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 10 Q 2.5 0, 5 10 Q 7.5 0, 10 10" fill="none" stroke="red"/></svg>');
-    background-size: 10px 10px;
+    background-size: 12px;
     background-repeat: repeat-x;
-    background-position: 0 100%;
+    background-position: 0 120%;
+}
+
+.codeblockContainer {
+    border: 3px solid rgb(0, 0, 0);
+    width: 600px;
+    height: 480px;
+    border-radius: 10px;
+    position: absolute;
+    top: 36%;
+    right: 4%;
+}
+
+.editorTitle {
+    font-size: 20px;
+    /* 상 우 하 좌 */
+    margin: 16px 0px 8px 25px;
+    font-family: 'hanbitFont';
+}
+
+.line {
+    width: 300px;
+    margin: 0;
+    margin-left: 20px;
+    height: 0.5px;
+    background-color: rgb(233, 229, 229);
+}
+
+.codeContainer {
+    width: 557px;
+    height: 270px;
+    background-color: #ffffff;
+    border: 2px solid gray;
+    display: flex;
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+}
+
+.codeContent {
+    margin-left: 10px;
+}
+
+.terminalContainer {
+    width: 557px;
+    height: 130px;
+    background-color: rgb(63, 63, 63);
+    display: flex;
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+}
+
+.terminalContent {
+    margin-left: 10px;
+}
+
+.basic {
+    font-family: 'hanbitFont';
+    color: black;
+}
+
+.component {
+    font-family: 'hanbitFont';
+    color: rgb(100, 100, 212);
+}
+
+.style {
+    font-family: 'hanbitFont';
+    color: #ee7c4e;
+}
+
+.componentTitle {
+    font-family: 'hanbitFont';
+    color: green;
+    margin-bottom: 30px;
+}
+
+.textArea {
+    position: absolute;
+    top: 24%;
+    right: 4%;
 }

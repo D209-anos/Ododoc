@@ -11,7 +11,6 @@ import Mypage from './components/editor/mypage/Mypage';
 function App() {
 
   return (
-
     <Router>
       <Menu />
       <Routes>
