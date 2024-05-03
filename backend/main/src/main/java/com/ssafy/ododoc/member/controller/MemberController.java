@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 /**
  * @author 이준희
  */
@@ -53,6 +55,14 @@ public class MemberController {
 
         log.debug("[테스트 social login 호출] : {} {}", provider, code);
         Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
+
+        JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
+        String vscodeUri = "vscode://ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "?provider=" + jwtTokenResponse.oAuthProvider();
+        try {
+            response.sendRedirect(vscodeUri);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         jwtProvider.setRefreshTokenForClient(response, memberInfo);
         return jwtProvider.makeJwtTokenResponse(memberInfo);
