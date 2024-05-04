@@ -20,14 +20,8 @@ function HomePage4 () {
     // 스크롤 opacity
     useIntersectionObserver({
         ref: sectionRef,
-        onIntersect: () => {
-            setIsVisible(true)
-            console.log("들어왔다~~  ", isVisible)
-        },
-        onExit: () => {
-            setIsVisible(false)
-            console.log("나갔다~~ ", isVisible)
-        },
+        onIntersect: () => { setIsVisible(true) },
+        onExit: () => { setIsVisible(false) },
         threshold: 0.4
     });
 
@@ -47,22 +41,16 @@ function HomePage4 () {
 
     useEffect(() => {
         if (!isVisible) return;
-        console.log('isvisibe??  ', isVisible);
 
         const fadeInOut = (element: HTMLElement, delay: number) => {
             return new Promise<void>(resolve => {
                 setTimeout(() => {
-                    console.log(element, '애니메이션 시작');
-                    console.log(isVisibleRef.current);
                     if (!isVisibleRef.current) return;
                     element.style.opacity = '1';
                     element.style.transition = 'opacity 0.5s ease-in-out';
                     setTimeout(() => {
-                        console.log(isVisibleRef.current);
-
                         if (!isVisibleRef.current) return; 
                         element.style.opacity = '0.3';
-                        console.log(element, '애니메이션 종료');
                         resolve();
                     }, 1000);
                 }, delay);

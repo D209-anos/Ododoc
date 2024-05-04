@@ -18,7 +18,7 @@
   align-items: center;
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+  z-index: 100002;
   transition: transform 0.1s ease;
 }
 
@@ -30,47 +30,93 @@
   position: fixed;
   right: 20px;
   bottom: 80px;
-  /* 토글 버튼 바로 위 */
-  background-color: white;
   border-radius: 10px;
   padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 2;
+  z-index: 100002;
 }
-
-.menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu li {
-  text-align: center;
-  width: 50px;
-  padding: 8px;
-  border-bottom: 1px solid #ccc;
-}
-
-.menu li:hover{
-  font-weight: bold;
-}
-
-.menu li:last-child {
-  border-bottom: none;
-}
-
-/*
-  ==============================================
-  로그인 모달창 CSS
-  ==============================================
-  */
 
 .loginOpenBtn{
   cursor: pointer;
+  background-color: rgb(252, 216, 59);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'hanbitFont';
+  position: absolute;
+  top: -7vh;
+  right: 1vh;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
 }
 
-.clickable{
+.loginOpenBtn:hover {
+  transform: scale(1.1) !important;
+}
+
+.homeOpenBtn {
   cursor: pointer;
+  background-color: rgb(252, 216, 59);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'hanbitFont';
+  position: absolute;
+  top: -18vh;
+  right: 1vh;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.homeOpenBtn:hover {
+  transform: scale(1.1) !important;
+}
+
+.startOpenBtn {
+  cursor: pointer;
+  background-color: rgb(252, 216, 59);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'hanbitFont';
+  position: absolute;
+  top: 1vh;
+  right: 10vh;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+
+.startOpenBtn:hover {
+  transform: scale(1.1) !important;
+}
+
+.editorOpenBtn {
+  cursor: pointer;
+  background-color: rgb(252, 216, 59);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'hanbitFont';
+  position: absolute;
+  top: 1vh;
+  right: 21vh;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.1s ease;
+}
+
+.editorOpenBtn:hover {
+  transform: scale(1.1) !important;
 }
 
 .customFaster  {
@@ -87,7 +133,7 @@
   justify-content: center;
   align-items: center;
   background: rgba(0,0,0,0.5);
-  z-index: 2;
+  z-index: 11112;
   opacity: 1;
 }
 

@@ -20,6 +20,8 @@ function App() {
         <Route path='/oauth' element={<LoginLoading />}></Route>
         <Route path='/editor' element={<Editor />} />
         <Route path='editor/:id' element={<Editor />} />
+        <Route path='/start' element={<Start />} />
+        {/* <Route path='/profile' element={<Mypage />} /> */}
       </Routes>
     </Router>
   );
