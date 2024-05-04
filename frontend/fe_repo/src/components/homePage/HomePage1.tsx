@@ -33,7 +33,6 @@ function HomePage1(props: HomePage1Props) {
                             typeSpeed={40}
                             backSpeed={25}
                             loop
-                            shuffle
                         />
                     </div>
                 </div>
