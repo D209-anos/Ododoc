@@ -41,6 +41,7 @@
     "react-router-dom": "^6.22.3",
     "react-scripts": "5.0.1",
     "react-scroll": "^1.9.0",
+    "react-spring": "^9.7.3",
     "react-typed": "^2.0.12",
     "redux": "^5.0.1",
     "styled-components": "^6.1.8",

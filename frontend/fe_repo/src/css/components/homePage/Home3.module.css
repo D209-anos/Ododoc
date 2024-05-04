@@ -1,5 +1,6 @@
 .container {
-    height: 170vh;
+    height: 160vh;
+    max-width: 97vw;
     position: relative;
 }
 
@@ -58,6 +59,7 @@
     position: absolute;
     top: 43%;
     left: 5vh;
+    box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .EditorErrorPage {
@@ -105,11 +107,11 @@
 }
 
 .NextVector {
-    position: absolute;
-    top: 54%;
-    left: 50.8%;
+    position: fixed;
+    top: 90vh;
+    left: 50%;
     transform: translate(-50%, -50%);
-    width: 100px;
+    width: 50px;
     z-index: 10;
 }
 
@@ -151,24 +153,25 @@
 }
 
 .codeblockContainer {
-    border: 3px solid rgb(0, 0, 0);
-    width: 600px;
+    border: 0.2px solid rgb(0, 0, 0, 0.1);
+    width: 650px;
     height: 480px;
     border-radius: 10px;
     position: absolute;
     top: 36%;
-    right: 4%;
+    right: 2.3%;
+    box-shadow: 3px 5px 3px 2px rgba(0, 0, 0, 0.2);
 }
 
 .editorTitle {
     font-size: 20px;
     /* 상 우 하 좌 */
     margin: 16px 0px 8px 25px;
-    font-family: 'hanbitFont';
+    font-family: 'bmjuaFont';
 }
 
 .line {
-    width: 300px;
+    width: 180px;
     margin: 0;
     margin-left: 20px;
     height: 0.5px;
@@ -178,16 +181,13 @@
 .codeContainer {
     width: 557px;
     height: 270px;
-    background-color: #ffffff;
-    border: 2px solid gray;
+    background-color: #f8f7f7;
+    border: 2px solid rgb(189, 188, 188);
     display: flex;
     margin-top: 10px;
     margin-left: 20px;
     border-radius: 5px;
-}
-
-.codeContent {
-    margin-left: 10px;
+    flex-direction: row;
 }
 
 .terminalContainer {
@@ -229,4 +229,35 @@
     position: absolute;
     top: 24%;
     right: 4%;
+}
+
+.editorTerminal {
+    display: flex;
+    flex-direction: row;
+}
+
+.terminalNumber {
+    width: 30px;
+    height: 100%;
+    background-color: #e2e1e1;
+    display: flex;
+    flex-direction: column;
+    font-family: 'hanbitFont';
+    min-width: 30px;
+    text-align: center;
+}
+
+.number1 {
+    margin: 0;
+    margin-top: 5px;
+}
+
+.number {
+    margin: 0;
+}
+
+.codeContent {
+    margin: 0;
+    margin-top: 5px;
+    margin-left: 10px;
 }
