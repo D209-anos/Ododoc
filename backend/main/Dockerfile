@@ -1,15 +1,13 @@
-FROM gradle:8.5-jdk21 as builder
-WORKDIR /app
+FROM openjdk:21
 
-COPY build.gradle settings.gradle /app/
-COPY src /app/src
+ENV TZ=Asia/Seoul
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN gradle build -x test --parallel --continue
+ARG JAR_FILE=build/libs/ododoc-0.0.1-SNAPSHOT.jar
+ARG JASYPT_KEY
 
-FROM openjdk:21-jdk-slim
+ENV JASYPT_KEY=$JASYPT_KEY
 
-COPY --from=builder /app/build/libs/*.jar /app/app.jar
+COPY ${JAR_FILE} app.jar
 
-EXPOSE 8080
-
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-DJASYPT_KEY=${JASYPT_KEY}", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]

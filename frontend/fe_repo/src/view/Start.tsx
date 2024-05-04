@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Logo from '../assets/images/ododoc-start.png';
-import start from '../css/view/Start.module.css';
-import VSCode from '../components/start/VSCode';
-import IntelliJ from '../components/start/IntelliJ';
-import Chrome from '../components/start/Chrome';
+import Logo from '../assets/images/ododocLogo/ododoc-start.png';
+import start from '../css/view/startPage/Start.module.css';
+import VSCode from '../components/startPage/VSCode';
+import IntelliJ from '../components/startPage/IntelliJ';
+import Chrome from '../components/startPage/Chrome';
 
 type SelectedType = 'VSCode' | 'IntelliJ' | 'Chrome';
 

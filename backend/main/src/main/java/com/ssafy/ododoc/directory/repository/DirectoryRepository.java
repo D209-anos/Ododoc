@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface DirectoryRepository extends JpaRepository<Directory, Long> {
 
-    List<Directory> findAllByPathContains(String path);
 }

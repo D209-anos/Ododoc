@@ -35,8 +35,9 @@ public class Directory extends BaseTime {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private Directory parent;
 
-    @Column(length = 512)
-    private String path;
+    @OneToMany(mappedBy = "parent")
+    private List<Directory> children = new ArrayList<>();
 }
