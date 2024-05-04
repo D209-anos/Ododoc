@@ -29,12 +29,10 @@ class LoginWebView {
     static instance;
     panel;
     constructor(context) {
-        console.log(context, "만들었어~`");
         context.subscriptions.push(vscode.commands.registerCommand("ododoc.showLoginWebView", () => this.showLoginWebViewCommand(context)));
     }
     static getInstance(context) {
         if (!LoginWebView.instance) {
-            console.log(context, "만들게~`");
             LoginWebView.instance = new LoginWebView(context);
         }
         return LoginWebView.instance;
@@ -52,7 +50,7 @@ class LoginWebView {
         }, undefined, context.subscriptions);
     }
     getWebviewContent(webview, extensionUri) {
-        const OdodocLogoUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "ododocLogo.png"));
+        const ododocLogoUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "ododocLogo.png"));
         const kakaoLogoUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "kakaoLogo.png"));
         const naverLogoUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "naverLogo.png"));
         const googleLogoUri = webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "googleLogo.png"));
@@ -102,7 +100,7 @@ class LoginWebView {
     <body>
       <div class="container">
         <h1>Login</h1>
-        <img class="ododoc-logo" src="${OdodocLogoUri}" alt="Ododoc Logo" />
+        <img class="ododoc-logo" src="${ododocLogoUri}" alt="Ododoc Logo" />
         <div class="login-btn-container">
           <button id="login-naver" class="login-btn">
             <img class="social-logo" src="${naverLogoUri}" alt="Naver">
@@ -136,10 +134,11 @@ class LoginWebView {
     </html>
     `;
     }
-    getSuccessContent() {
+    getSuccessContent(extensionUri) {
         if (!this.panel) {
             return;
         }
+        const ododocLogoGifUri = this.panel.webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "images", "ododocLogo.gif"));
         this.panel.webview.html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -147,10 +146,26 @@ class LoginWebView {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login Successful</title>
+        <style>
+        .container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background-color: #ffffff;
+        }
+
+        .success-h1 {
+          color: #000000;
+        }
+        </style>
       </head>
       <body>
-        <h1>로그인에 성공했습니다!</h1>
-        <p>코딩해라</p>
+        <div class="container">
+          <h1>Login Success</h1>
+          <img class="ododoc-logo" src="${ododocLogoGifUri}" alt="Ododoc Logo" />
+        </div>
       </body>
       </html>
     `;

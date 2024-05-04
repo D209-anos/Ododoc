@@ -22,33 +22,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = __importStar(require("vscode"));
-const AccountsItem_1 = require("./tree_items/AccountsItem");
+const AccountsItem_1 = __importDefault(require("./tree_items/AccountsItem"));
 class OdodocTreeProvider {
-    secretStorage;
     // 데이터 변경이 발생했을 때 TreeView를 새로 고침하도록 vscode에 알리는 데에 사용
-    onDidChangeTreeData;
+    _onDidChangeTreeData = new vscode.EventEmitter();
+    onDidChangeTreeData = this._onDidChangeTreeData.event;
     constructor(context) {
-        this.secretStorage = context.secrets;
-        this.onDidChangeTreeData = new vscode.EventEmitter().event;
+        vscode.window.createTreeView("ododoc.main", {
+            treeDataProvider: this,
+        });
+        context.subscriptions.push(vscode.authentication.onDidChangeSessions(() => {
+            this.refresh();
+        }));
     }
+    refresh = () => {
+        console.log("refresh");
+        this._onDidChangeTreeData.fire();
+    };
     // 각 노드를 어떻게 표시할 것인지 정의
     getTreeItem(element) {
         return element;
     }
     // 트리 뷰에 표시할 노드들
-    getChildren(element) {
-        if (this.isLogin()) {
-            return [AccountsItem_1.AccountsItem];
+    async getChildren(element) {
+        const loggedInSession = await this.isLogin();
+        if (loggedInSession !== undefined) {
+            return [new AccountsItem_1.default(loggedInSession.account.label)];
         }
         return [];
     }
-    isLogin() {
-        const token = this.secretStorage.get("authToken");
-        console.log(token);
-        // return token !== undefined && token !== null;
-        return false;
+    async isLogin() {
+        const session = await vscode.authentication.getSession("jwtProvider", [], {
+            createIfNone: false,
+        });
+        console.log(session, "session");
+        return session;
     }
 }
 exports.default = OdodocTreeProvider;

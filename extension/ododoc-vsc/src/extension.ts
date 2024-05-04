@@ -16,10 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
   JwtAuthenticationProvider.getInstance(context);
 
   // extension view 생성
-  const ododocTreeProvider = new OdodocTreeProvider(context);
-  vscode.window.createTreeView("ododoc.main", {
-    treeDataProvider: ododocTreeProvider,
-  });
+  new OdodocTreeProvider(context);
 
   // 터미널 생성
   const terminalManager = new TerminalManager();

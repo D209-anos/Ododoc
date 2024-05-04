@@ -23,7 +23,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AccountsItem = void 0;
 const vscode = __importStar(require("vscode"));
-exports.AccountsItem = new vscode.TreeItem("hello hello?", vscode.TreeItemCollapsibleState.None);
+class AccountsItem extends vscode.TreeItem {
+    label;
+    collapsibleState;
+    constructor(label, collapsibleState = vscode
+        .TreeItemCollapsibleState.None) {
+        super(label, collapsibleState);
+        this.label = label;
+        this.collapsibleState = collapsibleState;
+        this.tooltip = `${this.label}`;
+        this.iconPath = new vscode.ThemeIcon("account");
+        this.contextValue = "account";
+    }
+}
+exports.default = AccountsItem;
 //# sourceMappingURL=AccountsItem.js.map

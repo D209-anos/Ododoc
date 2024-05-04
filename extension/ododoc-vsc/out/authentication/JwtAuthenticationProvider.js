@@ -87,20 +87,19 @@ class JwtAuthenticationProvider {
         }
     }
     async getSessions(scopes) {
-        const sessions = await this.context.secrets.get("jwtSessions");
+        const sessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
         if (sessions) {
             return JSON.parse(sessions);
         }
         return [];
     }
     async removeSession(sessionId) {
-        console.log("삭제중~~");
         let sessions = await this.getSessions();
         if (sessions) {
             const sessionIdx = sessions.findIndex((s) => s.id === sessionId);
             const session = sessions[sessionIdx];
             sessions.splice(sessionIdx, 1);
-            await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify(session));
+            await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify(sessions));
             if (session) {
                 this.sessionChangeEmitter.fire({
                     added: [],
@@ -113,20 +112,18 @@ class JwtAuthenticationProvider {
     // arrow function으로 변경하면 this가 JwtAuthenticationProvider로 고정
     // 일반 함수였으면 this가 global일 것.
     handleLoginUri = async (uri) => {
-        console.log("uri: ", uri.path, uri.query);
         if (uri.path === "/callback") {
             const params = new URLSearchParams(uri.query);
             const token = params.get("token");
             const provider = params.get("provider");
-            console.log("token: ", token, "provider: ", provider);
             if (token && provider) {
                 try {
                     this.token = token;
                     this.provider = provider;
                     const session = await this.createSession([]);
-                    LoginWebView_1.default.getInstance(this.context).getSuccessContent();
-                    vscode.window.showErrorMessage(`성공~~ ${session.account.label}님 환영합니다! ${session.accessToken}`);
-                    console.log(`성공~~ ${session.account.label}님 환영합니다! ${session.accessToken}`);
+                    LoginWebView_1.default.getInstance(this.context).getSuccessContent(this.context.extensionUri);
+                    vscode.window.showInformationMessage(`${session.account.label}님 환영합니다!`);
+                    console.log("로그인 성공! => ", session);
                 }
                 catch (error) {
                     vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);
