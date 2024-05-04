@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Home5 from '../../css/components/Home5.module.css'
-import VscodeIcon from '../../assets/images/vscodeIcon.png'
-import IntellijIcon from '../../assets/images/intellijIcon.png'
-import ChromeIcon from '../../assets/images/chromeIcon.png'
-import PreButton from '../../assets/images/prebutton.png'
-import NextButton from '../../assets/images/nextbutton.png'
+import Home5 from '../../css/components/homePage/Home5.module.css'
+import VscodeIcon from '../../assets/images/logoImage/vscodeIcon.png'
+import IntellijIcon from '../../assets/images/logoImage/intellijIcon.png'
+import ChromeIcon from '../../assets/images/logoImage/chromeIcon.png'
+import PreButton from '../../assets/images/mark/prebutton.png'
+import NextButton from '../../assets/images/mark/nextbutton.png'
+import CarouselItem from './element/CarouselItem';
+import useCarouselEffect from '../../hooks/useCarouselEffect';
 
 interface CarouselElement {
     src: string;
@@ -14,8 +16,6 @@ interface CarouselElement {
     button: string;
     path: string;
 }
-
-
 
 // 카로셀 요소
 const carouselElements: CarouselElement[] = [
@@ -46,8 +46,8 @@ function HomePage5() {
     const navigate = useNavigate()
     const carouselRef = useRef<HTMLDivElement>(null);
     const [angle, setAngle] = useState(0);
-    const [isRow, setIsRow] = useState(false);
     const [translateZ, setTranslateZ] = useState(0);
+    const [isRow, setIsRow] = useState(false);
     const ratateAngle = 360 / carouselElements.length;
     const dragStartX = useRef(0);
 
@@ -67,19 +67,12 @@ function HomePage5() {
         }
     };
 
-    useEffect(() => {
-        const radian = (ratateAngle / 2) * Math.PI / 180;
-        const tz = Math.round((800 / 2) / Math.tan(radian));
-        setTranslateZ(tz);
-
-        window.addEventListener('mousedown', handleMouseDown)
-        window.addEventListener('mouseup', handleMouseUp);
-
-        return () => {
-            window.removeEventListener('mousedown', handleMouseDown)
-            window.removeEventListener('mouseup', handleMouseUp);
-        }
-    }, [angle]);
+    useCarouselEffect({
+        angle,
+        setTranslateZ,
+        handleMouseDown,
+        handleMouseUp
+    })
 
     const handlePrevClick = () => {
         setAngle(prevAngle => prevAngle - ratateAngle);
@@ -88,8 +81,6 @@ function HomePage5() {
     const handleNextClick = () => {
         setAngle(prevAngle => prevAngle + ratateAngle);
     };
-
-    // const navigate = useNavigate();
 
     const handleNavigate = (type: string) => {
         navigate(`/start/${type}`);
@@ -110,42 +101,14 @@ function HomePage5() {
                         const isMain = normalizedAngle === currentAngle || normalizedAngle === (currentAngle + 360) % 360;
 
                         return (
-                            <div
+                            <CarouselItem
                                 key={idx}
-                                className={Home5.carouselElement}
-                                style={{
-                                    transform: `rotate${isRow ? 'X' : 'Y'}(${itemAngle}deg) translateZ(${translateZ}px)`,
-                                    opacity: isMain ? 1 : 0.2
-                                }}
-                            >
-                                {/* 카로셀 이미지 */}
-                                <img
-                                    src={element.src}
-                                    alt={`${element.label}-icon`}
-                                    style={{ width: '100%', height: 'auto' }} />
-                                {/* 카로셀 타이틀 */}
-                                <div
-                                    className={Home5.label}
-                                    style={{ fontFamily: 'hanbitFont', opacity: isMain ? 1 : 0 }}
-                                >
-                                    {element.label}
-                                </div>
-                                {/* 카로셀 내용 */}
-                                <div
-                                    className={Home5.content}
-                                    style={{ fontFamily: 'hanbitFont', opacity: isMain ? 1 : 0 }}
-                                >
-                                    {element.content}
-                                </div>
-                                {/* 카로셀 버튼 */}
-                                <button
-                                    className={Home5.button}
-                                    style={{ fontFamily: 'hanbitFont', opacity: isMain ? 1 : 0 }}
-                                    onClick={() => handleNavigate(element.path.replace(" ", ""))}
-                                >
-                                    {element.button}
-                                </button>
-                            </div>
+                                element={element}
+                                itemAngle={itemAngle}
+                                translateZ={translateZ}
+                                isMain={isMain}
+                                handleNavigate={handleNavigate}
+                            />
                         );
                     })}
                 </div>

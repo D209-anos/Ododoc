@@ -64,6 +64,7 @@
     margin: 3vh 0vh 2vh 0vh;
     align-items: center;
     justify-content: center;
+    margin-left: 60px;
     /* pointer-events: none; */
     /* user-select: none; */
 }
@@ -82,6 +83,12 @@
 .pencil {
     width: 9%;
     margin: 0vh 0vh 0vh 2vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.pencil:hover {
+    transform: scale(1.2);
 }
 
 .line {
@@ -125,12 +132,17 @@
     cursor: pointer;
 }
 
+.fileName {
+    font-family: 'hanbitFont';
+}
+
 .fileSpace {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin: 0vh 0vh 0.5vh 0vh;
     width: 100%;
+    cursor: pointer;
     /* pointer-events: none;
     user-select: none; */
 }
@@ -170,27 +182,58 @@
     /* user-select: none; */
 }
 
+.profileImage {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.profileImage:hover {
+    transform: scale(1.2);
+}
+
 .makeFileButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.makeFileButton:hover {
+    transform: scale(1.2);
 }
 
 .trashButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.trashButton:hover {
+    transform: scale(1.2);
 }
 
 .settingButton {
     width: 2rem;
     height: 2rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.settingButton:hover {
+    transform: scale(1.2);
 }
 
 .folderWrapper:hover {
     background-color: gray;
     color: white;
     width: 110%;
+    border-radius: 8px;
 }
 
 .fileSpace:hover {

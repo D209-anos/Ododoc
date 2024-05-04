@@ -1,5 +1,5 @@
-import Home6 from "../../css/components/Home6.module.css"
-import LogotextAni from "../../assets/images/ododoc-orange.gif"
+import Home6 from "../../css/components/homePage/Home6.module.css"
+import LogotextAni from "../../assets/images/ododocLogo/ododoc-orange.gif"
 
 function HomePage6(){
     return(
