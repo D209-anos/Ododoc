@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useTypingAnimation } from '../../hooks/useTypingAnimation';
 import Home3 from '../../css/components/homePage/Home3.module.css';
 import NextVector from '../../assets/images/mark/nextVector.png';
 import Terminal from '../../assets/images/homePageImage/terminal.png';
-import { useSpring, animated, useTransition } from 'react-spring';
+import { animated, useTransition } from 'react-spring';
 
 interface HomePage3Props {
     backgroundColor: string;
@@ -40,140 +41,37 @@ function HomePage3({ backgroundColor, opacity, textColor }: HomePage3Props) {
         <p class="${Home3.error}">ERROR in src/view/HomePage.tsx:17:8</p>
         <p class="${Home3.TS2741}">TS2741: Property 'setTypingCompleted' is missing in type '{}' but required in type 'HomePage2Props'.</p>
     `
-    const [isVisible, setIsVisible] = useState(false);
-    const sectionRef = useRef<HTMLElement>(null);
-    const [displayedTetminalHTML, setDisplayedTetminalHTML] = useState('');         // 타이핑 출력 문자
-    const [displayedEditorTerminalHTML, setDisplayedEditorTerminalHTML] = useState('');
-    const [displayedEditorCodeHTML, setDisplayedEditorCodeHTML] = useState('');
 
-    const [visibleAni, setVisibleAni] = useState(true);
+    const { displayedHTML: displayedTerminalHTML, startTyping: startTypingTerminal, resetTyping: resetTypingTerminal } = useTypingAnimation(terminalHTML);
+    const { displayedHTML: displayedEditorCodeHTML, startTyping: startTypingEditorCode, resetTyping: resetTypingEditorCode } = useTypingAnimation(editorCodeHTML);
+    const { displayedHTML: displayedEditorTerminalHTML, startTyping: startTypingEditorTerminal, resetTyping: resetTypingEditorTerminal } = useTypingAnimation(editorTerminalHTML);
 
-    const terminalIndexRef = useRef(0);                          // 타이핑 글자 인덱스
-    const editorTerminalIndexRef = useRef(0);
-    const editorCodeIndexRef = useRef(0);
-    
     const terminalRef = useRef(null);
     const editorTerminalRef = useRef(null);
     const editorCodeRef = useRef(null);
+    const sectionRef = useRef<HTMLElement>(null);
 
+    const [isVisible, setIsVisible] = useState(false);
+    const [visibleAni, setVisibleAni] = useState(true);
     
-    const startTypingTerminal = useCallback(() => {
-        const timer = setInterval(() => {
-            if (terminalIndexRef.current >= terminalHTML.length) {
-                clearInterval(timer);
-                return;
-            }
-
-            const nextChar = terminalHTML.charAt(terminalIndexRef.current);
-            if (nextChar === '<') {
-                const endIndex = terminalHTML.indexOf('>', terminalIndexRef.current);
-                if (endIndex !== -1) {
-                    const fullTag = terminalHTML.slice(terminalIndexRef.current, endIndex + 1);
-                    setDisplayedTetminalHTML(prev => prev + fullTag);
-                    terminalIndexRef.current = endIndex + 1;
-                }
-            } else {
-                setDisplayedTetminalHTML(prev => prev + nextChar);
-                terminalIndexRef.current++;
-            }
-        }, 5);
-    }, [terminalHTML]);
-
-    const startTypingEditorTerminal = useCallback(() => {
-        const timer = setInterval(() => {
-            if (editorTerminalIndexRef.current >= editorTerminalHTML.length) {
-                clearInterval(timer);
-                return;
-            }
-
-            const nextChar = editorTerminalHTML.charAt(editorTerminalIndexRef.current);
-            if (nextChar === '<') {
-                const endIndex = editorTerminalHTML.indexOf('>', editorTerminalIndexRef.current);
-                if (endIndex !== -1) {
-                    const fullTag = editorTerminalHTML.slice(editorTerminalIndexRef.current, endIndex + 1);
-                    setDisplayedEditorTerminalHTML(prev => prev + fullTag);
-                    editorTerminalIndexRef.current = endIndex + 1;
-                }
-            } else {
-                setDisplayedEditorTerminalHTML(prev => prev + nextChar);
-                editorTerminalIndexRef.current++;
-            }
-        }, 18);
-    }, [editorTerminalHTML]);
-
-    const startTypingEditorCode = useCallback(() => {
-        const timer = setInterval(() => {
-            if (editorCodeIndexRef.current >= editorCodeHTML.length) {
-                clearInterval(timer);
-                return;
-            }
-
-            const nextChar = editorCodeHTML.charAt(editorCodeIndexRef.current);
-            if (nextChar === '<') {
-                const endIndex = editorCodeHTML.indexOf('>', editorCodeIndexRef.current);
-                if (endIndex !== -1) {
-                    const fullTag = editorCodeHTML.slice(editorCodeIndexRef.current, endIndex + 1);
-                    setDisplayedEditorCodeHTML(prev => prev + fullTag);
-                    editorCodeIndexRef.current = endIndex + 1;
-                }
-            } else {
-                setDisplayedEditorCodeHTML(prev => prev + nextChar);
-                editorCodeIndexRef.current++;
-            }
-        }, 4.8);
-    }, [editorCodeHTML]);
-
-    const resetTyping = useCallback(() => {
-        setDisplayedTetminalHTML('');
-        setDisplayedEditorTerminalHTML('');
-        setDisplayedEditorCodeHTML('');
-        terminalIndexRef.current = 0;
-        editorTerminalIndexRef.current = 0;
-        editorCodeIndexRef.current = 0;
-    }, []);
-    
-    useEffect(() => {
-        const terminalElement = terminalRef.current;
-        const editorTerminalElement = editorTerminalRef.current;
-        const editorCodeElement = editorCodeRef.current;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && entry.target === terminalElement) {
-                    startTypingTerminal();
-                } else if (entry.isIntersecting && entry.target === editorTerminalElement) {
-                    startTypingEditorTerminal();
-                } else if (entry.isIntersecting && entry.target === editorCodeElement) {
-                    startTypingEditorCode();
-                } else {
-                    resetTyping();
-                }
-            });
-        });
-
-        if (terminalElement && editorTerminalElement && editorCodeElement) {
-            observer.observe(terminalElement);
-            observer.observe(editorTerminalElement);
-            observer.observe(editorCodeElement);
-        }
-
-        return () => {
-            if (terminalElement && editorTerminalElement && editorCodeElement) {
-                observer.unobserve(terminalElement);
-                observer.unobserve(editorTerminalElement);
-                observer.unobserve(editorCodeElement);
-            }
-        };
-    }, [startTypingTerminal, startTypingEditorTerminal, startTypingEditorCode, resetTyping]);
-
     useIntersectionObserver({
         ref: sectionRef,
-        onIntersect: () => setIsVisible(true),
-        onExit: () => setIsVisible(false),
+        onIntersect: () => {
+            setIsVisible(true);
+            startTypingTerminal();
+            startTypingEditorCode();
+            startTypingEditorTerminal();
+        },
+        onExit: () => {
+            setIsVisible(false);
+            resetTypingTerminal();
+            resetTypingEditorCode();
+            resetTypingEditorTerminal();
+        },
         threshold: 0.4
     });
 
-        const sectionStyle = {
+    const sectionStyle = {
         opacity: isVisible ? 1 : 0.3,
         transition: 'opacity 0.8s ease-in-out'
     };
@@ -186,13 +84,6 @@ function HomePage3({ backgroundColor, opacity, textColor }: HomePage3Props) {
         loop: true, // 애니메이션 반복 설정
     })
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setVisibleAni(prev => !prev);
-        }, 700);
-        return () => clearInterval(interval);
-    }, []);
-
     return (
         <section className={Home3.container} ref={sectionRef} style={sectionStyle}>
             <div className={Home3.textArea}>
@@ -202,7 +93,7 @@ function HomePage3({ backgroundColor, opacity, textColor }: HomePage3Props) {
             <div className={Home3.splitContainer}>
                 <div className={Home3.leftHalf}>
                     <div ref={terminalRef} style={{ backgroundImage: `url(${Terminal})` }} className={Home3.Terminal}>
-                        <div className={Home3.terminalErrorMessageWrapper} dangerouslySetInnerHTML={{ __html: displayedTetminalHTML }} />
+                        <div className={Home3.terminalErrorMessageWrapper} dangerouslySetInnerHTML={{ __html: displayedTerminalHTML }} />
                     </div>
                 </div>
                 <div className={Home3.rightHalf}>

@@ -11,11 +11,10 @@ function HomePage4 () {
     const blogRef = useRef<HTMLDivElement>(null);
     const ododocRef = useRef<HTMLDivElement>(null);
     const isVisibleRef = useRef(false);
+    const sectionRef = useRef<HTMLElement>(null);
 
     const [isVisible, setIsVisible] = useState(false);
     isVisibleRef.current = isVisible;
-
-    const sectionRef = useRef<HTMLElement>(null);
 
     // 스크롤 opacity
     useIntersectionObserver({
