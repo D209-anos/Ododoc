@@ -3,19 +3,58 @@
   "displayName": "ododoc_vsc",
   "description": "ododoc extension for vsc",
   "version": "0.0.1",
+  "publisher": "anos",
   "engines": {
     "vscode": "^1.88.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ododoc",
+          "title": "Ododoc",
+          "icon": "images/logo.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ododoc.main",
+        "contents": "ododoc에 로그인하여 서비스를 이용해 보세요! \n[ododoc 바로가기](http://k10d209.p.ssafy.io:3000/). \n[😊Ododoc Login](command:ododoc.showLoginWebView)"
+      }
+    ],
+    "views": {
+      "ododoc": [
+        {
+          "id": "ododoc.main",
+          "name": ""
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "ododoc-vsc.helloWorld",
-        "title": "Hello World"
+        "command": "ododoc.showLoginWebView",
+        "title": "Show Webview: Login"
+      }
+    ],
+    "terminal": {
+      "profiles": [
+        {
+          "title": "My Custom Terminal",
+          "id": "myterminal.my-custom-terminal"
+        }
+      ]
+    },
+    "uriHandlers": [
+      {
+        "uri": "anos.ododoc-vsc"
       }
     ]
   },
@@ -28,14 +67,24 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.88.0",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/uuid": "^9.0.8",
+    "@types/vscode": "^1.88.0",
+    "@types/ws": "^8.5.10",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.3.3",
     "@vscode/test-cli": "^0.0.8",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1",
+    "ws": "^8.17.0"
   }
 }
