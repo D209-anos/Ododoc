@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -42,9 +43,6 @@ public class Member extends BaseTime implements UserDetails {
 
     @Column(length = 100, nullable = false)
     private String nickname;
-
-    @Column(length = 200, nullable = false)
-    private String title;
 
     @Column(columnDefinition = "bigint default 0")
     private Long buildCount;
@@ -91,5 +89,23 @@ public class Member extends BaseTime implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null) return false;
+
+        try {
+            Member member = (Member) obj;
+            return Objects.equals(this.id, member.getId());
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 }

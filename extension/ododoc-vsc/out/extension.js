@@ -22,13 +22,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(require("vscode"));
 const TerminalManager_1 = require("./terminal/TerminalManager");
+const OdodocTreeProvider_1 = __importDefault(require("./treeview/OdodocTreeProvider"));
+const LoginWebView_1 = __importDefault(require("./authentication/LoginWebView"));
+const JwtAuthenticationProvider_1 = __importDefault(require("./authentication/JwtAuthenticationProvider"));
 function activate(context) {
     console.log('"ododoc" 활성화.');
     vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
+    // webview 등록
+    // new LoginWebView(context); => 이렇게 하면 안됨, 싱글톤 제어가 안됨  spring처럼 생각하면 안됨
+    LoginWebView_1.default.getInstance(context);
+    // authentication provider 등록
+    JwtAuthenticationProvider_1.default.getInstance(context);
+    // extension view 생성
+    const ododocTreeProvider = new OdodocTreeProvider_1.default(context);
+    vscode.window.createTreeView("ododoc.main", {
+        treeDataProvider: ododocTreeProvider,
+    });
     // 터미널 생성
     const terminalManager = new TerminalManager_1.TerminalManager();
     let ododocTerminal = terminalManager.createTerminal();
