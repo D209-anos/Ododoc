@@ -39,4 +39,4 @@ const handleLoginUri = async (uri) => {
     }
 };
 exports.handleLoginUri = handleLoginUri;
-//# sourceMappingURL=AuthenticationProvider.js.map
+//# sourceMappingURL=AuthService.js.map

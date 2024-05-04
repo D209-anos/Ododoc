@@ -1,18 +1,19 @@
 import * as vscode from "vscode";
 import { TerminalManager } from "./terminal/TerminalManager";
 import OdodocTreeProvider from "./treeview/OdodocTreeProvider";
-import { showLoginWebViewCommand } from "./authentication/LoginWebView";
+import LoginWebView from "./authentication/LoginWebView";
+import JwtAuthenticationProvider from "./authentication/JwtAuthenticationProvider";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('"ododoc" 활성화.');
   vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
 
-  // command 등록
-  context.subscriptions.push(
-    vscode.commands.registerCommand("ododoc.showLoginWebView", () =>
-      showLoginWebViewCommand(context)
-    )
-  );
+  // webview 등록
+  // new LoginWebView(context); => 이렇게 하면 안됨, 싱글톤 제어가 안됨  spring처럼 생각하면 안됨
+  LoginWebView.getInstance(context);
+
+  // authentication provider 등록
+  JwtAuthenticationProvider.getInstance(context);
 
   // extension view 생성
   const ododocTreeProvider = new OdodocTreeProvider(context);

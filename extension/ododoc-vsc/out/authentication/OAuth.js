@@ -22,15 +22,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccessToken = exports.oAuthLogin = void 0;
+exports.oAuthLogin = void 0;
 const vscode = __importStar(require("vscode"));
-const axios_1 = __importDefault(require("axios"));
-const redirectUri = encodeURIComponent("https://k10d209.p.ssafy.io/api");
 const oAuthLogin = async (provider) => {
+    const redirectUri = encodeURIComponent(`http://localhost:8080/api/oauth2/authorization/${provider}`);
     const socialLoginUrl = {
         kakao: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a23282fc18f2b445d559dfe93fa96e6b&redirect_uri=${redirectUri}`,
         naver: `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DRnVNgGzq_x_6Q4apfhJ&redirect_uri=${redirectUri}`,
@@ -40,22 +36,4 @@ const oAuthLogin = async (provider) => {
     await vscode.env.openExternal(vscode.Uri.parse(authUrl));
 };
 exports.oAuthLogin = oAuthLogin;
-const getAccessToken = async (code, provider) => {
-    const tokenUrl = `https://k10d209.p.ssafy.io/api/oauth2/authorization/${provider}`;
-    try {
-        const response = await axios_1.default.post(tokenUrl, {
-            code: code,
-            redirectUri: redirectUri,
-        });
-        if (response.data) {
-            console.log("Access Token:", response.data.accessToken);
-            console.log("Refresh Token:", response.data.refreshToken);
-            // secreatStorage에 저장 로직 추가
-        }
-    }
-    catch (error) {
-        console.error("access 토큰 발급에 실패했는디요??:", error);
-    }
-};
-exports.getAccessToken = getAccessToken;
 //# sourceMappingURL=OAuth.js.map

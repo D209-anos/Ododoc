@@ -57,8 +57,10 @@ public class MemberController {
         Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
 
         JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
-        String vscodeUri = "vscode://ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "?provider=" + jwtTokenResponse.oAuthProvider();
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "&provider=" + jwtTokenResponse.oAuthProvider();
         try {
+            System.out.println("vscodeUri : " + vscodeUri);
+            System.out.println("accessToken : " + jwtTokenResponse.accessToken());
             response.sendRedirect(vscodeUri);
         } catch (IOException e) {
             throw new RuntimeException(e);
