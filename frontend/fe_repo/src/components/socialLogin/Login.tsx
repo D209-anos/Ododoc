@@ -65,8 +65,8 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 카카오 로그인 URL
         const loginUrl = {
             kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri.kakao}&response_type=code`,
-            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}?provider=&response_type=code&scope=profile email&access_type=offline`,
-            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}?provider=&response_type=code`
+            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}&response_type=code&scope=profile%20email&access_type=offline`,
+            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}&response_type=code`
         }
         window.location.href = loginUrl[provider];
     }
