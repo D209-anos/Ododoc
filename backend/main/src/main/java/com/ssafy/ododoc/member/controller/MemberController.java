@@ -56,18 +56,24 @@ public class MemberController {
         log.debug("[테스트 social login 호출] : {} {}", provider, code);
         Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
 
-        JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
-        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "&provider=" + jwtTokenResponse.oAuthProvider();
-        try {
-            System.out.println("vscodeUri : " + vscodeUri);
-            System.out.println("accessToken : " + jwtTokenResponse.accessToken());
-            response.sendRedirect(vscodeUri);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         jwtProvider.setRefreshTokenForClient(response, memberInfo);
         return jwtProvider.makeJwtTokenResponse(memberInfo);
+    }
+
+    @GetMapping("/authorization/vsc/{provider}")
+    public void vscLogin(@RequestParam String code,
+                         @RequestParam(required = false) String redirectUri,
+                         @PathVariable String provider,
+                         HttpServletResponse response) throws IOException {
+
+        log.debug("[테스트 social login 호출] : {} {}", provider, code);
+        Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
+
+        JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "&provider=" + jwtTokenResponse.oAuthProvider();
+
+        jwtProvider.setRefreshTokenForClient(response, memberInfo);
+        response.sendRedirect(vscodeUri);
     }
 
     /**
