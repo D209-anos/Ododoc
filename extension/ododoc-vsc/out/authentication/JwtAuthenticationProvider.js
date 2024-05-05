@@ -64,7 +64,6 @@ class JwtAuthenticationProvider {
             const decoded = jwt.verify(this.token, secretKeyBuffer, {
                 algorithms: ["HS256"],
             });
-            console.log("decoded: ", decoded);
             const session = {
                 id: (0, uuid_1.v4)(),
                 accessToken: this.token,
@@ -80,6 +79,7 @@ class JwtAuthenticationProvider {
                 removed: [],
                 changed: [],
             });
+            WebSocketClient_1.default.getInstance().connect();
             return session;
         }
         catch (error) {
@@ -107,6 +107,7 @@ class JwtAuthenticationProvider {
                     removed: [session],
                     changed: [],
                 });
+                WebSocketClient_1.default.getInstance().disconnect();
             }
         }
     }
@@ -133,7 +134,6 @@ class JwtAuthenticationProvider {
             const session = await this.createSession([]);
             LoginWebView_1.default.getInstance(this.context).getSuccessContent(this.context.extensionUri);
             vscode.window.showInformationMessage(`${session.account.label}님 환영합니다!`);
-            WebSocketClient_1.default.getInstance();
             console.log("로그인 성공! => ", session);
         }
         catch (error) {

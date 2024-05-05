@@ -60,7 +60,6 @@ export default class JwtAuthenticationProvider
         algorithms: ["HS256"],
       }) as any;
 
-      console.log("decoded: ", decoded);
       const session: vscode.AuthenticationSession = {
         id: uuid(),
         accessToken: this.token,
@@ -81,6 +80,8 @@ export default class JwtAuthenticationProvider
         removed: [],
         changed: [],
       });
+
+      WebSocketClient.getInstance().connect();
 
       return session;
     } catch (error) {
@@ -117,6 +118,8 @@ export default class JwtAuthenticationProvider
           removed: [session],
           changed: [],
         });
+
+        WebSocketClient.getInstance().disconnect();
       }
     }
   }
@@ -149,8 +152,6 @@ export default class JwtAuthenticationProvider
       vscode.window.showInformationMessage(
         `${session.account.label}님 환영합니다!`
       );
-
-      WebSocketClient.getInstance();
       console.log("로그인 성공! => ", session);
     } catch (error) {
       vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);

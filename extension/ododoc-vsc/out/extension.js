@@ -32,6 +32,8 @@ const TerminalManager_1 = require("./terminal/TerminalManager");
 const OdodocTreeProvider_1 = __importDefault(require("./treeview/OdodocTreeProvider"));
 const LoginWebView_1 = __importDefault(require("./authentication/LoginWebView"));
 const JwtAuthenticationProvider_1 = __importDefault(require("./authentication/JwtAuthenticationProvider"));
+const AuthService_1 = require("./authentication/AuthService");
+const WebSocketClient_1 = __importDefault(require("./network/WebSocketClient"));
 function activate(context) {
     console.log('"ododoc" 활성화.');
     vscode.window.showInformationMessage('"ododoc" 활성화! 코딩에만 집중하세요!');
@@ -42,6 +44,9 @@ function activate(context) {
     JwtAuthenticationProvider_1.default.getInstance(context);
     // extension view 생성
     new OdodocTreeProvider_1.default(context);
+    if ((0, AuthService_1.getLoggedInSession)() !== undefined) {
+        WebSocketClient_1.default.getInstance().connect();
+    }
     // 터미널 생성
     const terminalManager = new TerminalManager_1.TerminalManager();
     let ododocTerminal = terminalManager.createTerminal();

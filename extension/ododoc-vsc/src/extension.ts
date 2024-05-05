@@ -3,6 +3,8 @@ import { TerminalManager } from "./terminal/TerminalManager";
 import OdodocTreeProvider from "./treeview/OdodocTreeProvider";
 import LoginWebView from "./authentication/LoginWebView";
 import JwtAuthenticationProvider from "./authentication/JwtAuthenticationProvider";
+import { getLoggedInSession } from "./authentication/AuthService";
+import WebSocketClient from "./network/WebSocketClient";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('"ododoc" 활성화.');
@@ -17,6 +19,10 @@ export function activate(context: vscode.ExtensionContext) {
 
   // extension view 생성
   new OdodocTreeProvider(context);
+
+  if (getLoggedInSession() !== undefined) {
+    WebSocketClient.getInstance().connect();
+  }
 
   // 터미널 생성
   const terminalManager = new TerminalManager();

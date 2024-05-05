@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.dto;
+package com.ssafy.ododoc.data;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

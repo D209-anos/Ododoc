@@ -1,9 +1,12 @@
+import * as vscode from "vscode";
 import WebSocket from "ws";
+import { MessageData } from "./MessageData";
+import { getLoggedInSession } from "../authentication/AuthService";
 
 const URL = "ws://localhost:18080/process/ws";
 
 export default class WebSocketClient {
-  private socket: WebSocket;
+  private socket: WebSocket | null = null;
   private static instance: WebSocketClient;
 
   public static getInstance(): WebSocketClient {
@@ -13,32 +16,60 @@ export default class WebSocketClient {
     return WebSocketClient.instance;
   }
 
-  private constructor() {
-    this.socket = new WebSocket(URL);
+  private constructor() {}
 
+  public connect() {
+    const socket = new WebSocket(URL);
+    this.socket = socket;
     console.log("WebSocketClient created");
 
-    this.socket.on("open", () => {
+    socket.on("open", () => {
       console.log("Connection established");
-      this.socket.send("Hello Server!");
+      this.sendMessage("SIGNAL", "vsc에서 연결합니다.");
     });
 
-    this.socket.on("message", (data) => {
+    socket.on("message", (data) => {
       console.log("Message from server:", data);
     });
 
-    this.socket.on("error", (error) => {
+    socket.on("error", (error) => {
       console.error("WebSocket error:", error);
     });
 
-    this.socket.on("close", () => {
+    socket.on("close", () => {
       console.log("Connection closed");
+      this.socket = null;
     });
   }
 
-  sendMessage(message: string) {
-    if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(message);
+  public disconnect() {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+  }
+
+  public async sendMessage(dataType: string, message: string) {
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      const session = await getLoggedInSession();
+
+      if (session === undefined) {
+        console.log("Session not found.");
+        return;
+      }
+
+      const messageData: MessageData = {
+        senderState: {
+          sourceApplication: "VSCODE",
+          accessToken: session.accessToken,
+        },
+        connectedFileId: 1,
+        dataType: dataType,
+        contents: message,
+        timestamp: new Date(),
+      };
+
+      this.socket.send(JSON.stringify(messageData));
     } else {
       console.log("Connection not ready.");
     }

@@ -1,12 +1,14 @@
-package com.ssafy.ododoc.dto;
+package com.ssafy.ododoc.data;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
+import java.time.Instant;
+
+@Getter
 public class MessageData {
     private SenderState senderState;
     private Long connectedFileId;
     private DataType dataType;
     private String contents;
-    private LocalDateTime timestamp;
-
+    private Instant timestamp;
 }

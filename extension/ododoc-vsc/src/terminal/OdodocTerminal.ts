@@ -13,13 +13,14 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
   private inputCommand = "";
   private cursorPosition = 0;
   private subprocesses: ChildProcessWithoutNullStreams[] = [];
-  private webSocketClient: WebSocketClient | undefined;
+  private webSocketClient: WebSocketClient;
 
   constructor() {
     this.ptyProcess = null as any;
     this.folderPath = vscode.workspace.workspaceFolders
       ? vscode.workspace.workspaceFolders[0].uri.fsPath
       : null;
+    this.webSocketClient = WebSocketClient.getInstance();
     this.initializeTerminal();
   }
 
@@ -170,7 +171,7 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
         const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
         this.writeEmitter.fire(formattedData);
         if (this.webSocketClient) {
-          this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+          this.webSocketClient.sendMessage("OUTPUT", formattedData);
         }
       });
 
@@ -178,7 +179,7 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
         const formattedData = data.toString().replace(/\n/g, "\r\n");
         this.writeEmitter.fire(formattedData);
         if (this.webSocketClient) {
-          this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+          this.webSocketClient.sendMessage("ERROR", formattedData);
         }
       });
 
