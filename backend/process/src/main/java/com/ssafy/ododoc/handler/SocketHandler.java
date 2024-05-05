@@ -36,6 +36,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 System.out.println(dataType);
                 System.out.println(messageData.getContents());
                 break;
+
             case OUTPUT:
                 System.out.println(dataType);
                 System.out.println(messageData.getContents());

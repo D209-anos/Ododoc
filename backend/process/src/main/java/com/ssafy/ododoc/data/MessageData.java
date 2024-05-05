@@ -2,7 +2,7 @@ package com.ssafy.ododoc.data;
 
 import lombok.Getter;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Getter
 public class MessageData {
@@ -10,5 +10,5 @@ public class MessageData {
     private Long connectedFileId;
     private DataType dataType;
     private String contents;
-    private Instant timestamp;
+    private Date timestamp;
 }
