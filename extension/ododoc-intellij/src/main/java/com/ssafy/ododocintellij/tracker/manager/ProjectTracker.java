@@ -36,30 +36,34 @@ public class ProjectTracker {
 
     // 프로젝트 생성시 프로젝트 파일 상태들을 해쉬 값으로 저장
     public void initHashStatus(Project project) {
-        String fileHash = "";
-        getProjectFileList(project);
-        beforeProjectStatus.clear();
+        ApplicationManager.getApplication().runReadAction(() ->{
+            String fileHash = "";
+            getProjectFileList(project);
+            beforeProjectStatus.clear();
 
-        for(PsiFile file : psiFiles){
-            String codeHash = getEncrypt(file.getText());
-            beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
-            fileHash += getEncrypt(file.getName());
-        }
-        allBeforeProjectStatus = getEncrypt(fileHash);
+            for(PsiFile file : psiFiles){
+                String codeHash = getEncrypt(file.getText());
+                beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
+                fileHash += getEncrypt(file.getName());
+            }
+            allBeforeProjectStatus = getEncrypt(fileHash);
+        });
     }
 
     // 지금 현재 프로젝트 파일 상태들을 해쉬 값으로 저장
     public void currentHashStatus(Project project) {
-        String fileHash = "";
-        getProjectFileList(project);
-        currentProjectStatus.clear();
+        ApplicationManager.getApplication().runReadAction(() -> {
+            String fileHash = "";
+            getProjectFileList(project);
+            currentProjectStatus.clear();
 
-        for(PsiFile file : psiFiles){
-            String codeHash = getEncrypt(file.getText());
-            currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
-            fileHash += getEncrypt(file.getName());
-        }
-        allCurrentProjectStatus = getEncrypt(fileHash);
+            for(PsiFile file : psiFiles){
+                String codeHash = getEncrypt(file.getText());
+                currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
+                fileHash += getEncrypt(file.getName());
+            }
+            allCurrentProjectStatus = getEncrypt(fileHash);
+        });
     }
 
     private void getProjectFileList(Project project){

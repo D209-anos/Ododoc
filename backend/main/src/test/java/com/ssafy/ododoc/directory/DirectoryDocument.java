@@ -29,8 +29,7 @@ public class DirectoryDocument {
             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("새로 생성된 폴더/파일의 아이디"),
             fieldWithPath("data.name").type(JsonFieldType.STRING).description("폴더/파일명"),
             fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
-            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)"),
-            fieldWithPath("data.path").optional().type(JsonFieldType.STRING).description("폴더/파일 경로 (null 가능)")
+            fieldWithPath("data.parentId").optional().type(JsonFieldType.NUMBER).description("상위 폴더 아이디 (null 가능)")
     );
 
     public static final Snippet deletePathFields = pathParameters(
@@ -55,5 +54,16 @@ public class DirectoryDocument {
             fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("변경된 디렉토리 아이디"),
             fieldWithPath("data.name").type(JsonFieldType.STRING).description("변경된 이름")
+    );
+
+    public static final Snippet moveRequestFields = requestFields(
+      fieldWithPath("id").type(JsonFieldType.NUMBER).description("이동할 폴더/파일 아이디"),
+      fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).description("이동할 폴더/파일의 상위 폴더 아이디")
+    );
+
+    public static final Snippet moveResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이동된 폴더/파일 아이디"),
+            fieldWithPath("data.newParentId").optional().type(JsonFieldType.NUMBER).description("이동된 폴더/파일의 상위 폴더 아이디")
     );
 }

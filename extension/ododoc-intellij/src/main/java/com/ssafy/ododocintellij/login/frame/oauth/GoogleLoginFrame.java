@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.token.TokenManager;
+import com.ssafy.ododocintellij.sender.BuildResultSender;
 import com.ssafy.ododocintellij.tracker.CodeListener;
 import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
@@ -19,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.java_websocket.client.WebSocketClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -143,6 +145,7 @@ public class GoogleLoginFrame extends Stage {
 
                     // 지금 현재 등록되어 있는 모든 프로젝트들에게 codeListener 추가하기
                     addCodeListener(ProjectProvider.getInstance());
+                    connectWebSocket();
 
                     mainLoginFrame.close();
                     close();
@@ -173,5 +176,10 @@ public class GoogleLoginFrame extends Stage {
                 projectTracker.initHashStatus(finalTempProject);
             });
         }
+    }
+
+    // 처리 서버와 webSocket 연결해주기
+    private void connectWebSocket() {
+        BuildResultSender.getINSTANCE("ws://localhost:18080/process/ws");
     }
 }

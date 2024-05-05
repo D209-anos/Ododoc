@@ -47,13 +47,13 @@
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-    background-color: #ea7515; /* 세로 스크롤바 색상 */
+    background-color: #ff914d; /* 세로 스크롤바 색상 */
     border-radius: 10px;
     border: 2px solid #f9f9f9;
 }
 
 .sidebar::-webkit-scrollbar-thumb:horizontal {
-    background-color: #da7c1f; /* 가로 스크롤바 색상 */
+    background-color: #ff914d; /* 가로 스크롤바 색상 */
     border-radius: 10px;
     border: 2px solid #f9f9f9;
 }
@@ -64,6 +64,7 @@
     margin: 3vh 0vh 2vh 0vh;
     align-items: center;
     justify-content: center;
+    margin-left: 60px;
     /* pointer-events: none; */
     /* user-select: none; */
 }
@@ -82,6 +83,12 @@
 .pencil {
     width: 9%;
     margin: 0vh 0vh 0vh 2vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.pencil:hover {
+    transform: scale(1.2);
 }
 
 .line {
@@ -125,12 +132,17 @@
     cursor: pointer;
 }
 
+.fileName {
+    font-family: 'hanbitFont';
+}
+
 .fileSpace {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin: 0vh 0vh 0.5vh 0vh;
     width: 100%;
+    cursor: pointer;
     /* pointer-events: none;
     user-select: none; */
 }
@@ -170,30 +182,130 @@
     /* user-select: none; */
 }
 
+.profileImage {
+    width: 2rem;
+    height: 2rem;
+    margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.profileImage:hover {
+    transform: scale(1.2);
+}
+
 .makeFileButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.makeFileButton:hover {
+    transform: scale(1.2);
 }
 
 .trashButton {
     width: 2rem;
     height: 2rem;
     margin-bottom: 2.5vh;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.trashButton:hover {
+    transform: scale(1.2);
 }
 
 .settingButton {
     width: 2rem;
     height: 2rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.settingButton:hover {
+    transform: scale(1.2);
 }
 
 .folderWrapper:hover {
     background-color: gray;
     color: white;
     width: 110%;
+    border-radius: 8px;
 }
 
 .fileSpace:hover {
     background-color: gray;
     color: white;
+}
+
+.contextMenu {
+    width: 150px;
+    background-color: rgb(250, 242, 242);
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    list-style: none;
+    position: fixed;
+    z-index: 1000;
+}
+
+.contextMenu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.contextMenu li:hover {
+    background-color: #f5f5f5;
+}
+
+.editWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 7px;
+    margin-left: 5px;
+}
+
+.editIcon {
+    width: 1.75rem;
+}
+
+.rightClickEdit {
+    margin-left: 5px;
+}
+
+.rightClickEdit:hover {
+    color: #ff914d;
+}
+
+.deleteWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 7px;
+    margin-left: 5px;
+}
+
+.deleteIcon {
+    width: 1.75rem;
+}
+
+.rightClickDelete {
+    margin-left: 5px;
+}
+
+.rightClickDelete:hover {
+    color: #ff914d;
+}
+
+.renderNameField {
+    display: flex;
+    text-align: center;
+    height: 30px;
+    font-size: medium;
+    background-color: rgb(250, 242, 242);
 }

@@ -1,10 +1,7 @@
 package com.ssafy.ododoc.directory.handler;
 
 import com.ssafy.ododoc.common.type.ErrorResponse;
-import com.ssafy.ododoc.directory.exception.FileParentNullException;
-import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
-import com.ssafy.ododoc.directory.exception.DirectoryGoneException;
-import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
+import com.ssafy.ododoc.directory.exception.*;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,9 +17,9 @@ public class DirectoryExceptionHandler {
         return makeErrorResponse(e, "directory");
     }
 
-    @ExceptionHandler(DirectoryGoneException.class)
-    public List<ErrorResponse> folderGoneExceptionHandler(DirectoryGoneException e) {
-        return makeErrorResponse(e, "folder");
+    @ExceptionHandler(DirectoryAlreadyDeletedException.class)
+    public List<ErrorResponse> directoryAlreadyDeletedExceptionHandler(DirectoryAlreadyDeletedException e) {
+        return makeErrorResponse(e, "directory");
     }
 
     @ExceptionHandler(DirectoryAccessDeniedException.class)
@@ -30,8 +27,13 @@ public class DirectoryExceptionHandler {
         return makeErrorResponse(e, "directory");
     }
 
-    @ExceptionHandler(FileParentNullException.class)
-    public List<ErrorResponse> fileParentNullExceptionHandler(FileParentNullException e) {
-        return makeErrorResponse(e, "parent");
+    @ExceptionHandler(RootDirectoryDeletionException.class)
+    public List<ErrorResponse> rootDirectoryDeletionExceptionHandler(RootDirectoryDeletionException e) {
+        return makeErrorResponse(e, "directory");
+    }
+
+    @ExceptionHandler(CannotCreateDirectoryException.class)
+    public List<ErrorResponse> cannotCreateDirectoryExceptionHandler(CannotCreateDirectoryException e) {
+        return makeErrorResponse(e, "directory");
     }
 }
