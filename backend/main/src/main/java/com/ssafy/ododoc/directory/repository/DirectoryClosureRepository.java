@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface DirectoryClosureRepository extends JpaRepository<DirectoryClosure, Directory>, DirectoryClosureCustomRepository {
 
-    List<DirectoryClosure> findAllByDescendant(Directory directory);
-    List<DirectoryClosure> findAllByAncestor(Directory directory);
+    List<DirectoryClosure> findAllByDescendantId(Long directoryId);
+    List<DirectoryClosure> findAllByAncestorId(Long ancestorId);
 }
