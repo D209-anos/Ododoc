@@ -1,11 +1,15 @@
 import api from '../instances/api'
 
 // 인가 코드 백엔드로 전송
-export const sendCodeToBackend = async(code: string, provider: string, setAccessToken: (token: string) => void) => {
+export const sendCodeToBackend = async(code: string, url: string, provider: string, setAccessToken: (token: string) => void) => {
     try {
-        const response = await api.post(`api/oauth2/authorization/${provider}`, {
+        console.log("code: ", code);
+        console.log("url: ", url);
+        console.log("provider: ", provider);
+        
+        const response = await api.post(`/oauth2/authorization/${provider}`, {
             code: code,
-            url: "https://k10d209.p.ssafy.io/oauth?provider=kakao"
+            url: url
         });
         console.log('Access Token:', response.data);
         
