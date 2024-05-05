@@ -49,19 +49,19 @@ const dummyData: IContentItem = {
                         "id": 144,
                         "type": "FILE",
                         "name": "2024-04-22",
-                        "contents": "13번입니다."
+                        "contents": "144번입니다."
                         },
                         {
                         "id": 155,
                         "type": "FILE",
                         "name": "2024-04-25",
-                        "contents": "13번입니다."
+                        "contents": "155번입니다."
                         },
                         {
                         "id": 166,
                         "type": "FILE",
                         "name": "2024-05-03",
-                        "contents": "13번입니다."
+                        "contents": "166번입니다."
                         },
                     ]
                 },
@@ -73,7 +73,7 @@ const dummyData: IContentItem = {
             "type": "FOLDER",
             "name": "밀정윷놀이 프로젝트",
             "contents": [
-                { "id": 5,
+                { "id": 999,
                 "type": "FILE",
                 "name": "Project Description",
                 "contents": "안녕 글 내용이야 이렇고 저렇고"

@@ -38,6 +38,7 @@ const NameEditor: React.FC<NameEditorProps> = ({ objectId, name, setName, saveNa
                 autoFocus
                 className={Sidebar.renderNameField}
                 style={{ fontFamily: 'hanbitFont' }}
+                maxLength={30}
             />
         </form>
     )

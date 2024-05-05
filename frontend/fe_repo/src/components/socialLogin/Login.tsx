@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { sendCodeToBackend } from '../../api/service/user';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
-import { sendCodeToBackend } from '../../api/service/user';
 import menu from '../../css/components/menu/Menu.module.css';
 import 'animate.css';
 
@@ -11,8 +12,8 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
+    const { accessToken, setAccessToken } = useAuth();
     const loginBackground = useRef<HTMLDivElement>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
     const navigate = useNavigate();          // 리다이렉트
     const [animation, setAnimation] = useState('animate__backInDown');
 
@@ -41,18 +42,17 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
             const url = redirectUri[provider]
             if (code && provider && url !== undefined) {
                 sendCodeToBackend(code, url, provider, setAccessToken);
-                console.log(code, provider)
             }
         }
-        
     }, [setAccessToken]);
 
-    // 로그인 성공 시 Home 화면으로 이동
+    // 로그인 성공 시 editor 화면으로 이동
     useEffect(() => {
+        console.log(accessToken)
         if (accessToken) {
-            navigate('/'); 
+            navigate('/editor'); 
         }
-    }, [accessToken, navigate]);
+    }, [accessToken]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {
