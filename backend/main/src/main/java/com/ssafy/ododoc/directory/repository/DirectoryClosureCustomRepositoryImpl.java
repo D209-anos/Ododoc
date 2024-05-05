@@ -5,6 +5,8 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.ododoc.directory.dto.response.DirectoryResponse;
 import com.ssafy.ododoc.directory.entity.Directory;
+import com.ssafy.ododoc.directory.entity.DirectoryClosure;
+import com.ssafy.ododoc.directory.entity.QDirectoryClosure;
 import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
 import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
 import com.ssafy.ododoc.member.entity.Member;
@@ -26,17 +28,40 @@ public class DirectoryClosureCustomRepositoryImpl implements DirectoryClosureCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public void deleteClosure(Directory moveDirectory) {
-        JPQLQuery<Directory> children = JPAExpressions.select(directoryClosure.descendant)
-                .from(directoryClosure)
-                .where(directoryClosure.ancestor.eq(moveDirectory));
+    public List<DirectoryClosure> deleteClosure(Long directoryId) {
+        QDirectoryClosure dc1 = new QDirectoryClosure("dc1");
+        QDirectoryClosure dc2 = new QDirectoryClosure("dc2");
 
-        JPQLQuery<Directory> parentList = JPAExpressions.select(directoryClosure.ancestor)
-                .from(directoryClosure)
-                .where(directoryClosure.descendant.eq(moveDirectory).and(directoryClosure.ancestor.ne(moveDirectory)));
+        JPQLQuery<Long> children = JPAExpressions.select(dc2.descendant.id)
+                .from(dc2)
+                .where(dc2.ancestor.id.eq(directoryId));
 
-        jpaQueryFactory.delete(directoryClosure)
-                .where(directoryClosure.ancestor.in(parentList).and(directoryClosure.descendant.in(children)));
+        List<DirectoryClosure> listTest = jpaQueryFactory.selectFrom(dc1)
+                .where(dc1.descendant.id.in(children))
+                .fetch();
+
+        log.info("listTest : {}", listTest);
+
+        return listTest;
+    }
+
+    @Override
+    public List<DirectoryClosure> moveClosure(Long directoryId) {
+        QDirectoryClosure dc1 = new QDirectoryClosure("dc1");
+        QDirectoryClosure dc2 = new QDirectoryClosure("dc2");
+        QDirectoryClosure dc3 = new QDirectoryClosure("dc3");
+
+        JPQLQuery<Long> childrenIds = JPAExpressions.select(dc2.descendant.id)
+                .from(dc2)
+                .where(dc2.ancestor.id.eq(directoryId));
+
+        JPQLQuery<Long> parentIdList = JPAExpressions.select(dc3.ancestor.id)
+                .from(dc3)
+                .where(dc3.descendant.id.eq(directoryId).and(dc3.ancestor.id.ne(directoryId)));
+
+        return jpaQueryFactory.selectFrom(dc1)
+                .where(dc1.descendant.id.in(childrenIds).and(dc1.ancestor.id.in(parentIdList)))
+                .fetch();
     }
 
     @Override
