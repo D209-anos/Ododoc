@@ -54,11 +54,20 @@ public class DirectoryTestUtil extends TestBase {
         return getValueFromJSONBody(mvcResult, "$.data.id", Long.class);
     }
 
-    public void 폴더_삭제(String token, Long directoryId, MockMvc mockMvc) throws Exception {
+    public void 폴더_삭제_휴지통(String token, Long directoryId, MockMvc mockMvc) throws Exception {
         mockMvc.perform(
                 delete("/directory/{option}/{directoryId}", "trashbin", directoryId)
                         .header(ApiTest.AUTH_HEADER, token)
         )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200));
+    }
+
+    public void 폴더_삭제_영구(String token, Long directoryId, MockMvc mockMvc) throws Exception {
+        mockMvc.perform(
+                        delete("/directory/{option}/{directoryId}", "delete", directoryId)
+                                .header(ApiTest.AUTH_HEADER, token)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200));
     }
