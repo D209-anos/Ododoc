@@ -11,6 +11,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
+import com.ssafy.ododocintellij.sender.BuildResultSender;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
 import com.ssafy.ododocintellij.tracker.response.BuildResultInfo;
@@ -62,7 +63,7 @@ public class CodeListener implements ExecutionListener {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
                     String output = objectMapper.writeValueAsString(buildResultInfo);
-                    System.out.println(output);
+                    BuildResultSender.sendMessage(output);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
