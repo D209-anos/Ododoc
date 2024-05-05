@@ -20,7 +20,7 @@ interface IContentItem {
     id: number;
     type: 'FOLDER' | 'FILE';
     name: string;
-    contents?: string | IContentItem[];
+    contents?: IContentItem[] | string;
 }
 
 // 임시 데이터
@@ -66,18 +66,25 @@ const dummyData: IContentItem = {
                     ]
                 },
             ]
+            
         },
         {
             "id": 4,
             "type": "FOLDER",
             "name": "밀정윷놀이 프로젝트",
-            "contents": "안녕 글 내용이야 이렇고 저렇고"
+            "contents": [
+                { "id": 5,
+                "type": "FILE",
+                "name": "Project Description",
+                "contents": "안녕 글 내용이야 이렇고 저렇고"
+            }
+          ]
         },
         {
             "id": 5,
             "type": "FOLDER",
             "name": "vodle 프로젝트",
-            "contents": "글글글글"
+            "contents": []
         }
     ]
 };
@@ -90,6 +97,7 @@ const SideBar: React.FC = () => {
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 수정 여부
     const [folderName, setFolderName] = useState<string>(dummyData.name);
     const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [isFolderOpen, setIsFolderOpen] = useState<Record<number, boolean>>({});      // 폴더 열고 닫기
 
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();
     const contextMenuRef = useRef<HTMLUListElement>(null);
@@ -104,10 +112,19 @@ const SideBar: React.FC = () => {
         // 사용자 이름 수정 API 호출 코드 작성
     };
 
+    // 폴더 열고 닫는 함수
+    const toggleFolder = (id: number) => {
+        setIsFolderOpen(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
     // 항목 클릭
     const handleItemClick = (id: number): void => {
         navigate(`/editor/${id}`, {state: id})
         setSelectedId(id);
+        console.log(id)
     }
 
     // 폴더명 수정 함수
@@ -133,16 +150,25 @@ const SideBar: React.FC = () => {
     };
 
     // 폴더 및 파일 하위 구조
-    const renderContents = (contents: IContentItem[] | undefined): JSX.Element[] => {
+    const renderContents = (contents: IContentItem[] | undefined, indentLevel: number = 0): JSX.Element[] => {
         if (!contents) return [];
 
         return contents.map((item: IContentItem) => {
-        if (item.type === 'FOLDER') {
-            return <FolderItem key={item.id} item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={renderContents} handleContextMenu={handleContextMenu} />;
-        } else {
-            return <FileItem key={item.id} item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={handleItemClick}/>;
-        }
-    });
+            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 들여쓰기 클래스 조건적 적용
+            if (item.type === 'FOLDER') {
+                return (
+                    <div key={item.id} className={className}>
+                        <FolderItem item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} handleContextMenu={handleContextMenu} />
+                    </div>
+                );
+            } else {
+                return (
+                    <div key={item.id} className={className}>
+                        <FileItem item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={handleItemClick}/>
+                    </div>
+                );
+            }
+        });
     };
 
     return (

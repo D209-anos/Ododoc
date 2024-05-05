@@ -308,3 +308,10 @@
     font-size: medium;
     background-color: rgb(250, 242, 242);
 }
+
+.item {
+    width: 100%;
+}
+.itemIndent {
+    margin-left: 3vh;
+}

@@ -76,12 +76,20 @@ function HomePage3({ backgroundColor, opacity, textColor }: HomePage3Props) {
         transition: 'opacity 0.8s ease-in-out'
     };
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setVisibleAni(visible => !visible);
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, []);
+
     const vectorAnimation = useTransition(visibleAni, {
         from: { opacity: 0, transform: 'translateX(-20px)' },
         enter: { opacity: 1, transform: 'translateX(0)' },
         leave: { opacity: 0, transform: 'translateX(20px)' },
         config: { duration: 1000 },
-        loop: true, // 애니메이션 반복 설정
+        loop: true, // 애니메이션 계속 반복
     })
 
     return (
