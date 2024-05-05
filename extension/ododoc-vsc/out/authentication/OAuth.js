@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.oAuthLogin = void 0;
 const vscode = __importStar(require("vscode"));
 const oAuthLogin = async (provider) => {
-    const redirectUri = encodeURIComponent(`http://localhost:8080/api/oauth2/authorization/${provider}`);
+    const redirectUri = encodeURIComponent(`http://localhost:8080/api/oauth2/authorization/vsc/${provider}`);
     const socialLoginUrl = {
         kakao: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a23282fc18f2b445d559dfe93fa96e6b&redirect_uri=${redirectUri}`,
         naver: `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=DRnVNgGzq_x_6Q4apfhJ&redirect_uri=${redirectUri}`,
