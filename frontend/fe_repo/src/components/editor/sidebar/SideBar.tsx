@@ -94,10 +94,11 @@ const SideBar: React.FC = () => {
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
-    const [isEditing, setIsEditing] = useState<boolean>(false);                         // 수정 여부
-    const [folderName, setFolderName] = useState<string>(dummyData.name);
-    const [selectedId, setSelectedId] = useState<number | null>(null);
-    const [isFolderOpen, setIsFolderOpen] = useState<Record<number, boolean>>({});      // 폴더 열고 닫기
+    const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
+    const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
+    const [userName, setUserName] = useState<string>(dummyData.name);                   // 사용자 이름 수정
+    const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
+    const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
 
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();
     const contextMenuRef = useRef<HTMLUListElement>(null);
@@ -106,44 +107,43 @@ const SideBar: React.FC = () => {
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
     };
-    
-    const saveName = (objectId: number) => {
+
+    // file 클릭
+    const fileItemClick = (id: number): void => {
+        navigate(`/editor/${id}`, {state: id})
+        // setSelectedId(id);
+        // console.log(id)
+    }
+
+    // folder 클릭
+    const folderItemClick = (id: number): void => {
+        // setSelectedId(id);
+        // console.log(id)
+    }
+
+    // 사용자 이름 저장 함수
+    const saveUserName = (objectId: number) => {
         setIsEditing(false);
         // 사용자 이름 수정 API 호출 코드 작성
     };
 
-    // 폴더 열고 닫는 함수
-    const toggleFolder = (id: number) => {
-        setIsFolderOpen(prev => ({
-            ...prev,
-            [id]: !prev[id]
-        }));
-    };
-
-    // 항목 클릭
-    const handleItemClick = (id: number): void => {
-        navigate(`/editor/${id}`, {state: id})
-        setSelectedId(id);
-        console.log(id)
-    }
-
-    // 폴더명 수정 함수
+    // 사용자 이름 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isEditing) {
             return (
                 <div>
                     <NameEditor 
                         objectId={dummyData.id} 
-                        name={folderName} 
-                        setName={setFolderName} 
-                        saveName={saveName}
+                        name={userName} 
+                        setName={setUserName} 
+                        saveName={saveUserName}
                     />
                 </div>
             );
         }
         return (
             <div onClick={() => setIsEditing(true)} className={Sidebar.nickname}>
-                {folderName}
+                {userName}
                 <img src={PencilImage} alt="pencil-image" className={Sidebar.pencil} onClick={() => setIsEditing(true)} />
             </div>
         );
@@ -158,18 +158,62 @@ const SideBar: React.FC = () => {
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
-                        <FolderItem item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} handleContextMenu={handleContextMenu} />
+                        <FolderItem item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} handleContextMenu={handleContextMenu} handleItemClick={folderItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
                     </div>
                 );
             } else {
                 return (
                     <div key={item.id} className={className}>
-                        <FileItem item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={handleItemClick}/>
+                        <FileItem item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={fileItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
                     </div>
                 );
             }
         });
     };
+
+    const findItemById = (contents: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
+        if (!contents || typeof contents === 'string') return undefined; // Early return if contents is undefined or a string
+
+        for (let item of contents) {
+            if (item.id === id) {
+                return item;
+            }
+            // Ensure we only recurse into contents if it is an array
+            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
+                const found = findItemById(item.contents, id);
+                if (found) return found;
+            }
+        }
+        return undefined;
+    };
+
+    // 우클릭 한 해당 항목의 정보를 setSelectedItem에 상태관리하는 함수
+    const handleEdit = (id: number) => {
+        // console.log(`${id}`)
+        const itemToEdit = findItemById(dummyData.contents, id);
+        if (itemToEdit) {
+            setSelectedItem(itemToEdit);
+            setIsContentEditing(true);
+            hideMenu();
+        } else {
+            console.error('Item not found.')
+        }
+    }
+
+    // 이름 저장
+    const saveName = (newName: string) => {
+        if (selectedItem) {
+            selectedItem.name = newName;
+            setIsContentEditing(false);
+        } else {
+            console.error('No item selected.')
+        }
+    }    
+
+    const handleDelete = (id: number) => {
+        console.log(`${id}`)
+        hideMenu();
+    }
 
     return (
         // 사이드바
@@ -180,7 +224,15 @@ const SideBar: React.FC = () => {
             <img src={Line} alt="line" className={Sidebar.line}/>
             {renderContents(dummyData.contents as IContentItem[])}
             {menuState.visible && (
-                <ContextMenu ref={contextMenuRef} visible={menuState.visible} x={menuState.x} y={menuState.y} />
+                <ContextMenu 
+                    ref={contextMenuRef} 
+                    visible={menuState.visible} 
+                    x={menuState.x} 
+                    y={menuState.y} 
+                    id={menuState.id}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
             )}
             <div className={Sidebar.sideButtonWrapper}>
                 <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>

@@ -64,7 +64,6 @@
     margin: 3vh 0vh 2vh 0vh;
     align-items: center;
     justify-content: center;
-    margin-left: 60px;
     /* pointer-events: none; */
     /* user-select: none; */
 }
@@ -78,11 +77,14 @@
 
 .nickname {
     font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .pencil {
     width: 9%;
-    margin: 0vh 0vh 0vh 2vh;
+    margin: 0vh 0vh 0vh 1vh;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
