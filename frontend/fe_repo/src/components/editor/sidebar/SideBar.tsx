@@ -157,7 +157,7 @@ const SideBar: React.FC = () => {
                 <ContextMenu ref={contextMenuRef} visible={menuState.visible} x={menuState.x} y={menuState.y} />
             )}
             <div className={Sidebar.sideButtonWrapper}>
-                <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage}/>
+                <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton}/>
                 <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} onClick={() => setTrashModalOpen(true)}/>
                 <TrashModal isOpen={isTrashModalOpen} onClose={() => setTrashModalOpen(false)} />

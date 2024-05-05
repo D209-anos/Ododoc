@@ -174,9 +174,8 @@
 
 .sideButtonWrapper {
     display: flex;
-    flex-direction: column;
-    position: absolute;
-    left: 3vh;
+    flex-direction: row;
+    position: fixed;
     bottom: 5vh;
     /* pointer-events: none; */
     /* user-select: none; */
@@ -185,7 +184,7 @@
 .profileImage {
     width: 2rem;
     height: 2rem;
-    margin-bottom: 2.5vh;
+    margin-right: 4vh;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
@@ -197,7 +196,7 @@
 .makeFileButton {
     width: 2rem;
     height: 2rem;
-    margin-bottom: 2.5vh;
+    margin-right: 4vh;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
@@ -209,7 +208,7 @@
 .trashButton {
     width: 2rem;
     height: 2rem;
-    margin-bottom: 2.5vh;
+    margin-right: 4vh;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
