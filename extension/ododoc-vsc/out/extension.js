@@ -41,10 +41,7 @@ function activate(context) {
     // authentication provider 등록
     JwtAuthenticationProvider_1.default.getInstance(context);
     // extension view 생성
-    const ododocTreeProvider = new OdodocTreeProvider_1.default(context);
-    vscode.window.createTreeView("ododoc.main", {
-        treeDataProvider: ododocTreeProvider,
-    });
+    new OdodocTreeProvider_1.default(context);
     // 터미널 생성
     const terminalManager = new TerminalManager_1.TerminalManager();
     let ododocTerminal = terminalManager.createTerminal();
