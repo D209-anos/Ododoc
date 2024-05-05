@@ -44,9 +44,11 @@ public class DirectoryService {
             createRequest.setName(type.equals(DirectoryType.FOLDER) ? "새 폴더" : LocalDate.now().toString());
         }
 
-        // 상위 폴더 찾고 없을 경우 예외 처리
-        Directory parent = directoryRepository.findById(createRequest.getParentId())
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더를 찾을 수 없습니다."));
+        List<DirectoryClosure> parentList = directoryClosureRepository.findAllByDescendantId(createRequest.getParentId());
+
+        checkEmpty(parentList);
+
+        Directory parent = parentList.getLast().getDescendant();
 
         // 찾은 상위 폴더의 member와 로그인 한 member가 다를 경우 예외 처리
         checkAccess(parent, member);
@@ -63,8 +65,6 @@ public class DirectoryService {
                 .member(member)
                 .parent(parent)
                 .build());
-
-        List<DirectoryClosure> parentList = directoryClosureRepository.findAllByDescendant(parent);
 
         List<DirectoryClosure> closures = new ArrayList<>();
         for(DirectoryClosure dc : parentList) {
@@ -92,18 +92,20 @@ public class DirectoryService {
 
     @Transactional
     public DeleteResponse deleteDirectory(String option, Long directoryId, Member member) {
-        Directory directory = directoryRepository.findById(directoryId)
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestorId(directoryId);
+
+        checkEmpty(children);
+
+        Directory directory = children.getFirst().getAncestor();
 
         checkAccess(directory, member);
-
-        LocalDateTime now = LocalDateTime.now();
 
         if(directory.getParent() == null) {
             throw new RootDirectoryDeletionException("최상위 폴더는 삭제할 수 없습니다.");
         }
 
-        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestor(directory);
+        LocalDateTime now = LocalDateTime.now();
+
         for(DirectoryClosure dc : children) {
             if(option.equals("trashbin")) {
                 if(dc.getDescendant().getTrashbinTime() != null) {
@@ -119,6 +121,11 @@ public class DirectoryService {
                 }
                 dc.getDescendant().setDeletedTime(now);
             }
+        }
+
+        if(option.equals("delete")) {
+            directoryClosureRepository.deleteAllInBatch(directoryClosureRepository.deleteClosure(directoryId));
+            directoryClosureRepository.flush();
         }
 
         return DeleteResponse.builder()
@@ -147,15 +154,20 @@ public class DirectoryService {
 
     @Transactional
     public MoveResponse moveDirectory(MoveRequest moveRequest, Member member) {
-        Directory directory = directoryRepository.findById(moveRequest.getId())
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestorId(moveRequest.getId());
+
+        checkEmpty(children);
+
+        Directory directory = children.getFirst().getAncestor();
 
         checkAccess(directory, member);
         checkIfDeleted(directory);
 
-        // 상위 폴더 찾기
-        Directory newParent = directoryRepository.findById(moveRequest.getParentId())
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+        List<DirectoryClosure> newParentList = directoryClosureRepository.findAllByDescendantId(moveRequest.getParentId());
+
+        checkEmpty(newParentList);
+
+        Directory newParent = newParentList.getLast().getDescendant();
 
         // 접근 권한 예외 처리
         checkAccess(newParent, member);
@@ -167,12 +179,10 @@ public class DirectoryService {
         checkIfDeleted(newParent);
 
         // 이동시킬 디렉토리의 모든 하위 디렉토리와 연관된 부모 관계 삭제
-        directoryClosureRepository.deleteClosure(directory);
+        directoryClosureRepository.deleteAll(directoryClosureRepository.moveClosure(moveRequest.getId()));
+        directoryClosureRepository.flush();
 
         // 이동할 디렉토리에 이동시킬 디렉토리와 모든 하위 디렉토리 연결
-        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestor(directory);
-        List<DirectoryClosure> newParentList = directoryClosureRepository.findAllByDescendant(newParent);
-
         List<DirectoryClosure> newList = new ArrayList<>();
         for(DirectoryClosure parent : newParentList) {
             for(DirectoryClosure child : children) {
@@ -196,6 +206,12 @@ public class DirectoryService {
 
     public DirectoryResponse getDirectory(Long rootId, Member member) {
         return directoryClosureRepository.getDirectory(rootId, member);
+    }
+
+    private void checkEmpty(List<DirectoryClosure> list) {
+        if(list.isEmpty()) {
+            throw new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다.");
+        }
     }
 
     private void checkAccess(Directory directory, Member member) {
