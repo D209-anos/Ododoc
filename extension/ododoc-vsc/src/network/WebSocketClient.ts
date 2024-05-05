@@ -1,10 +1,20 @@
 import WebSocket from "ws";
 
-export class WebSocketClient {
-  private socket: WebSocket;
+const URL = "ws://localhost:18080/process/ws";
 
-  constructor() {
-    this.socket = new WebSocket("ws://localhost:8080/ws");
+export default class WebSocketClient {
+  private socket: WebSocket;
+  private static instance: WebSocketClient;
+
+  public static getInstance(): WebSocketClient {
+    if (!WebSocketClient.instance) {
+      WebSocketClient.instance = new WebSocketClient();
+    }
+    return WebSocketClient.instance;
+  }
+
+  private constructor() {
+    this.socket = new WebSocket(URL);
 
     console.log("WebSocketClient created");
 

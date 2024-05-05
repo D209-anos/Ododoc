@@ -3,7 +3,7 @@ import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
-import { WebSocketClient } from "../network/WebSocketClient";
+import WebSocketClient from "../network/WebSocketClient";
 
 export class OdodocTerminal implements vscode.Pseudoterminal {
   private writeEmitter = new vscode.EventEmitter<string>();
@@ -13,14 +13,13 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
   private inputCommand = "";
   private cursorPosition = 0;
   private subprocesses: ChildProcessWithoutNullStreams[] = [];
-  private webSocketClient: WebSocketClient;
+  private webSocketClient: WebSocketClient | undefined;
 
   constructor() {
     this.ptyProcess = null as any;
     this.folderPath = vscode.workspace.workspaceFolders
       ? vscode.workspace.workspaceFolders[0].uri.fsPath
       : null;
-    this.webSocketClient = new WebSocketClient();
     this.initializeTerminal();
   }
 
@@ -162,10 +161,6 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
 
   executeSubprocess(command: string, args: string[]) {
     if (this.ptyProcess) {
-      this.webSocketClient.sendMessage(
-        `Executinssg: ${command} ${args.join(" ")}`
-      );
-
       const subprocess = spawn(command, args, {
         cwd: this.folderPath || process.cwd(),
         shell: true, // cmd or bash
@@ -174,13 +169,17 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
       subprocess.stdout.on("data", (data) => {
         const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
         this.writeEmitter.fire(formattedData);
-        this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+        if (this.webSocketClient) {
+          this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+        }
       });
 
       subprocess.stderr.on("data", (data) => {
         const formattedData = data.toString().replace(/\n/g, "\r\n");
         this.writeEmitter.fire(formattedData);
-        this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+        if (this.webSocketClient) {
+          this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+        }
       });
 
       subprocess.on("close", (code) => {

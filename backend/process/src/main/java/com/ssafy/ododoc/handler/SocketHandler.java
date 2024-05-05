@@ -24,7 +24,31 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println(message.getPayload());
-    }
+        String payload = message.getPayload();
+        System.out.println("payload: " + payload);
+        System.out.println("session.id: " + session.getId());
+        System.out.println("session.principal: " + session.getPrincipal());
+        System.out.println("session.uri: " + session.getUri());
+        System.out.println("session.attributes: " + session.getAttributes());
+        System.out.println("session.handshakeHeaders: " + session.getHandshakeHeaders());
+        System.out.println("session.localAddress: "+ session.getLocalAddress());
+        System.out.println("session.remoteAddress: " + session.getRemoteAddress());
 
+        switch (payload){
+            case "Terminal":
+                System.out.println("Terminal");
+                System.out.println(payload);
+                break;
+
+            case "SCM":
+                System.out.println("SCM");
+                System.out.println(payload);
+                break;
+
+            default:
+                System.out.println("default");
+                System.out.println(payload);
+                break;
+        }
+    }
 }

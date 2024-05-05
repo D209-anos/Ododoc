@@ -3,12 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebSocketClient = void 0;
 const ws_1 = __importDefault(require("ws"));
+const URL = "ws://localhost:18080/process/ws";
 class WebSocketClient {
     socket;
+    static instance;
+    static getInstance() {
+        if (!WebSocketClient.instance) {
+            WebSocketClient.instance = new WebSocketClient();
+        }
+        return WebSocketClient.instance;
+    }
     constructor() {
-        this.socket = new ws_1.default("ws://localhost:8080/ws");
+        this.socket = new ws_1.default(URL);
         console.log("WebSocketClient created");
         this.socket.on("open", () => {
             console.log("Connection established");
@@ -33,5 +40,5 @@ class WebSocketClient {
         }
     }
 }
-exports.WebSocketClient = WebSocketClient;
+exports.default = WebSocketClient;
 //# sourceMappingURL=WebSocketClient.js.map

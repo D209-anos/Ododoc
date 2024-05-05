@@ -28,7 +28,6 @@ const vscode = __importStar(require("vscode"));
 const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const WebSocketClient_1 = require("../network/WebSocketClient");
 class OdodocTerminal {
     writeEmitter = new vscode.EventEmitter();
     onDidWrite = this.writeEmitter.event;
@@ -43,7 +42,6 @@ class OdodocTerminal {
         this.folderPath = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
             : null;
-        this.webSocketClient = new WebSocketClient_1.WebSocketClient();
         this.initializeTerminal();
     }
     initializeTerminal() {
@@ -162,7 +160,6 @@ class OdodocTerminal {
     }
     executeSubprocess(command, args) {
         if (this.ptyProcess) {
-            this.webSocketClient.sendMessage(`Executinssg: ${command} ${args.join(" ")}`);
             const subprocess = (0, child_process_1.spawn)(command, args, {
                 cwd: this.folderPath || process.cwd(),
                 shell: true, // cmd or bash
@@ -170,12 +167,16 @@ class OdodocTerminal {
             subprocess.stdout.on("data", (data) => {
                 const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
                 this.writeEmitter.fire(formattedData);
-                this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+                if (this.webSocketClient) {
+                    this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+                }
             });
             subprocess.stderr.on("data", (data) => {
                 const formattedData = data.toString().replace(/\n/g, "\r\n");
                 this.writeEmitter.fire(formattedData);
-                this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+                if (this.webSocketClient) {
+                    this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+                }
             });
             subprocess.on("close", (code) => {
                 // this.writeEmitter.fire(`\r\nProcess exited with code ${code}`);
