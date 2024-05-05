@@ -86,4 +86,16 @@ public class DirectoryDocument {
             fieldWithPath("data.children[].children[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
             fieldWithPath("data.children[].children[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트")
     );
+
+    public static final Snippet restorePathFields = pathParameters(
+            parameterWithName("directoryId").attributes(required()).description("복원할 폴더/파일 아이디")
+    );
+
+    public static final Snippet restoreResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("복원할 폴더/파일 아이디"),
+            fieldWithPath("data.trashbinTime").optional().type(JsonFieldType.STRING).description("휴지통 삭제된 시간"),
+            fieldWithPath("data.deletedTime").optional().type(JsonFieldType.STRING).description("영구 삭제된 시간"),
+            fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE")
+    );
 }

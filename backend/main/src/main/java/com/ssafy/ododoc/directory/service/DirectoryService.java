@@ -208,6 +208,31 @@ public class DirectoryService {
         return directoryClosureRepository.getDirectory(rootId, member);
     }
 
+    @Transactional
+    public RestoreResponse restoreDirectory(Long directoryId, Member member) {
+        List<DirectoryClosure> children = directoryClosureRepository.findAllByAncestorId(directoryId);
+
+        checkEmpty(children);
+
+        Directory directory = children.getFirst().getAncestor();
+        checkAccess(directory, member);
+
+        if(directory.getTrashbinTime() == null) {
+            throw new NotDeletedDirectoryException("삭제된 폴더/파일이 아닙니다.");
+        }
+
+        for(DirectoryClosure dc : children) {
+            dc.getDescendant().setTrashbinTime(null);
+        }
+
+        return RestoreResponse.builder()
+                .id(directory.getId())
+                .trashbinTime(directory.getTrashbinTime())
+                .deletedTime(directory.getDeletedTime())
+                .type(directory.getType())
+                .build();
+    }
+
     private void checkEmpty(List<DirectoryClosure> list) {
         if(list.isEmpty()) {
             throw new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다.");
