@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.process.service;
 
 import com.ssafy.ododoc.process.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,25 +13,30 @@ public class DataTypeHandlerService {
 
     public void handle(MessageDto messageDto){
 
-        switch (messageDto.getDataType()) {
+        DataType dataType = messageDto.getDataType();
+        switch (dataType){
             case SIGNAL:
-                processSignal(messageDto);
+                System.out.println(dataType);
+                System.out.println(messageDto.getContent());
                 break;
 
             case OUTPUT:
-                processOutput(messageDto);
+                System.out.println(dataType);
+                System.out.println(messageDto.getContent());
                 break;
 
             case ERROR:
-                processError(messageDto);
+                System.out.println(dataType);
+                System.out.println(messageDto.getContent());
                 break;
 
             case SCM:
-                processSCM(messageDto);
+                System.out.println(dataType);
+                System.out.println(messageDto.getContent());
                 break;
 
             default:
-                System.out.println("알 수 없는 데이터 타입");
+                System.out.println(dataType);
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.service;
+package com.ssafy.ododoc.process.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

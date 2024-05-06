@@ -1,10 +1,10 @@
-package com.ssafy.ododoc.service;
+package com.ssafy.ododoc.process.service;
 
 import com.ssafy.ododoc.data.MessageData;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OutputService {
+public class OutputHandlerService {
     private MessageData messageData;
     public MessageData processOutput(MessageData messageDataInput) {
         messageData = messageDataInput;

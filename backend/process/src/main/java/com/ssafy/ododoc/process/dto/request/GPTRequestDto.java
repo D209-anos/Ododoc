@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.dto;
+package com.ssafy.ododoc.process.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Builder;
