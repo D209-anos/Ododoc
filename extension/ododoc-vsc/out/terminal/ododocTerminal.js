@@ -22,13 +22,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OdodocTerminal = void 0;
 const vscode = __importStar(require("vscode"));
 const child_process_1 = require("child_process");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const WebSocketClient_1 = require("../network/WebSocketClient");
+const WebSocketClient_1 = __importDefault(require("../network/WebSocketClient"));
 class OdodocTerminal {
     writeEmitter = new vscode.EventEmitter();
     onDidWrite = this.writeEmitter.event;
@@ -43,7 +46,7 @@ class OdodocTerminal {
         this.folderPath = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
             : null;
-        this.webSocketClient = new WebSocketClient_1.WebSocketClient();
+        this.webSocketClient = WebSocketClient_1.default.getInstance();
         this.initializeTerminal();
     }
     initializeTerminal() {
@@ -162,7 +165,6 @@ class OdodocTerminal {
     }
     executeSubprocess(command, args) {
         if (this.ptyProcess) {
-            this.webSocketClient.sendMessage(`Executinssg: ${command} ${args.join(" ")}`);
             const subprocess = (0, child_process_1.spawn)(command, args, {
                 cwd: this.folderPath || process.cwd(),
                 shell: true, // cmd or bash
@@ -170,12 +172,16 @@ class OdodocTerminal {
             subprocess.stdout.on("data", (data) => {
                 const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
                 this.writeEmitter.fire(formattedData);
-                this.webSocketClient.sendMessage(`stout: ${formattedData}`);
+                if (this.webSocketClient) {
+                    this.webSocketClient.sendMessage("OUTPUT", formattedData);
+                }
             });
             subprocess.stderr.on("data", (data) => {
                 const formattedData = data.toString().replace(/\n/g, "\r\n");
                 this.writeEmitter.fire(formattedData);
-                this.webSocketClient.sendMessage(`sterr: ${formattedData}`);
+                if (this.webSocketClient) {
+                    this.webSocketClient.sendMessage("ERROR", formattedData);
+                }
             });
             subprocess.on("close", (code) => {
                 // this.writeEmitter.fire(`\r\nProcess exited with code ${code}`);

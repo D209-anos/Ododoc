@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { v4 as uuid } from "uuid";
 import * as jwt from "jsonwebtoken";
 import LoginWebView from "./LoginWebView";
+import WebSocketClient from "../network/WebSocketClient";
 
 const AUTH_TYPE = "jwtProvider";
 const AUTH_NAME = "Ododoc";
@@ -59,7 +60,6 @@ export default class JwtAuthenticationProvider
         algorithms: ["HS256"],
       }) as any;
 
-      console.log("decoded: ", decoded);
       const session: vscode.AuthenticationSession = {
         id: uuid(),
         accessToken: this.token,
@@ -80,6 +80,8 @@ export default class JwtAuthenticationProvider
         removed: [],
         changed: [],
       });
+
+      WebSocketClient.getInstance().connect();
 
       return session;
     } catch (error) {
@@ -116,6 +118,8 @@ export default class JwtAuthenticationProvider
           removed: [session],
           changed: [],
         });
+
+        WebSocketClient.getInstance().disconnect();
       }
     }
   }
@@ -129,27 +133,29 @@ export default class JwtAuthenticationProvider
       const provider = params.get("provider");
 
       if (token && provider) {
-        try {
-          this.token = token;
-          this.provider = provider;
-          const session = await this.createSession([]);
-          LoginWebView.getInstance(this.context).getSuccessContent(
-            this.context.extensionUri
-          );
-          vscode.window.showInformationMessage(
-            `${session.account.label}님 환영합니다!`
-          );
-          console.log("로그인 성공! => ", session);
-        } catch (error) {
-          vscode.window.showErrorMessage(
-            `로그인에 실패했습니다... =>  ${error}`
-          );
-          console.log(`로그인에 실패했습니다... =>  ${error}`);
-        }
+        this.login(token, provider);
       } else {
         vscode.window.showErrorMessage("토큰을 받아오지 못했습니다");
         console.log("토큰을 받아오지 못했습니다");
       }
+    }
+  };
+
+  private login = async (token: string, provider: string) => {
+    try {
+      this.token = token;
+      this.provider = provider;
+      const session = await this.createSession([]);
+      LoginWebView.getInstance(this.context).getSuccessContent(
+        this.context.extensionUri
+      );
+      vscode.window.showInformationMessage(
+        `${session.account.label}님 환영합니다!`
+      );
+      console.log("로그인 성공! => ", session);
+    } catch (error) {
+      vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);
+      console.log(`로그인에 실패했습니다... =>  ${error}`);
     }
   };
 }

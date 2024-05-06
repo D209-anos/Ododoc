@@ -28,6 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = __importStar(require("vscode"));
 const AccountsItem_1 = __importDefault(require("./tree_items/AccountsItem"));
+const AuthService_1 = require("../authentication/AuthService");
 class OdodocTreeProvider {
     // 데이터 변경이 발생했을 때 TreeView를 새로 고침하도록 vscode에 알리는 데에 사용
     _onDidChangeTreeData = new vscode.EventEmitter();
@@ -50,18 +51,11 @@ class OdodocTreeProvider {
     }
     // 트리 뷰에 표시할 노드들
     async getChildren(element) {
-        const loggedInSession = await this.isLogin();
+        const loggedInSession = await (0, AuthService_1.getLoggedInSession)();
         if (loggedInSession !== undefined) {
             return [new AccountsItem_1.default(loggedInSession.account.label)];
         }
         return [];
-    }
-    async isLogin() {
-        const session = await vscode.authentication.getSession("jwtProvider", [], {
-            createIfNone: false,
-        });
-        console.log(session, "session");
-        return session;
     }
 }
 exports.default = OdodocTreeProvider;

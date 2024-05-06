@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import AccountsItem from "./tree_items/AccountsItem";
+import { getLoggedInSession } from "../authentication/AuthService";
 
 export default class OdodocTreeProvider
   implements vscode.TreeDataProvider<vscode.TreeItem>
@@ -39,19 +40,10 @@ export default class OdodocTreeProvider
 
   // 트리 뷰에 표시할 노드들
   async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
-    const loggedInSession = await this.isLogin();
+    const loggedInSession = await getLoggedInSession();
     if (loggedInSession !== undefined) {
       return [new AccountsItem(loggedInSession.account.label)];
     }
     return [];
-  }
-
-  async isLogin(): Promise<vscode.AuthenticationSession | undefined> {
-    const session = await vscode.authentication.getSession("jwtProvider", [], {
-      createIfNone: false,
-    });
-    console.log(session, "session");
-
-    return session;
   }
 }

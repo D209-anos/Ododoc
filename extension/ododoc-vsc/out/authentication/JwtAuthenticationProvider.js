@@ -30,6 +30,7 @@ const vscode = __importStar(require("vscode"));
 const uuid_1 = require("uuid");
 const jwt = __importStar(require("jsonwebtoken"));
 const LoginWebView_1 = __importDefault(require("./LoginWebView"));
+const WebSocketClient_1 = __importDefault(require("../network/WebSocketClient"));
 const AUTH_TYPE = "jwtProvider";
 const AUTH_NAME = "Ododoc";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
@@ -63,7 +64,6 @@ class JwtAuthenticationProvider {
             const decoded = jwt.verify(this.token, secretKeyBuffer, {
                 algorithms: ["HS256"],
             });
-            console.log("decoded: ", decoded);
             const session = {
                 id: (0, uuid_1.v4)(),
                 accessToken: this.token,
@@ -79,6 +79,7 @@ class JwtAuthenticationProvider {
                 removed: [],
                 changed: [],
             });
+            WebSocketClient_1.default.getInstance().connect();
             return session;
         }
         catch (error) {
@@ -106,6 +107,7 @@ class JwtAuthenticationProvider {
                     removed: [session],
                     changed: [],
                 });
+                WebSocketClient_1.default.getInstance().disconnect();
             }
         }
     }
@@ -117,23 +119,26 @@ class JwtAuthenticationProvider {
             const token = params.get("token");
             const provider = params.get("provider");
             if (token && provider) {
-                try {
-                    this.token = token;
-                    this.provider = provider;
-                    const session = await this.createSession([]);
-                    LoginWebView_1.default.getInstance(this.context).getSuccessContent(this.context.extensionUri);
-                    vscode.window.showInformationMessage(`${session.account.label}님 환영합니다!`);
-                    console.log("로그인 성공! => ", session);
-                }
-                catch (error) {
-                    vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);
-                    console.log(`로그인에 실패했습니다... =>  ${error}`);
-                }
+                this.login(token, provider);
             }
             else {
                 vscode.window.showErrorMessage("토큰을 받아오지 못했습니다");
                 console.log("토큰을 받아오지 못했습니다");
             }
+        }
+    };
+    login = async (token, provider) => {
+        try {
+            this.token = token;
+            this.provider = provider;
+            const session = await this.createSession([]);
+            LoginWebView_1.default.getInstance(this.context).getSuccessContent(this.context.extensionUri);
+            vscode.window.showInformationMessage(`${session.account.label}님 환영합니다!`);
+            console.log("로그인 성공! => ", session);
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);
+            console.log(`로그인에 실패했습니다... =>  ${error}`);
         }
     };
 }
