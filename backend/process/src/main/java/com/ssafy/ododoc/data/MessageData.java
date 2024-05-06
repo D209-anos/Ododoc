@@ -6,9 +6,10 @@ import java.util.Date;
 
 @Getter
 public class MessageData {
-    private SenderState senderState;
+    private SourceApplication sourceApplication;
+    private String accessToken;
     private Long connectedFileId;
     private DataType dataType;
-    private String contents;
+    private Contents contents;
     private Date timestamp;
 }
