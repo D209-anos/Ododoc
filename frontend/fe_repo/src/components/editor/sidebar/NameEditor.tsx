@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 
 interface NameEditorProps {
@@ -9,32 +9,36 @@ interface NameEditorProps {
 }
 
 const NameEditor: React.FC<NameEditorProps> = ({ objectId, name, setName, saveName }) => {
+    const [inputName, setInputName] = useState(name);
+
     // 파일 또는 폴더명 바꾸는 함수
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value)
+        setInputName(event.target.value)
     };
 
     // 파일 또는 폴더명 수정 후 엔터 쳤을 때 실행되는 함수
-    const handleBlur = (event: React.FocusEvent<HTMLInputElement>): void => {
-        const newName = event.target.value;
-        saveName(objectId, newName);
+    const handleBlur = () => {
+        saveName(objectId, inputName);
+        setName(inputName);
     }
 
     const handleNameSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        saveName(objectId, name);
+        saveName(objectId, inputName);
+        setName(inputName);
     };
 
     return (
         <form onSubmit={handleNameSubmit} className={Sidebar.renderNameField}>
             <input 
                 type="text"
-                value={name}
+                value={inputName}
                 onChange={handleNameChange}
                 onBlur={handleBlur}
                 autoFocus
                 className={Sidebar.renderNameField}
                 style={{ fontFamily: 'hanbitFont' }}
+                maxLength={30}
             />
         </form>
     )

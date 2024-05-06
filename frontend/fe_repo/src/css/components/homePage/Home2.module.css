@@ -44,6 +44,7 @@
     position: absolute;
     top: 5vh;
     right: 10vh;
+    box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .intellijImage {
@@ -67,5 +68,14 @@
     top: 30vh;
     right: 16vh;
     border: 1px solid rgb(216, 214, 214);
+    box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.3);
 }
 
+.editorOverlayText {
+    font-family: 'hanbitFont';
+    position: absolute;
+    top: 5%;
+    left: 33%;
+    font-size: 18px;
+    line-height: 1.8;
+}
