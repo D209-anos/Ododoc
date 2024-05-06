@@ -46,8 +46,8 @@
   align-items: center;
   font-family: 'hanbitFont';
   position: absolute;
-  top: -7vh;
-  right: 1vh;
+  top: -9vh;
+  right: -1vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.1s ease;
 }
@@ -88,8 +88,8 @@
   align-items: center;
   font-family: 'hanbitFont';
   position: absolute;
-  top: 1vh;
-  right: 10vh;
+  top: -5.7vh;
+  right: 9vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.1s ease;
 }
@@ -109,8 +109,8 @@
   align-items: center;
   font-family: 'hanbitFont';
   position: absolute;
-  top: 1vh;
-  right: 21vh;
+  top: 4vh;
+  right: 12vh;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   transition: transform 0.1s ease;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../../assets/images/icon/pencil.png'
 import Line from '../../../assets/images/mark/line.png'
@@ -15,6 +15,7 @@ import FileItem from './FileItem';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
+import { fetchDirectory } from '../../../api/service/directory';
 
 interface IContentItem {
     id: number;
@@ -91,18 +92,35 @@ const dummyData: IContentItem = {
 
 const SideBar: React.FC = () => {
     const navigate = useNavigate();
+    const [contents, setContents] = useState<IContentItem[]>([]);
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
     const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>(dummyData.name);                   // 사용자 이름 수정
+    const [userName, setUserName] = useState<string>('');                   // 사용자 이름 수정
     const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
     const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
 
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();
     const contextMenuRef = useRef<HTMLUListElement>(null);
     useHandleClickOutside(contextMenuRef, hideMenu);
+
+    useEffect(() => {
+        const loadDirectory = async () => {
+            const rootId = 1;
+            const directoryData = await fetchDirectory(rootId);
+            const token = localStorage.getItem('accessToken')
+            if (directoryData && token) {
+                console.log('데이터 들어왔따 ~~~')
+                console.log(directoryData)
+                setContents(directoryData.contents as IContentItem[]);
+                setUserName(directoryData.name);
+            }
+        };
+
+        loadDirectory();
+    }, [])
 
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
