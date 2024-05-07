@@ -1,6 +1,6 @@
-package com.ssafy.ododoc.config;
+package com.ssafy.ododoc.common.config;
 
-import com.ssafy.ododoc.handler.SocketHandler;
+import com.ssafy.ododoc.common.handler.SocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -16,6 +16,5 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(socketHandler, "/ws").setAllowedOrigins("*");
-        ;
     }
 }

@@ -11,11 +11,13 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
+import com.ssafy.ododocintellij.login.token.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
+import com.ssafy.ododocintellij.tracker.dto.RequestDto;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
-import com.ssafy.ododocintellij.tracker.response.BuildResultInfo;
-import com.ssafy.ododocintellij.tracker.response.ModifiedFileInfo;
+import com.ssafy.ododocintellij.tracker.dto.BuildResultInfo;
+import com.ssafy.ododocintellij.tracker.dto.ModifiedFileInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -41,28 +43,32 @@ public class CodeListener implements ExecutionListener {
             // 빌드가 끝이 났을 경우
             @Override
             public void processTerminated(@NotNull ProcessEvent event) {
+                RequestDto requestDto = new RequestDto();
                 BuildResultInfo buildResultInfo = new BuildResultInfo();
-                // Todo : 연동된 파일 ID 넣기
-                buildResultInfo.setConnectedFileId(5);
 
-                // 빌드가 끝난 시간 담기
-                buildResultInfo.setTimeStamp(LocalDateTime.now().toString());
+                requestDto.setSourceApplication("IntelliJ");
+                requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
+                // Todo: 연동된 파일 ID 넣기
+                requestDto.setConnectedFileId(5);
+                requestDto.setTimeStamp(LocalDateTime.now().toString());
 
                 // 빌드 성공 유무
                 if(event.getExitCode() == 0){
-                    buildResultInfo.setSuccess(true);
+                    requestDto.setDataType("OUTPUT");
+                    buildResultInfo.setDetails("빌드 성공");
                 }
                 // 실패했을 경우 에러 내용 담기
                 else{
-                    buildResultInfo.setSuccess(false);
-                    buildResultInfo.setContents(outputLog.toString());
+                    requestDto.setDataType("ERROR");
+                    buildResultInfo.setDetails(outputLog.toString());
                 }
                 buildResultInfo.setModifiedFiles(getModifiedFiles());
+                requestDto.setContent(buildResultInfo);
                 outputLog.setLength(0);
 
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
-                    String output = objectMapper.writeValueAsString(buildResultInfo);
+                    String output = objectMapper.writeValueAsString(requestDto);
                     BuildResultSender.sendMessage(output);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
