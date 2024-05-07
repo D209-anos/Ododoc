@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public class DataTypeHandlerService {
 
     private final DataTransferService dataTransferService;
+    private final OutputHandlerService outputHandlerService;
 
     public void handle(MessageDto messageDto){
 
@@ -23,6 +24,7 @@ public class DataTypeHandlerService {
             case OUTPUT:
                 System.out.println(dataType);
                 System.out.println(messageDto.getContent());
+                outputHandlerService.process(messageDto);
                 break;
 
             case ERROR:
@@ -39,6 +41,8 @@ public class DataTypeHandlerService {
                 System.out.println(dataType);
                 break;
         }
+
+        // main으로 데이터 전송 로직 추가
     }
 
     private void processSignal(MessageDto messageDto){
