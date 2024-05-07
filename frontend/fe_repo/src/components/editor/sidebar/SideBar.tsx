@@ -19,6 +19,7 @@ import { fetchDirectory } from '../../../api/service/directory';
 
 interface IContentItem {
     id: number;
+    parentId?: number | null;
     type: 'FOLDER' | 'FILE';
     name: string;
     contents?: IContentItem[] | string;
@@ -74,6 +75,12 @@ const dummyData: IContentItem = {
             "type": "FOLDER",
             "name": "밀정윷놀이 프로젝트",
             "contents": [
+                {
+                    "id": 45,
+                    "type": "FOLDER",
+                    "name": "얌얌 프로젝트",
+                    "contents": []
+                },
                 { "id": 999,
                 "type": "FILE",
                 "name": "Project Description",
@@ -131,8 +138,9 @@ const SideBar: React.FC = () => {
     // file 클릭
     const fileItemClick = (id: number): void => {
         navigate(`/editor/${id}`, {state: id})
-        // setSelectedId(id);
-        // console.log(id)
+        const parentId = findParentId(dummyData.contents as IContentItem[], id);
+        console.log("Select ID:", id)
+        console.log("Parent ID:", parentId)
     }
 
     // folder 클릭
@@ -140,6 +148,9 @@ const SideBar: React.FC = () => {
         // setSelectedId(id);
         // console.log(id)
     }
+
+    // 폴더 드래그 시작하는 함수
+
 
     // 사용자 이름 저장 함수
     const saveUserName = (objectId: number) => {
@@ -169,8 +180,31 @@ const SideBar: React.FC = () => {
         );
     };
 
+    // 부모 ID를 찾는 함수
+    const findParentId = (contents: IContentItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
+        if (!contents || typeof contents === 'string') return undefined;
+
+        for (let item of contents) {
+            if (item.id === id) {
+                return parentId;
+            }
+            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
+                const foundParentId = findParentId(item.contents as IContentItem[], id, item.id);   // 재귀로 부모 찾기
+                if (foundParentId !== undefined) return foundParentId;
+            }
+        }
+        return undefined;
+    }
+
+    // parentId
+    const parentId = (id: number): void => {
+        findParentId(dummyData.contents as IContentItem[], id);
+        console.log("Select ID:", id)
+        console.log("Parent ID:", parentId)
+    }
+
     // 폴더 및 파일 하위 구조
-    const renderContents = (contents: IContentItem[] | undefined, indentLevel: number = 0): JSX.Element[] => {
+    const renderContents = (contents: IContentItem[] | undefined, parentId: number | null, indentLevel: number = 0): JSX.Element[] => {
         if (!contents) return [];
 
         return contents.map((item: IContentItem) => {
@@ -178,13 +212,34 @@ const SideBar: React.FC = () => {
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
-                        <FolderItem item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} handleContextMenu={handleContextMenu} handleItemClick={folderItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
+                        <FolderItem 
+                            item={item}
+                            parentId={parentId}
+                            toggleModal={toggleModal} 
+                            modalActive={modalActive} 
+                            renderContents={() => renderContents(item.contents as IContentItem[], item.id, indentLevel + 1)} 
+                            handleContextMenu={handleContextMenu} 
+                            handleItemClick={folderItemClick} 
+                            selectedItem={selectedItem} 
+                            isContentEditing={isContentEditing} 
+                            setIsContentEditing={setIsContentEditing} 
+                            saveName={saveName}
+                        />
                     </div>
                 );
             } else {
                 return (
                     <div key={item.id} className={className}>
-                        <FileItem item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={fileItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
+                        <FileItem 
+                            item={item} 
+                            parentId={item.id}
+                            selected={item.id === selectedId} 
+                            handleContextMenu={handleContextMenu} 
+                            handleItemClick={fileItemClick} 
+                            selectedItem={selectedItem} 
+                            isContentEditing={isContentEditing} 
+                            setIsContentEditing={setIsContentEditing} 
+                            saveName={saveName}/>
                     </div>
                 );
             }
@@ -209,7 +264,7 @@ const SideBar: React.FC = () => {
 
     // 우클릭 한 해당 항목의 정보를 setSelectedItem에 상태관리하는 함수
     const handleEdit = (id: number) => {
-        // console.log(`${id}`)
+        console.log(`${id}`)
         const itemToEdit = findItemById(dummyData.contents, id);
         if (itemToEdit) {
             setSelectedItem(itemToEdit);
@@ -242,7 +297,7 @@ const SideBar: React.FC = () => {
                 {renderNameField()}
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
-            {renderContents(dummyData.contents as IContentItem[])}
+            {renderContents(dummyData.contents as IContentItem[], null)}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 
