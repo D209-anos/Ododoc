@@ -28,10 +28,11 @@ public class MemberController {
 
     /**
      * 소셜 로그인
+     *
      * @param loginRequest  OAuth 인가 코드와 redirect_uri
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
-     * @return 로그인 한 회원의 JWT 정보
+     * @return 로그인 한 회원의 JWT 정보, root Directory 정보
      */
     @PostMapping(value = "/authorization/{provider}")
     public LoginResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
@@ -42,11 +43,12 @@ public class MemberController {
     }
 
     /**
-     *  소셜 로그인 테스트용
+     * IntelliJ Plugin 소셜 로그인
+     *
      * @param code OAuth 인가코드
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
-     * @return 로그인 한 회원의 JWT 정보
+     * @return 로그인 한 회원의 JWT 정보, root Directory 정보
      */
     @GetMapping("/authorization/{provider}")
     public LoginResponse login(@RequestParam String code,
@@ -61,6 +63,15 @@ public class MemberController {
         return jwtProvider.makeLoginResponse(loginDto);
     }
 
+    /**
+     * VSCode 소셜 로그인
+     *
+     * @param code 소셜 로그인 인가 코드
+     * @param redirectUri 소셜 로그인 redirectUri
+     * @param provider OAuth Provider (kakao, google, naver)
+     * @param response 쿠키 저장을 위한 response
+     * @throws IOException
+     */
     @GetMapping("/authorization/vsc/{provider}")
     public void vscLogin(@RequestParam String code,
                          @RequestParam(required = false) String redirectUri,
