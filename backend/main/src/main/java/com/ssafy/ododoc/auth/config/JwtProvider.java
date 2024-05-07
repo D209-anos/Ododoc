@@ -1,7 +1,9 @@
 package com.ssafy.ododoc.auth.config;
 
 import com.ssafy.ododoc.auth.response.JwtTokenResponse;
+import com.ssafy.ododoc.auth.response.LoginResponse;
 import com.ssafy.ododoc.auth.type.JwtCode;
+import com.ssafy.ododoc.member.dto.LoginDto;
 import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.entity.RefreshToken;
 import com.ssafy.ododoc.member.exception.TokenInvalidException;
@@ -151,6 +153,19 @@ public class JwtProvider {
                 .accessToken(accessToken)
                 .tokenType("Bearer")
                 .oAuthProvider(member.getProvider())
+                .build();
+    }
+
+    public LoginResponse makeLoginResponse(LoginDto loginDto) {
+        String accessToken = makeAccessToken(loginDto.getMember().getCode(), loginDto.getMember().getRoles(), loginDto.getMember().getProvider(), loginDto.getMember().getNickname());
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .tokenType("Bearer")
+                .oAuthProvider(loginDto.getMember().getProvider())
+                .rootId(loginDto.getDirectory().getId())
+                .title(loginDto.getDirectory().getName())
+                .type(loginDto.getDirectory().getType())
                 .build();
     }
 

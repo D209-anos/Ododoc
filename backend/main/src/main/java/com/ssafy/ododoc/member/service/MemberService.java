@@ -5,6 +5,7 @@ import com.ssafy.ododoc.directory.entity.DirectoryClosure;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
 import com.ssafy.ododoc.directory.repository.DirectoryRepository;
 import com.ssafy.ododoc.directory.type.DirectoryType;
+import com.ssafy.ododoc.member.dto.LoginDto;
 import com.ssafy.ododoc.member.dto.OAuthMemberInfo;
 import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.exception.OAuthInfoNullException;
@@ -14,12 +15,10 @@ import com.ssafy.ododoc.member.util.GoogleOAuth2Utils;
 import com.ssafy.ododoc.member.util.KakaoOAuth2Utils;
 import com.ssafy.ododoc.member.util.NaverOAuth2Utils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class MemberService {
 
     private final KakaoOAuth2Utils kakaoUtil;
@@ -29,15 +28,15 @@ public class MemberService {
     private final DirectoryRepository directoryRepository;
     private final DirectoryClosureRepository directoryClosureRepository;
 
-    public Member getMemberInfo(String inputProvider, String code, String redirectUri) {
+    public LoginDto getMemberInfo(String inputProvider, String code, String redirectUri) {
         OAuthProvider provider = OAuthProvider.getOAuthProvider(inputProvider);
         OAuthMemberInfo oAuthMemberInfo = getOAuthMemberInfo(provider, code, redirectUri);
 
         if(oAuthMemberInfo == null){
-            throw  new OAuthInfoNullException("존재하지않는 유저입니다.");
+            throw new OAuthInfoNullException("존재하지않는 유저입니다.");
         }
 
-        return memberRepository.findByCodeAndProvider(oAuthMemberInfo.code(), provider)
+        return memberRepository.findMemberAndRoot(oAuthMemberInfo, provider)
                 .orElseGet(() -> createMemberAndDirectory(oAuthMemberInfo, provider));
     }
 
@@ -49,7 +48,7 @@ public class MemberService {
         };
     }
 
-    private Member createMemberAndDirectory(OAuthMemberInfo oAuthMemberInfo, OAuthProvider provider) {
+    private LoginDto createMemberAndDirectory(OAuthMemberInfo oAuthMemberInfo, OAuthProvider provider) {
         Member member = memberRepository.save(Member.builder()
                 .code(oAuthMemberInfo.code())
                 .provider(provider)
@@ -67,6 +66,9 @@ public class MemberService {
                 .descendant(root)
                 .build());
 
-        return member;
+        return LoginDto.builder()
+                .member(member)
+                .directory(root)
+                .build();
     }
 }
