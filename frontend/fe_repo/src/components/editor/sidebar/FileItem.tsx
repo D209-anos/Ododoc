@@ -47,6 +47,7 @@ const FileItem: React.FC<FileItemProps> = ({
         return 'black'
     }
 
+    // 파일명 수정 함수
     const renderContentNameField = (): JSX.Element | null => {
         if (isContentEditing && selectedItem && selectedItem.id === item.id) {
 

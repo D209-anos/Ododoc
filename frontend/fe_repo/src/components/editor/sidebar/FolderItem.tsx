@@ -28,11 +28,13 @@ interface FolderItemProps {
 const FolderItem: React.FC<FolderItemProps> = ({ item, toggleModal, modalActive, renderContents, handleContextMenu, handleItemClick, selectedItem, isContentEditing, setIsContentEditing, saveName }) => {
     const [isFolderOpen, setIsFolderOpen] = useState(false);
 
+    // 폴더 하위 요소 여닫는 함수
     const toggleFolder = () => {
         setIsFolderOpen(!isFolderOpen);
         handleItemClick(item.id)
     }
 
+    // 폴더명 수정 함수
     const renderContentNameField = (): JSX.Element | null => {
         if (isContentEditing && selectedItem && selectedItem.id === item.id) {
 
