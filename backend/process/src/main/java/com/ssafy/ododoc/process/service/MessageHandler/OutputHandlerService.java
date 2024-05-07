@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.service;
+package com.ssafy.ododoc.process.service.MessageHandler;
 
 import com.ssafy.ododoc.gpt.GptService;
 import com.ssafy.ododoc.gpt.dto.GptResponseDto;
@@ -14,18 +14,17 @@ public class OutputHandlerService {
 
     public MessageDto process(MessageDto messageDataInput) {
         messageData = messageDataInput;
-
         System.out.println("!output process start!");
 
-        a();
+        gptProcess();
+
         b();
 
         System.out.println("!output process end!");
-
         return messageData;
     }
 
-    private void a() {
+    private void gptProcess() {
         System.out.println("===================process 1===================");
 //        GptResponseDto chat = gptService.chat("gpt-3.5-turbo", messageData.getContent().toString() + "\n이거 요약해줘 ", "http://localhost:8080/api");
 //        System.out.println(chat.getChoices().get(0).getMessage().getContent());
