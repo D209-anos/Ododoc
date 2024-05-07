@@ -1,9 +1,8 @@
-import { SenderState } from "./SenderState";
-
 export interface MessageData {
-  senderState: SenderState;
+  sourceApplication: string;
+  accessToken: string;
   connectedFileId: number;
   dataType: string;
-  contents: string;
-  timestamp: Date;
+  content: string;
+  timestamp: string;
 }

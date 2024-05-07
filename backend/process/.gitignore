@@ -1,4 +1,5 @@
 HELP.md
+.gradle
 ../../../../../../새 폴더/process/.gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
