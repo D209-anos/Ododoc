@@ -1,13 +1,13 @@
 package com.ssafy.ododoc.process.service;
 
-import com.ssafy.ododoc.data.MessageData;
+import com.ssafy.ododoc.process.dto.receive.MessageDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OutputHandlerService {
-    private MessageData messageData;
-    public MessageData processOutput(MessageData messageDataInput) {
-        messageData = messageDataInput;
+    private MessageDto messageDto;
+    public MessageDto processOutput(MessageDto messageDataInput) {
+        messageDto = messageDataInput;
 
         System.out.println("process start");
 
@@ -16,7 +16,7 @@ public class OutputHandlerService {
 
         System.out.println("process end");
 
-        return messageData;
+        return messageDto;
     }
     private void a() {
 
