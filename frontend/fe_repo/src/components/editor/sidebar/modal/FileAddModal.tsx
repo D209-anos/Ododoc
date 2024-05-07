@@ -35,11 +35,12 @@ const FileAddModal = forwardRef<HTMLImageElement, ModalProps>(({ isOpen, onClose
                 <div className={Modal.addElement}>
                     <div className={`${Modal.imageWrapper} ${selected === 'folder' ? Modal.active : ''}`} onClick={() => handleImageClick('folder')}>
                         <img src={FolderImage} alt="folder-image" className={Modal.folderImage}/>
+                        <div className={Modal.title}>폴더 추가</div>
                     </div>
-                    <img src={ColumnLine} alt="column-line" className={Modal.columnLine}/>
                     <div className={`${Modal.imageWrapper} ${selected === 'file' ? Modal.active : ''}`}
                          onClick={() => handleImageClick('file')}>
                         <img src={FileImage} alt="file-image" className={Modal.fileImage}/>
+                        <div className={Modal.title}>파일 추가</div>
                     </div>
                 </div>
             </div>

@@ -92,13 +92,14 @@ const dummyData: IContentItem = {
 
 const SideBar: React.FC = () => {
     const navigate = useNavigate();
-    const [contents, setContents] = useState<IContentItem[]>([]);
+    // const [contents, setContents] = useState<IContentItem[]>([]);
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
     const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
+    // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
+    const [userName, setUserName] = useState<string>(dummyData.name);                  // 사용자 이름 수정
     const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
     const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
 
@@ -106,21 +107,22 @@ const SideBar: React.FC = () => {
     const contextMenuRef = useRef<HTMLUListElement>(null);
     useHandleClickOutside(contextMenuRef, hideMenu);
 
-    useEffect(() => {
-        const loadDirectory = async () => {
-            const rootId = 1;
-            const directoryData = await fetchDirectory(rootId);
-            const token = localStorage.getItem('accessToken')
-            if (directoryData && token) {
-                console.log('데이터 들어왔따 ~~~')
-                console.log(directoryData)
-                setContents(directoryData.contents as IContentItem[]);
-                setUserName(directoryData.name);
-            }
-        };
+    // 디렉토리 조회
+    // useEffect(() => {
+    //     const loadDirectory = async () => {
+    //         const rootId = 1;
+    //         const directoryData = await fetchDirectory(rootId);
+    //         const token = localStorage.getItem('accessToken')
+    //         if (directoryData && token) {
+    //             console.log('데이터 들어왔따 ~~~')
+    //             console.log(directoryData)
+    //             setContents(directoryData.contents as IContentItem[]);
+    //             setUserName(directoryData.name);
+    //         }
+    //     };
 
-        loadDirectory();
-    }, [])
+    //     loadDirectory();
+    // }, [])
 
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
@@ -172,7 +174,7 @@ const SideBar: React.FC = () => {
         if (!contents) return [];
 
         return contents.map((item: IContentItem) => {
-            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 들여쓰기 클래스 조건적 적용
+            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
@@ -189,14 +191,14 @@ const SideBar: React.FC = () => {
         });
     };
 
+    // 선택된 항목 ID 찾기 함수
     const findItemById = (contents: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
-        if (!contents || typeof contents === 'string') return undefined; // Early return if contents is undefined or a string
+        if (!contents || typeof contents === 'string') return undefined;
 
         for (let item of contents) {
             if (item.id === id) {
                 return item;
             }
-            // Ensure we only recurse into contents if it is an array
             if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
                 const found = findItemById(item.contents, id);
                 if (found) return found;

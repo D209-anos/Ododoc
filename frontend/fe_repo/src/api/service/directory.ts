@@ -12,8 +12,8 @@ export const fetchDirectory = async (rootId: number): Promise<IContentItem | nul
     try {
         const response = await api.get<IContentItem>(`/directory/${rootId}`);
         return response.data;
-    } catch (error) {
-        console.error('Failed to fetch directory:', error);
+    } catch (error: any) {
+        console.error('Failed to fetch directory:', error.response?.data || error.message);
         return null;
     }
 };
