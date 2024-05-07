@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.process.service;
 
 import com.ssafy.ododoc.process.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.service.MessageHandler.OutputHandlerService;
 import com.ssafy.ododoc.process.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ public class DataTypeHandlerService {
         DataType dataType = messageDto.getDataType();
         switch (dataType){
             case SIGNAL:
-                System.out.println(dataType);
                 System.out.println(messageDto.getContent());
                 break;
 
