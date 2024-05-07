@@ -12,6 +12,7 @@ function Editor() {
             <Routes>
                 <Route path="/" element={<Mypage/>} />
                 <Route path="/:id" element={<Editor1 />} />
+                <Route path="/editor" element={<Editor1 />} />
                 {/* <Route path={`/${id}`} element={<Editor1 />} /> */}
             </Routes>
             </div>

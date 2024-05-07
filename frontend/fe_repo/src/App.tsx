@@ -19,8 +19,6 @@ function App() {
         <Route path='/start/:selectedType' element={<Start />} />
         <Route path='/editor/*' element={<Editor />}></Route>
         <Route path='/oauth' element={<LoginLoading />}></Route>
-        <Route path='/editor' element={<Editor />} />
-        <Route path='editor/:id' element={<Editor />} />
       </Routes>
     </Router>
   );
