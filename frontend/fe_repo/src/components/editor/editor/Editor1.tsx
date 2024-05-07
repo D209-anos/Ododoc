@@ -1,12 +1,33 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
-import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock, Block, uploadToTmpFilesDotOrg_DEV_ONLY } from "@blocknote/core";
-import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
+import { BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems, Block, } from "@blocknote/core";
+import {
+  BlockNoteView,
+  useCreateBlockNote,
+  SuggestionMenuController,
+  getDefaultReactSlashMenuItems,
+  SideMenuController,
+  SideMenu,
+  RemoveBlockItem,
+  BlockColorsItem,
+  DragHandleMenu,
+  FormattingToolbarController,
+  FormattingToolbar,
+  BlockTypeSelect,
+  ImageCaptionButton,
+  ReplaceImageButton,
+  BasicTextStyleButton,
+  TextAlignButton,
+  ColorStyleButton,
+  NestBlockButton,
+  UnnestBlockButton,
+  CreateLinkButton
+} from "@blocknote/react";
 import { CodeBlock, insertCode } from "./CodeBlock";
 import { useParams } from 'react-router-dom'
 import React, { useState, useEffect, useCallback } from 'react';
 import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
-import _ from 'lodash';
+import _, { isNull } from 'lodash';
 import axios from 'axios';
 import useImageUpload from "../../../hooks/editor/useImageUpload";
 
@@ -17,6 +38,73 @@ const Editor1 = () => {
   const [title, setTitle] = useState('제목입니다22');
   const titleId = "title-id"; // 제목 블록의 고유 ID
 
+  // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
+  // 파일 ID를 사용하여 데이터베이스에서 파일 내용을 불러오는 함수
+  //서버에서 불러온 데이터를 해당 코드에 집어넣으면 됩니다
+  const [content, setContent] = useState<Block[]>([
+    {
+      "id": "title-id",
+      "type": "heading",
+      "props": {
+        "textColor": "default",
+        "backgroundColor": "default",
+        "textAlignment": "left",
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "제목입니다22",
+          "styles": {}
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "d837d32c-0fe2-4fc0-b87e-f9d28711f5ff",
+      "type": "paragraph",
+      "props": {
+        "textColor": "default",
+        "backgroundColor": "default",
+        "textAlignment": "left"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "서버에서는 JSON 형식으로 데이터를 전송합니다",
+          "styles": {}
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "9556e88c-8273-44ad-b593-c27fcf11c870",
+      "type": "paragraph",
+      "props": {
+        "textColor": "default",
+        "backgroundColor": "default",
+        "textAlignment": "left"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "이렇게 여러개의 데이터를 어떻게 initailContent에 집어 넣어야 하지?",
+          "styles": {}
+        }
+      ],
+      "children": []
+    },
+    {
+      "id": "cc35351d-e276-46ad-b2a1-cb6de104b9b1",
+      // @ts-ignore
+      "type": "terminal",
+      "props": {
+        // @ts-ignore
+        "data": "ggggg"
+      },
+      "children": []
+    },
+  ]);
   // 이미지 업로드 훅
   const { ImageUpload } = useImageUpload();
 
@@ -32,23 +120,6 @@ const Editor1 = () => {
       terminal: TerminalBlock
     },
   });
-
-  // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
-  // 파일 ID를 사용하여 데이터베이스에서 파일 내용을 불러오는 함수
-  useEffect(() => {
-    const fetchFileContent = async () => {
-      if (fileId) {
-        try {
-          const response = await axios.get(`/api/files/${fileId}`);
-          setBlocks(response.data.content); // 상태에 파일 내용 저장
-        } catch (error) {
-          console.error('Failed to fetch file content:', error);
-        }
-      }
-    };
-
-    fetchFileContent();
-  }, [fileId]);
 
   // 에디터의 내용을 로컬 스토리지에 저장하는 함수
   const saveContentToLocalStorage = (content: any) => {
@@ -74,30 +145,181 @@ const Editor1 = () => {
 
   const editor = useCreateBlockNote({
     schema: schema,
-    initialContent: [],
+    placeholders: {
+      default: "글을 작성하거나 명령어를 사용하려면 '/'키를 누르세요",
+      heading: "제목 입력",
+      bulletListItem: "리스트",
+      numberedListItem: "리스트",
+    },
     // 우리 s3에 업로드하는 훅
+    initialContent: content,
     uploadFile: ImageUpload
   });
+
+  // 슬래시 메뉴 한글로 변환
+  const getItemsWithKoreanTitles = async (query: any) => {
+    const defaultItems = await getDefaultReactSlashMenuItems(editor);
+    const translatedItems = defaultItems.map(item => ({
+      ...item,
+      title: translateTitleToKorean(item.title), // 한글로 번역하는 함수
+      subtext: translateSubTextToKorean(item.subtext ?? "")
+    }));
+    return filterSuggestionItems([...translatedItems, insertCode(), insertTerminal()], query);
+  };
+
+  function translateTitleToKorean(title: string): string {
+    const titleMap: { [key: string]: string } = {
+      "Heading 1": "제목 1",
+      "Heading 2": "제목 2",
+      "Heading 3": "제목 3",
+      "Numbered List": "번호 매기기 목록",
+      "Bullet List": "글머리 기호 목록",
+      "Paragraph": "텍스트",
+      "Table": "표",
+      "Image": "이미지"
+    };
+    return titleMap[title] || title;
+  }
+
+  function translateSubTextToKorean(subtext: string): string {
+    const subtextmap: { [key: string]: string } = {
+      "Used for a top-level heading": "섹션제목(대)",
+      "Used for key sections": "섹션제목(중)",
+      "Used for subsections and group headings": "섹션제목(소)",
+      "Used to display a numbered list": "번호 매기기 목록을 생성하세요",
+      "Used to display an unordered list": "글머리 기호 목록을 생성하세요",
+      "Used for the body of your document": "일반 텍스트를 사용해 쓰기를 시작하세요",
+      "Used for for tables": "간단한 표를 페이지에 추가합니다",
+      "Insert an image": "파일을 업로드하거나 링크를 이용해 임베드하세요"
+    };
+    return subtextmap[subtext] || subtext;
+  }
+
+  // 이벤트 핸들러 설정
+  const handleBackspace = (event: any) => {
+    if (event.key === 'Backspace') {
+      // const selection = editor.getTextCursorPosition();
+      const selection = editor.getTextCursorPosition();
+      
+      console.log("선택한 블록" + selection.block.content);
+      if (!selection || !selection.block.content) return;
+      // if (blockIndex <= 0) return;  // 첫 번째 블록인 경우 이전 블록이 없음
+      // const previousBlock = editor.document[blockIndex - 1];
+
+      if (Array.isArray(selection.block.content) && selection.block.content.length === 0) {
+        console.log(1111);
+        // 이전 블록이 코드블록인지 확인
+        if (selection.prevBlock?.type === 'procode' || selection.prevBlock?.type === 'terminal') {
+        console.log(2222);
+
+          event.preventDefault(); // 기본 동작 방지
+          const confirmDelete = window.confirm("코드 블록을 삭제하시겠습니까?");
+          if (confirmDelete) {
+            // 사용자가 확인한 경우, 코드 블록 삭제
+        console.log(3333);
+
+            editor.removeBlocks([selection.prevBlock?.id]);
+          }
+        }
+      }
+    }
+  };
+
+  // 키보드 이벤트 리스너 등록
+  useEffect(() => {
+    document.addEventListener('keydown', handleBackspace);
+    return () => {
+      document.removeEventListener('keydown', handleBackspace);
+    };
+  }, [editor]); // 의존성 배열에 editor 추가
+
+
 
   return (
     <>
       <BlockNoteView
         editor={editor}
         slashMenu={false}
-        onChange={() => {
+        formattingToolbar={false}
+        sideMenu={false}
+        onSelectionChange={() => {
+          // 커서 위치에서 현재 선택된 블록의 ID를 가져옴
+          const selection = editor.getTextCursorPosition();
+          console.log(selection);
+          if (!selection || !selection.block.content) return;
           // Saves the document JSON to state.
-          setBlocks(editor.document as unknown as Block[]);
+          setBlocks(selection.prevBlock as unknown as Block[]);
         }}
       >
         {/* @ts-ignore */}
         <SuggestionMenuController
           triggerCharacter={"/"}
-          getItems={async (query) =>
-            filterSuggestionItems(
-              [...getDefaultReactSlashMenuItems(editor), insertCode(), insertTerminal()],
-              query
-            )
-          }
+          getItems={getItemsWithKoreanTitles}
+        />
+        <SideMenuController
+          sideMenu={(props) => (
+            <SideMenu
+              {...props}
+              dragHandleMenu={(props) => (
+                <DragHandleMenu {...props}>
+                  <RemoveBlockItem {...props}>삭제</RemoveBlockItem>
+                  <BlockColorsItem {...props}>색상</BlockColorsItem>
+                </DragHandleMenu>
+              )}
+            />
+          )}
+        />
+        <FormattingToolbarController
+          formattingToolbar={() => (
+            <FormattingToolbar>
+              <BlockTypeSelect key={"blockTypeSelect"} />
+
+              <ImageCaptionButton key={"imageCaptionButton"} />
+              <ReplaceImageButton key={"replaceImageButton"} />
+
+              <BasicTextStyleButton
+                basicTextStyle={"bold"}
+                key={"boldStyleButton"}
+              />
+              <BasicTextStyleButton
+                basicTextStyle={"italic"}
+                key={"italicStyleButton"}
+              />
+              <BasicTextStyleButton
+                basicTextStyle={"underline"}
+                key={"underlineStyleButton"}
+              />
+              <BasicTextStyleButton
+                basicTextStyle={"strike"}
+                key={"strikeStyleButton"}
+              />
+              {/* Extra button to toggle code styles */}
+              <BasicTextStyleButton
+                key={"codeStyleButton"}
+                basicTextStyle={"code"}
+              />
+
+              <TextAlignButton
+                textAlignment={"left"}
+                key={"textAlignLeftButton"}
+              />
+              <TextAlignButton
+                textAlignment={"center"}
+                key={"textAlignCenterButton"}
+              />
+              <TextAlignButton
+                textAlignment={"right"}
+                key={"textAlignRightButton"}
+              />
+
+              <ColorStyleButton key={"colorStyleButton"} />
+
+              <NestBlockButton key={"nestBlockButton"} />
+              <UnnestBlockButton key={"unnestBlockButton"} />
+
+              <CreateLinkButton key={"createLinkButton"} />
+            </FormattingToolbar>
+          )}
         />
       </BlockNoteView>
       <div>Document JSON:</div>
@@ -115,3 +337,4 @@ const Editor1 = () => {
 
 
 export default Editor1;
+

@@ -148,6 +148,11 @@ const SideBar: React.FC = () => {
     };
 
     // 사용자 이름 수정 함수
+    // 항목 클릭
+    const handleItemClick = (id: number): void => {
+        navigate(`/editor/${id}`)
+        setSelectedId(id);
+    }
     const renderNameField = (): JSX.Element => {
         if (isEditing) {
             return (
