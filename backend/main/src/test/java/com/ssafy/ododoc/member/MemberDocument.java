@@ -30,6 +30,16 @@ public class MemberDocument {
             fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
             fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
             fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("JWT 토큰 타입"),
+            fieldWithPath("data.oAuthProvider").type(JsonFieldType.STRING).description("OAuth 제공자"),
+            fieldWithPath("data.rootId").type(JsonFieldType.NUMBER).description("root directory id"),
+            fieldWithPath("data.title").type(JsonFieldType.STRING).description("root name"),
+            fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE")
+    );
+
+    public static final Snippet issueResponseField = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("JWT 액세스 토큰"),
+            fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("JWT 토큰 타입"),
             fieldWithPath("data.oAuthProvider").type(JsonFieldType.STRING).description("OAuth 제공자")
     );
 }
