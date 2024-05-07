@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { sendCodeToBackend } from '../../api/service/user';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
-import { sendCodeToBackend } from '../../api/service/user';
 import menu from '../../css/components/menu/Menu.module.css';
 import 'animate.css';
 
@@ -11,8 +12,8 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
+    const { accessToken, setAccessToken } = useAuth();
     const loginBackground = useRef<HTMLDivElement>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);        // 토큰 상태 관리
     const navigate = useNavigate();          // 리다이렉트
     const [animation, setAnimation] = useState('animate__backInDown');
 
@@ -32,18 +33,26 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
         const provider = getProvider();
-        if (code && provider) {
-            sendCodeToBackend(code, provider, setAccessToken);
-            console.log(code, provider)
+        const redirectUri = {
+            kakao: process.env.REACT_APP_KAKAO_REDIRECT_URI,
+            google: process.env.REACT_APP_GOOGLE_REDIRECT_URI,
+            naver: process.env.REACT_APP_NAVER_REDIRECT_URI,
+        };
+        if (provider === 'kakao' || provider === 'google' || provider === 'naver' ){
+            const url = redirectUri[provider]
+            if (code && provider && url !== undefined) {
+                sendCodeToBackend(code, url, provider, setAccessToken);
+            }
         }
     }, [setAccessToken]);
 
-    // 로그인 성공 시 Home 화면으로 이동
+    // 로그인 성공 시 editor 화면으로 이동
     useEffect(() => {
+        console.log(accessToken)
         if (accessToken) {
-            navigate('/'); 
+            navigate('/editor'); 
         }
-    }, [accessToken, navigate]);
+    }, [accessToken]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {
@@ -58,15 +67,11 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
             naver: process.env.REACT_APP_NAVER_REDIRECT_URI,
         };
 
-        // 네이버 로그인 stateString 부분 - 필요시 교체
-        // const stateString = "SM6HMQOM5D"
-        // naverUrl = `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&response_type=code&redirect_uri=${redirectUri.naver}&state=${stateString}`
-
-        // 카카오 로그인 URL
+        // URL
         const loginUrl = {
             kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${clientId.kakao}&redirect_uri=${redirectUri.kakao}&response_type=code`,
-            google: `https://accounts.google.com/o/oauth2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}?provider=&response_type=code&scope=profile email&access_type=offline`,
-            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}?provider=&response_type=code`
+            google: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId.google}&redirect_uri=${redirectUri.google}&scope=profile&response_type=code`,
+            naver: `https://nid.naver.com/oauth2.0/authorize?client_id=${clientId.naver}&redirect_uri=${redirectUri.naver}&response_type=code`
         }
         window.location.href = loginUrl[provider];
     }

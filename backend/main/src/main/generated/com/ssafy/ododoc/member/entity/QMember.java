@@ -41,8 +41,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final NumberPath<Long> searchCount = createNumber("searchCount", Long.class);
 
-    public final StringPath title = createString("title");
-
     public final NumberPath<Long> visitCount = createNumber("visitCount", Long.class);
 
     public QMember(String variable) {

@@ -1,15 +1,30 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
-import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock } from "@blocknote/core";
+import { BlockNoteSchema, DefaultBlockSchema, defaultBlockSpecs, filterSuggestionItems, PartialBlock, Block, uploadToTmpFilesDotOrg_DEV_ONLY } from "@blocknote/core";
 import { BlockNoteView, useCreateBlockNote, SuggestionMenuController, getDefaultReactSlashMenuItems } from "@blocknote/react";
 import { CodeBlock, insertCode } from "./CodeBlock";
-import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'
+import React, { useState, useEffect, useCallback } from 'react';
 import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
+import _ from 'lodash';
+import axios from 'axios';
+import useImageUpload from "../../../hooks/editor/useImageUpload";
 
 const Editor1 = () => {
+  // 저장을 위해 에디터의 변동 사항을 확인하기 위한 hooks
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  // 제목의 변동사항을 확인하기 위한 hooks
   const [title, setTitle] = useState('제목입니다22');
   const titleId = "title-id"; // 제목 블록의 고유 ID
 
+  // 이미지 업로드 훅
+  const { ImageUpload } = useImageUpload();
+
+  // sideBar에서 id값 꺼내기 위한 hook
+  const { fileId } = useParams();
+  // const { fileId } = state.id;
+
+  //기본 에디터 + 코드블록 + 터미널블록 사용가능 스키마 설정
   const schema = BlockNoteSchema.create({
     blockSpecs: {
       ...defaultBlockSpecs,
@@ -18,109 +33,61 @@ const Editor1 = () => {
     },
   });
 
-  const editor = useCreateBlockNote({
-    schema: schema,
-    initialContent: [{
-      id: titleId,
-      type: "heading",
-      props: {
-        level: 1,
-        textColor: "default",
-        backgroundColor: "default",
-        textAlignment: "left",
-      },
-      content: title,
-      children: [],
-    }]
-  });
-
-  // 블록 추가 예제
-  const addBlock = () => {
-    const newBlock = {
-      type: 'paragraph',
-      props: {
-        text: 'Another new paragraph block!',
-        textColor: 'default',
-        backgroundColor: 'default',
-        textAlignment: 'left'
+  // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
+  // 파일 ID를 사용하여 데이터베이스에서 파일 내용을 불러오는 함수
+  useEffect(() => {
+    const fetchFileContent = async () => {
+      if (fileId) {
+        try {
+          const response = await axios.get(`/api/files/${fileId}`);
+          setBlocks(response.data.content); // 상태에 파일 내용 저장
+        } catch (error) {
+          console.error('Failed to fetch file content:', error);
+        }
       }
     };
 
-    // 블록 스키마에 맞게 newBlock을 캐스팅합니다. 여기서는 예제로써 간단하게 처리하며,
-    // 실제로는 PartialBlock<BSchema, ISchema, SSchema> 타입을 만족시키는 객체를 생성해야 합니다.
-    const blockToInsert = [newBlock as PartialBlock<DefaultBlockSchema>];
+    fetchFileContent();
+  }, [fileId]);
 
-    editor.insertBlocks(blockToInsert, 'document-end', 'after'); // 문서 끝에 새 블록 추가
-  };
+  // 에디터의 내용을 로컬 스토리지에 저장하는 함수
+  const saveContentToLocalStorage = (content: any) => {
+    const savedData = JSON.stringify(content, null, 4)
+    localStorage.setItem('editorContent', savedData);
+  }
 
-  // 제목이 변경되었는지 확인하고 서버에 업데이트
-  const handleEditorChange = () => {
-    const currentTitleBlock = editor.getBlock(titleId);
-    console.log(currentTitleBlock?.content)
-    if (currentTitleBlock && Array.isArray(currentTitleBlock.content) && currentTitleBlock.content.length > 0) {
-      const contentItem = currentTitleBlock.content[0];
-      let newTitle = '';
+  // 로컬 스토리지의 내용을 서버에 저장하는 함수
+  const saveToServer = () => {
+    const localContent = localStorage.getItem('editorContent');
+    axios.post('/api/save', { content: localContent })
+      .then(response => console.log('Saved successfully!', response))
+      .catch(error => console.error('Failed to save:', error));
+  }
 
-      // contentItem 타입이 StyledText 또는 Link인 경우 처리
-      if (contentItem.type === 'text' && contentItem.text) {
-        newTitle = contentItem.text; // StyledText의 경우 직접 텍스트 사용
-      } else if (contentItem.type === 'link' && contentItem.content && contentItem.content.length > 0) {
-        // Link의 경우 content 배열의 첫 번째 StyledText 객체에서 텍스트 추출
-        newTitle = contentItem.content[0].text;
-      }
+  // 내용이 변경될 때마다 로컬 스토리지에 저장하고, 서버에 저장하는 작업을 지연시키는 함수
+  const debouncedSave = useCallback(_.debounce(saveToServer, 30000), []);
 
-      // 새로운 제목과 이전 제목을 비교하고 상태 및 데이터베이스 업데이트
-      if (newTitle && newTitle !== title) {
-        setTitle(newTitle);
-        updateTitleInDatabase(newTitle);
-        saveEditorContentToServer();
-      }
-    }
-  };
+  useEffect(() => {
+    saveContentToLocalStorage(blocks);
+    debouncedSave();
+  }, [blocks, saveContentToLocalStorage, debouncedSave]);
 
-  // 서버에 제목을 업데이트하는 함수
-  const updateTitleInDatabase = async (newTitle: any) => {
-    try {
-      await fetch('/api/titles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ title: newTitle })
-      });
-      console.log("Title updated successfully");
-    } catch (error) {
-      console.error("Failed to update title:", error);
-    }
-  };
-
-  const saveEditorContentToServer = async () => {
-    // const content = editor.document; // 가정: 에디터 상태를 가져오는 메서드
-
-    const currentTitleBlock = editor.getBlock(titleId);
-    if (currentTitleBlock && Array.isArray(currentTitleBlock.content) && currentTitleBlock.content.length > 0){
-      console.log("내용불러오기" + currentTitleBlock.content[0]);
-    }
-    try {
-      await fetch('/api/editor-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        // body: JSON.stringify({ content }) // 전체 에디터 내용을 JSON으로 변환하여 전송
-      });
-      console.log("Editor content saved successfully");
-    } catch (error) {
-      console.error("Failed to save editor content:", error);
-    }
-  };
+  const editor = useCreateBlockNote({
+    schema: schema,
+    initialContent: [],
+    // 우리 s3에 업로드하는 훅
+    uploadFile: ImageUpload
+  });
 
   return (
     <>
       <BlockNoteView
         editor={editor}
         slashMenu={false}
-        onChange={handleEditorChange}
+        onChange={() => {
+          // Saves the document JSON to state.
+          setBlocks(editor.document as unknown as Block[]);
+        }}
       >
         {/* @ts-ignore */}
         <SuggestionMenuController
@@ -133,6 +100,13 @@ const Editor1 = () => {
           }
         />
       </BlockNoteView>
+      <div>Document JSON:</div>
+      <div className={"item bordered"}>
+        <pre>
+          <code>{JSON.stringify(blocks, null, 2)}</code>
+        </pre>
+      </div>
+      <p>에디터입니다</p>
     </>
   )
 

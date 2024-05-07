@@ -27,6 +27,7 @@ const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
     // 스크롤 타이핑 애니메이션
     useScrollTrigger({ setText, setTypingCompleted, fullText, textLength, elementRef });
 
+    // 스크롤 opacity
     useIntersectionObserver({
         ref: elementRef,
         onIntersect: () => {
@@ -49,12 +50,10 @@ const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
             <div className={`${Home2.halfContainerSide} ${Home2.imageSide}`}>
                 <div style={{ backgroundImage: `url(${VisualScreen})` }} className={Home2.visualImage} />
                 <div style={{ backgroundImage: `url(${IntellijScreen})` }} className={Home2.intellijImage} />
-                <div>
-                    <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage}>
-                        <p className={Home2.editorOverlayText}>
-                            {textLines}
-                        </p>
-                    </div>
+                <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage} >
+                    <p className={Home2.editorOverlayText}>
+                        {textLines}
+                    </p>
                 </div>
             </div>
         </section>

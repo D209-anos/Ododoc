@@ -1,5 +1,6 @@
 .container {
-    height: 100vh;
+    height: 160vh;
+    max-width: 97vw;
     position: relative;
 }
 
@@ -32,21 +33,45 @@
     text-align: right;
     margin-right: 15%;
     margin-top: 15px;
-    margin-bottom: 25px;
-}
-
-.heading{
     margin-bottom: 15px;
 }
 
 .subheading{
-    margin-top: 15px;
-    margin-bottom: 25px;
+    margin: 0;
+    margin-right: 100px;
+    font-size: 30px;
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+
+.heading {
+    font-size: 50px;
+    margin: 0;
+    margin-right: 100px;
+}
+
+.Terminal {
+    width: 655px;
+    height: 280px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    position: absolute;
+    top: 43%;
+    left: 5vh;
+    box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.3);
 }
 
 .EditorErrorPage {
-    width: 70%;
-    border-radius: 10px;
+    width: 550px;
+    height: 580px;
+    background-size: cover;
+    background-position: left;
+    border-radius: 5px;
+    position: absolute;
+    top: 22.5%;
+    left: 107vh;
+    border: 2px solid rgb(199, 196, 196);
 }
 
 .splitContainer {
@@ -82,10 +107,157 @@
 }
 
 .NextVector {
-    position: absolute;
-    top: 62%;
+    position: fixed;
+    top: 90vh;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100px;
+    width: 50px;
     z-index: 10;
+}
+
+.error {
+    color: #fa512f;
+    font-size: 17px;
+}
+
+.TS2741 {
+    color: white;
+}
+
+.info {
+    color: white;
+}
+
+.code {
+    color: #ce9178;
+}
+
+.yellowText {
+    color: yellow;
+}
+
+.terminalErrorMessageWrapper {
+    position: absolute;
+    top: 19%;
+    left: 4%;
+    line-height: 1;
+    font-size: 16px;
+}
+
+.redWaveUnderline {
+    text-decoration: none;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 10 Q 2.5 0, 5 10 Q 7.5 0, 10 10" fill="none" stroke="red"/></svg>');
+    background-size: 12px;
+    background-repeat: repeat-x;
+    background-position: 0 120%;
+}
+
+.codeblockContainer {
+    border: 0.2px solid rgb(0, 0, 0, 0.1);
+    width: 650px;
+    height: 480px;
+    border-radius: 10px;
+    position: absolute;
+    top: 36%;
+    right: 2.3%;
+    box-shadow: 3px 5px 3px 2px rgba(0, 0, 0, 0.2);
+}
+
+.editorTitle {
+    font-size: 20px;
+    /* 상 우 하 좌 */
+    margin: 16px 0px 8px 25px;
+    font-family: 'bmjuaFont';
+}
+
+.line {
+    width: 180px;
+    margin: 0;
+    margin-left: 20px;
+    height: 0.5px;
+    background-color: rgb(233, 229, 229);
+}
+
+.codeContainer {
+    width: 557px;
+    height: 270px;
+    background-color: #f8f7f7;
+    border: 2px solid rgb(189, 188, 188);
+    display: flex;
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+    flex-direction: row;
+}
+
+.terminalContainer {
+    width: 557px;
+    height: 130px;
+    background-color: rgb(63, 63, 63);
+    display: flex;
+    margin-top: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+}
+
+.terminalContent {
+    margin-left: 10px;
+}
+
+.basic {
+    font-family: 'hanbitFont';
+    color: black;
+}
+
+.component {
+    font-family: 'hanbitFont';
+    color: rgb(100, 100, 212);
+}
+
+.style {
+    font-family: 'hanbitFont';
+    color: #ee7c4e;
+}
+
+.componentTitle {
+    font-family: 'hanbitFont';
+    color: green;
+    margin-bottom: 30px;
+}
+
+.textArea {
+    position: absolute;
+    top: 24%;
+    right: 4%;
+}
+
+.editorTerminal {
+    display: flex;
+    flex-direction: row;
+}
+
+.terminalNumber {
+    width: 30px;
+    height: 100%;
+    background-color: #e2e1e1;
+    display: flex;
+    flex-direction: column;
+    font-family: 'hanbitFont';
+    min-width: 30px;
+    text-align: center;
+}
+
+.number1 {
+    margin: 0;
+    margin-top: 5px;
+}
+
+.number {
+    margin: 0;
+}
+
+.codeContent {
+    margin: 0;
+    margin-top: 5px;
+    margin-left: 10px;
 }

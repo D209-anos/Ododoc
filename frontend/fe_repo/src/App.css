@@ -26,3 +26,15 @@ a{
 a:hover{
   font-weight: bold;
 }
+
+@font-face {
+  font-family: 'GAMTANFont';
+  src: url('./assets/fonts/GAMTAN.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.gamtanFont {
+  font-family: 'GAMTANFont', sans-serif;
+  color: white;
+}

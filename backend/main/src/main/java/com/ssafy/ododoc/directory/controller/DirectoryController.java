@@ -89,4 +89,30 @@ public class DirectoryController {
                                       @AuthenticationPrincipal Member member) {
         return directoryService.moveDirectory(moveRequest, member);
     }
+
+    /**
+     * 디렉토리 조회 api.
+     *
+     * @param rootId 최상위 디렉토리 아이디
+     * @param member 로그인 한 멤버
+     * @return 디렉토리 구조
+     */
+    @GetMapping("/{rootId}")
+    public DirectoryResponse getDirectory(@PathVariable @Min(value = 1, message = "Directory ID는 1 이상이어야 합니다.") Long rootId,
+                                          @AuthenticationPrincipal Member member) {
+        return directoryService.getDirectory(rootId, member);
+    }
+
+    /**
+     * 휴지통 디렉토리 복원 api.
+     *
+     * @param directoryId 복원할 디렉토리 아이디
+     * @param member 로그인 한 멤버
+     * @return 복원된 디렉토리 결과
+     */
+    @PutMapping("/restore/{directoryId}")
+    public RestoreResponse restoreDirectory(@PathVariable @Min(value = 1, message = "Directory ID는 1 이상이어야 합니다.") Long directoryId,
+                                            @AuthenticationPrincipal Member member) {
+        return directoryService.restoreDirectory(directoryId, member);
+    }
 }

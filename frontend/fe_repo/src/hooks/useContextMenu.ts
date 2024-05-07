@@ -4,16 +4,19 @@ interface ContextWMenuState {
     visible: boolean;
     x: number;
     y: number;
+    id: number;
 }
 
 const useContextMenu = () => {
-    const [menuState, setMenuState] = useState<ContextWMenuState>({ visible: false, x:0, y:0 });
+    const [menuState, setMenuState] = useState<ContextWMenuState>({ visible: false, x:0, y:0, id:0});
 
-    const showMenu = (x: number, y: number) => {
+    const showMenu = (x: number, y: number, id: number) => {
+        // console.log(id)
         setMenuState({
             visible: true,
             x,
-            y
+            y,
+            id
         });
     };
 
@@ -23,7 +26,8 @@ const useContextMenu = () => {
 
     const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>, id: number): void => {
         event.preventDefault();
-        showMenu(event.clientX, event.clientY);
+        event.stopPropagation();
+        showMenu(event.clientX, event.clientY, id);
     };
     
     return {
