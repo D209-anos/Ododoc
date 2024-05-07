@@ -116,7 +116,7 @@ public class MemberApiTest extends ApiTest {
                                 "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 access Token 정보가</b>이 반환됩니다." +
                                 "<br> - <b>유효하지 않은 refresh token 전달 시, <b>401 UnAuthorized</b>가 반환됩니다.",
                         "액세스 토큰 재발급", MemberDocument.refreshTokenCookieRequestField,
-                        MemberDocument.loginResultResponseField));
+                        MemberDocument.issueResponseField));
     }
 
     @Test

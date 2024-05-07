@@ -2,8 +2,9 @@ package com.ssafy.ododoc.member.controller;
 
 import com.ssafy.ododoc.auth.config.JwtProvider;
 import com.ssafy.ododoc.auth.response.JwtTokenResponse;
+import com.ssafy.ododoc.auth.response.LoginResponse;
+import com.ssafy.ododoc.member.dto.LoginDto;
 import com.ssafy.ododoc.member.dto.request.LoginRequest;
-import com.ssafy.ododoc.member.entity.Member;
 import com.ssafy.ododoc.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,37 +28,39 @@ public class MemberController {
 
     /**
      * 소셜 로그인
+     *
      * @param loginRequest  OAuth 인가 코드와 redirect_uri
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
-     * @return 로그인 한 회원의 JWT 정보
+     * @return 로그인 한 회원의 JWT 정보, root Directory 정보
      */
     @PostMapping(value = "/authorization/{provider}")
-    public JwtTokenResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
-        Member memberInfo = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
+    public LoginResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
+        LoginDto loginDto = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
 
-        jwtProvider.setRefreshTokenForClient(response, memberInfo);
-        return jwtProvider.makeJwtTokenResponse(memberInfo);
+        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
+        return jwtProvider.makeLoginResponse(loginDto);
     }
 
     /**
-     *  소셜 로그인 테스트용
+     * IntelliJ Plugin 소셜 로그인
+     *
      * @param code OAuth 인가코드
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
-     * @return 로그인 한 회원의 JWT 정보
+     * @return 로그인 한 회원의 JWT 정보, root Directory 정보
      */
     @GetMapping("/authorization/{provider}")
-    public JwtTokenResponse login(@RequestParam String code,
-                                  @RequestParam(required = false) String redirectUri,
-                                  @PathVariable String provider,
-                                  HttpServletResponse response) {
+    public LoginResponse login(@RequestParam String code,
+                               @RequestParam(required = false) String redirectUri,
+                               @PathVariable String provider,
+                               HttpServletResponse response) {
 
         log.debug("[테스트 social login 호출] : {} {}", provider, code);
-        Member memberInfo = memberService.getMemberInfo(provider, code, redirectUri);
+        LoginDto loginDto = memberService.getMemberInfo(provider, code, redirectUri);
 
-        jwtProvider.setRefreshTokenForClient(response, memberInfo);
-        return jwtProvider.makeJwtTokenResponse(memberInfo);
+        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
+        return jwtProvider.makeLoginResponse(loginDto);
     }
 
     /**
@@ -72,6 +75,13 @@ public class MemberController {
                          @PathVariable String provider,
                          HttpServletResponse response) throws IOException {
 
+        log.debug("[테스트 social login 호출] : {} {}", provider, code);
+        LoginDto loginDto = memberService.getMemberInfo(provider, code, redirectUri);
+
+        LoginResponse loginResponse = jwtProvider.makeLoginResponse(loginDto);
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider();
+
+        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
         log.debug("[vscode용 login 호출] : {} {}", provider, code);
         Member memberInfo = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
         JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
