@@ -11,7 +11,6 @@ import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
 import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ import static com.ssafy.ododoc.directory.entity.QDirectory.directory;
 import static com.ssafy.ododoc.directory.entity.QDirectoryClosure.directoryClosure;
 
 @RequiredArgsConstructor
-@Slf4j
 public class DirectoryClosureCustomRepositoryImpl implements DirectoryClosureCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
@@ -39,8 +37,6 @@ public class DirectoryClosureCustomRepositoryImpl implements DirectoryClosureCus
         List<DirectoryClosure> listTest = jpaQueryFactory.selectFrom(dc1)
                 .where(dc1.descendant.id.in(children))
                 .fetch();
-
-        log.info("listTest : {}", listTest);
 
         return listTest;
     }
