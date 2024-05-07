@@ -65,6 +65,7 @@ public class MemberController {
 
     /**
      *  vscode extension 로그인
+     *
      * @param code OAuth 인가코드
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
@@ -73,21 +74,19 @@ public class MemberController {
     @GetMapping("/authorization/vsc/{provider}")
     public void vscLogin(@RequestParam String code,
                          @PathVariable String provider,
-                         HttpServletResponse response) throws IOException {
-
-        log.debug("[테스트 social login 호출] : {} {}", provider, code);
-        LoginDto loginDto = memberService.getMemberInfo(provider, code, redirectUri);
-
-        LoginResponse loginResponse = jwtProvider.makeLoginResponse(loginDto);
-        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider();
-
-        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
+                         HttpServletResponse response) {
         log.debug("[vscode용 login 호출] : {} {}", provider, code);
-        Member memberInfo = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
-        JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
-        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "&provider=" + jwtTokenResponse.oAuthProvider();
-        jwtProvider.setRefreshTokenForClient(response, memberInfo);
-        response.sendRedirect(vscodeUri);
+        LoginDto loginDto = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
+        LoginResponse loginResponse = jwtProvider.makeLoginResponse(loginDto);
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
+                "&rootId=" + loginDto.getDirectory().getId() + "&title=" + loginDto.getDirectory().getName() + "&type=" + loginDto.getDirectory().getType();
+        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
+
+        try {
+            response.sendRedirect(vscodeUri);
+        } catch (IOException e) {
+            log.warn("sendRedirect 중 IOException 발생 : {}", e.getMessage());
+        }
     }
 
     /**
