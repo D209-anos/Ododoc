@@ -35,6 +35,7 @@ export const useLogout = () => {
             await api.get('/oauth2/logout');
             dispatch({ type: 'LOGOUT' });
             localStorage.removeItem('authDetails');
+            localStorage.removeItem('directoryData')
         } catch (error) {
             console.error('Error during logout:', error);
         }

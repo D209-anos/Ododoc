@@ -20,10 +20,9 @@ import { useAuth } from '../../../contexts/AuthContext';
 
 interface IContentItem {
     id: number;
-    parentId?: number | null;
     type: 'FOLDER' | 'FILE';
     name: string;
-    contents?: IContentItem[] | string;
+    children?: IContentItem[] | string;
 }
 
 // 임시 데이터
@@ -31,40 +30,40 @@ const dummyData: IContentItem = {
     "id": 1,
     "type": "FOLDER",
     "name": "현재의 정리 공간",
-    "contents": [
+    "children": [
         {
             "id": 2,
             "type": "FOLDER",
             "name": "ododoc 프로젝트",
-            "contents": [
+            "children": [
                 {
                     "id": 7,
                     "type": "FOLDER",
                     "name": "프로젝트 이슈 모음집",
-                    "contents": [
+                    "children": [
                         {
                         "id": 13,
                         "type": "FILE",
                         "name": "2024-04-20",
-                        "contents": "13번입니다."
+                        "children": "13번입니다."
                         },
                         {
                         "id": 144,
                         "type": "FILE",
                         "name": "2024-04-22",
-                        "contents": "144번입니다."
+                        "children": "144번입니다."
                         },
                         {
                         "id": 155,
                         "type": "FILE",
                         "name": "2024-04-25",
-                        "contents": "155번입니다."
+                        "children": "155번입니다."
                         },
                         {
                         "id": 166,
                         "type": "FILE",
                         "name": "2024-05-03",
-                        "contents": "166번입니다."
+                        "children": "166번입니다."
                         },
                     ]
                 },
@@ -75,17 +74,17 @@ const dummyData: IContentItem = {
             "id": 4,
             "type": "FOLDER",
             "name": "밀정윷놀이 프로젝트",
-            "contents": [
+            "children": [
                 {
                     "id": 45,
                     "type": "FOLDER",
                     "name": "얌얌 프로젝트",
-                    "contents": []
+                    "children": []
                 },
                 { "id": 999,
                 "type": "FILE",
                 "name": "Project Description",
-                "contents": "안녕 글 내용이야 이렇고 저렇고"
+                "children": "안녕 글 내용이야 이렇고 저렇고"
             }
           ]
         },
@@ -93,7 +92,7 @@ const dummyData: IContentItem = {
             "id": 5,
             "type": "FOLDER",
             "name": "vodle 프로젝트",
-            "contents": []
+            "children": []
         }
     ]
 };
@@ -103,7 +102,7 @@ const SideBar: React.FC = () => {
     const { accessToken, rootId, title } = state;
 
     const navigate = useNavigate();
-    // const [contents, setContents] = useState<IContentItem[]>([]);
+    const [contents, setContents] = useState<IContentItem[]>([]);
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
@@ -120,28 +119,35 @@ const SideBar: React.FC = () => {
     // 디렉토리 조회
     useEffect(() => {
         const loadDirectory = async () => {
-            const rootId = state.rootId;
-            const accessToken = state.accessToken;
-            const directoryData = await fetchDirectory(rootId);
-
-            if (directoryData && accessToken) {
-                console.log('데이터 들어왔따 ~~~')
-                console.log(directoryData)
-                // setContents(directoryData.contents as IContentItem[]);
-                setUserName(directoryData.name);
+            if (accessToken && rootId) {
+                // 로컬 스토리지에서 데이터 불러오기
+                const storedData = localStorage.getItem('directoryData');
+                if (storedData) {
+                    const parseData = JSON.parse(storedData);
+                    console.log("디렉토리 조회:", parseData)
+                    setContents(parseData.data.children as IContentItem[]);
+                    setUserName(parseData.data.name)
+                } else {
+                    const directoryData = await fetchDirectory(rootId);
+                    if (directoryData) {
+                        console.log("데이터 들어왔어 ~~~");
+                        console.log(directoryData);
+                        setContents(directoryData.children as IContentItem[]);
+                        setUserName(directoryData.name);
+                    }
+                }
             }
         };
         
-
         loadDirectory();
-    }, [])
+    }, [accessToken, rootId])
 
 
     useEffect(() => {
         if (title) {
             setUserName(title);
         }
-    })
+    }, [title]);
 
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
@@ -176,7 +182,7 @@ const SideBar: React.FC = () => {
             return (
                 <div>
                     <NameEditor 
-                        objectId={state.rootId || 0} 
+                        objectId={rootId || 0} 
                         name={userName} 
                         setName={setUserName} 
                         saveName={saveUserName}
@@ -193,15 +199,15 @@ const SideBar: React.FC = () => {
     };
 
     // 부모 ID를 찾는 함수
-    const findParentId = (contents: IContentItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
-        if (!contents || typeof contents === 'string') return undefined;
+    const findParentId = (children: IContentItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
+        if (!children || typeof children === 'string') return undefined;
 
-        for (let item of contents) {
+        for (let item of children) {
             if (item.id === id) {
                 return parentId;
             }
-            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
-                const foundParentId = findParentId(item.contents as IContentItem[], id, item.id);   // 재귀로 부모 찾기
+            if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                const foundParentId = findParentId(item.children as IContentItem[], id, item.id);   // 재귀로 부모 찾기
                 if (foundParentId !== undefined) return foundParentId;
             }
         }
@@ -210,16 +216,16 @@ const SideBar: React.FC = () => {
 
     // parentId
     const parentId = (id: number): void => {
-        findParentId(dummyData.contents as IContentItem[], id);
+        const foundParentId = findParentId(contents, id);
         console.log("Select ID:", id)
         console.log("Parent ID:", parentId)
     }
 
     // 폴더 및 파일 하위 구조
-    const renderContents = (contents: IContentItem[] | undefined, parentId: number | null, indentLevel: number = 0): JSX.Element[] => {
-        if (!contents) return [];
+    const renderContents = (children: IContentItem[] | undefined, parentId: number | null, indentLevel: number = 0): JSX.Element[] => {
+        if (!children) return [];
 
-        return contents.map((item: IContentItem) => {
+        return children.map((item: IContentItem) => {
             const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
             if (item.type === 'FOLDER') {
                 return (
@@ -229,7 +235,7 @@ const SideBar: React.FC = () => {
                             parentId={parentId}
                             toggleModal={toggleModal} 
                             modalActive={modalActive} 
-                            renderContents={() => renderContents(item.contents as IContentItem[], item.id, indentLevel + 1)} 
+                            renderContents={() => renderContents(item.children as IContentItem[], item.id, indentLevel + 1)} 
                             handleContextMenu={handleContextMenu} 
                             handleItemClick={folderItemClick} 
                             selectedItem={selectedItem} 
@@ -259,15 +265,15 @@ const SideBar: React.FC = () => {
     };
 
     // 선택된 항목 ID 찾기 함수
-    const findItemById = (contents: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
-        if (!contents || typeof contents === 'string') return undefined;
+    const findItemById = (children: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
+        if (!children || typeof children === 'string') return undefined;
 
-        for (let item of contents) {
+        for (let item of children) {
             if (item.id === id) {
                 return item;
             }
-            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
-                const found = findItemById(item.contents, id);
+            if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                const found = findItemById(item.children, id);
                 if (found) return found;
             }
         }
@@ -277,7 +283,7 @@ const SideBar: React.FC = () => {
     // 우클릭 한 해당 항목의 정보를 setSelectedItem에 상태관리하는 함수
     const handleEdit = (id: number) => {
         console.log(`${id}`)
-        const itemToEdit = findItemById(dummyData.contents, id);
+        const itemToEdit = findItemById(contents, id);
         if (itemToEdit) {
             setSelectedItem(itemToEdit);
             setIsContentEditing(true);
@@ -309,7 +315,7 @@ const SideBar: React.FC = () => {
                 {renderNameField()}
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
-            {renderContents(dummyData.contents as IContentItem[], null)}
+            {renderContents(contents, null)}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 
