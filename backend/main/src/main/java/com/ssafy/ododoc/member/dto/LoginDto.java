@@ -2,13 +2,12 @@ package com.ssafy.ododoc.member.dto;
 
 import com.ssafy.ododoc.directory.entity.Directory;
 import com.ssafy.ododoc.member.entity.Member;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Builder
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginDto {
 
     private Member member;
