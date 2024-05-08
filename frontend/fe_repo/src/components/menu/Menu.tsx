@@ -6,11 +6,12 @@ import menu from '../../css/components/menu/Menu.module.css';
 import Login from '../socialLogin/Login';
 import 'animate.css';
 import useHandleClickOutside from '../../hooks/useHandleClickOutside';
-import { logout } from '../../api/service/user';
+import { useLogout } from '../../api/service/user';
 
 function Menu() {
   const navigate = useNavigate();
-  const { accessToken, setAccessToken } = useAuth();
+  const { state, dispatch } = useAuth();
+  const { accessToken } = state;
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -37,10 +38,12 @@ function Menu() {
     }
   }, [menuOpen])
 
+  const logout = useLogout();
+
   const handleLogout = async() => {
     await logout()
-    setAccessToken(null);
-    localStorage.removeItem('accessToken')
+    dispatch({ type: 'LOGOUT' });
+    localStorage.removeItem('authDetails');
     navigate('/')
   }
 

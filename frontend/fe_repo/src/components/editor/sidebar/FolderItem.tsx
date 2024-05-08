@@ -62,7 +62,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
 
     // 부모 ID를 찾는 함수
     const findParentId = (contents: IContentItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
-        console.log(contents)
+        // console.log(contents)
         /////지금 여기 contents 가 빈배열로 들어오고 있다 !!! 아무래도 ,,, 상위 컴포넌트에서 데이터 못 불러오는 것 같으니까 나중에 useState에 저장한데이터로 다시 해야곘음
         if (!contents || typeof contents === 'string') return undefined;
 
@@ -123,7 +123,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
     return (
         <div 
             key={item.id} 
-            className={`${Sidebar.folderSpace} ${Sidebar.folderItem} ${isDragOver ? 'drag-over' : ''}`}
+            className={Sidebar.folderSpace}
             draggable
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
