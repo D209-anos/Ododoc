@@ -49,6 +49,11 @@ public class MemberTestUtil extends TestBase {
         return mvcResult.getResponse().getCookie("refreshToken");
     }
 
+    public Long 회원가입_루트아이디_반환(MockMvc mockMvc) throws Exception {
+        MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
+        return getValueFromJSONBody(mvcResult, "$.data.rootId", Long.class);
+    }
+
     private MvcResult 회원가입_및_로그인(MockMvc mockMvc, String code) throws Exception {
         return mockMvc.perform(
                         post("/oauth2/authorization/{provider}", "google")

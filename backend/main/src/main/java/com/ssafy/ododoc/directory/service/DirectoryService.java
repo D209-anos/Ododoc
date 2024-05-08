@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -99,6 +101,15 @@ public class DirectoryService {
         Directory directory = children.getFirst().getAncestor();
 
         checkAccess(directory, member);
+        if(option.equals("trashbin")) {
+            if(directory.getTrashbinTime() != null) {
+                throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
+            }
+        } else {
+            if(directory.getDeletedTime() != null) {
+                throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
+            }
+        }
 
         if(directory.getParent() == null) {
             throw new RootDirectoryDeletionException("최상위 폴더는 삭제할 수 없습니다.");
@@ -108,18 +119,16 @@ public class DirectoryService {
 
         for(DirectoryClosure dc : children) {
             if(option.equals("trashbin")) {
-                if(dc.getDescendant().getTrashbinTime() != null) {
-                    throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
-                }
-                dc.getDescendant().setTrashbinTime(now);
-            } else {
-                if(dc.getDescendant().getDeletedTime() != null) {
-                    throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
-                }
                 if(dc.getDescendant().getTrashbinTime() == null) {
                     dc.getDescendant().setTrashbinTime(now);
                 }
-                dc.getDescendant().setDeletedTime(now);
+            } else {
+                if(dc.getDescendant().getDeletedTime() == null) {
+                    if (dc.getDescendant().getTrashbinTime() == null) {
+                        dc.getDescendant().setTrashbinTime(now);
+                    }
+                    dc.getDescendant().setDeletedTime(now);
+                }
             }
         }
 
@@ -206,6 +215,37 @@ public class DirectoryService {
 
     public DirectoryResponse getDirectory(Long rootId, Member member) {
         return directoryClosureRepository.getDirectory(rootId, member);
+    }
+
+    public List<DirectoryResponse> getTrashbinDirectory(Member member) {
+        List<Directory> directoryList = directoryRepository.findAllByMemberAndTrashbinTimeIsNotNullAndDeletedTimeIsNull(member);
+
+        Map<Long, DirectoryResponse> responseMap = new HashMap<>();
+        directoryList.forEach(directory -> {
+            DirectoryResponse response = DirectoryResponse.builder()
+                    .id(directory.getId())
+                    .name(directory.getName())
+                    .type(directory.getType())
+                    .children(new ArrayList<>())
+                    .build();
+
+            responseMap.put(directory.getId(), response);
+        });
+
+        List<DirectoryResponse> responseList = new ArrayList<>();
+        directoryList.forEach(directory -> {
+            if(directory.getParent() != null && directory.getParent().getTrashbinTime() != null && directory.getParent().getDeletedTime() == null) {
+                DirectoryResponse parent = responseMap.get(directory.getParent().getId());
+                DirectoryResponse child = responseMap.get(directory.getId());
+                if(parent != null) {
+                    parent.addChild(child);
+                }
+            } else if(directory.getParent() != null && directory.getParent().getTrashbinTime() == null && directory.getParent().getDeletedTime() == null) {
+                responseList.add(responseMap.get(directory.getId()));
+            }
+        });
+
+        return responseList;
     }
 
     @Transactional

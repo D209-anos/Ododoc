@@ -29,7 +29,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_성공_200() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         MockMultipartFile image = mockMultipartTestUtil.이미지_생성();
 
@@ -89,7 +90,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_파일아님_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.폴더_생성(token, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
 
         MockMultipartFile image = mockMultipartTestUtil.이미지_생성();
 
@@ -112,7 +114,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_사진없음_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         mockMvc.perform(
                         multipart("/file/image/{directoryId}", directoryId)
@@ -132,7 +135,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_토큰없음_401() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         MockMultipartFile image = mockMultipartTestUtil.이미지_생성();
 
@@ -153,7 +157,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_권한없음_403() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         MockMultipartFile image = mockMultipartTestUtil.이미지_생성();
 
@@ -201,11 +206,12 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_삭제된파일_409() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         MockMultipartFile image = mockMultipartTestUtil.이미지_생성();
 
-        directoryTestUtil.폴더_삭제_휴지통(token, directoryId, mockMvc);
+        directoryTestUtil.디렉토리_삭제_휴지통(token, directoryId, mockMvc);
 
         mockMvc.perform(
                         multipart("/file/image/{directoryId}", directoryId)
@@ -226,7 +232,8 @@ public class FileApiTest extends ApiTest {
     @Test
     void 파일_이미지_업로드_다른확장자_415() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, directoryTestUtil.rootId, mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         MockMultipartFile file = mockMultipartTestUtil.텍스트_파일_생성("textfile", "hello world", "image");
 
