@@ -3,7 +3,7 @@ package com.ssafy.ododoc.member.controller;
 import com.ssafy.ododoc.auth.config.JwtProvider;
 import com.ssafy.ododoc.auth.response.JwtTokenResponse;
 import com.ssafy.ododoc.auth.response.LoginResponse;
-import com.ssafy.ododoc.member.dto.LoginDto;
+import com.ssafy.ododoc.directory.entity.Directory;
 import com.ssafy.ododoc.member.dto.request.LoginRequest;
 import com.ssafy.ododoc.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,10 +36,10 @@ public class MemberController {
      */
     @PostMapping(value = "/authorization/{provider}")
     public LoginResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
-        LoginDto loginDto = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
+        Directory directory = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
 
-        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
-        return jwtProvider.makeLoginResponse(loginDto);
+        jwtProvider.setRefreshTokenForClient(response, directory.getMember());
+        return jwtProvider.makeLoginResponse(directory);
     }
 
     /**
@@ -57,34 +57,33 @@ public class MemberController {
                                HttpServletResponse response) {
 
         log.debug("[테스트 social login 호출] : {} {}", provider, code);
-        LoginDto loginDto = memberService.getMemberInfo(provider, code, redirectUri);
+        Directory directory = memberService.getMemberInfo(provider, code, redirectUri);
 
-        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
-        return jwtProvider.makeLoginResponse(loginDto);
+        jwtProvider.setRefreshTokenForClient(response, directory.getMember());
+        return jwtProvider.makeLoginResponse(directory);
     }
 
     /**
-     * VSCode 소셜 로그인
+     *  vscode extension 로그인
      *
-     * @param code 소셜 로그인 인가 코드
-     * @param redirectUri 소셜 로그인 redirectUri
+     * @param code OAuth 인가코드
      * @param provider OAuth Provider (kakao, google, naver)
      * @param response 쿠키 저장을 위한 response
-     * @throws IOException
+     * redirect => accesstoken을 uri에 담아서
      */
     @GetMapping("/authorization/vsc/{provider}")
     public void vscLogin(@RequestParam String code,
-                         @RequestParam(required = false) String redirectUri,
                          @PathVariable String provider,
                          HttpServletResponse response) throws IOException {
 
-        log.debug("[테스트 social login 호출] : {} {}", provider, code);
-        LoginDto loginDto = memberService.getMemberInfo(provider, code, redirectUri);
+        log.debug("[vscode용 login 호출] : {} {}", provider, code);
+        Directory directory = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
 
-        LoginResponse loginResponse = jwtProvider.makeLoginResponse(loginDto);
-        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider();
+        LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
+                "&rootId=" + loginResponse.rootId() + "&title=" + loginResponse.title() + "&type=" + loginResponse.type();
 
-        jwtProvider.setRefreshTokenForClient(response, loginDto.getMember());
+        jwtProvider.setRefreshTokenForClient(response, directory.getMember());
         response.sendRedirect(vscodeUri);
     }
 
