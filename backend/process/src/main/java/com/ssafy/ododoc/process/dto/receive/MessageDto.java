@@ -5,6 +5,9 @@ import com.ssafy.ododoc.process.type.SourceApplicationType;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
 @Getter
 @ToString
 public class MessageDto {
@@ -12,6 +15,6 @@ public class MessageDto {
     private String accessToken;
     private DataType dataType;
     private long connectedFileId;
-    private String timeStamp;
+    private LocalDateTime timestamp;
     private Object content;
 }
