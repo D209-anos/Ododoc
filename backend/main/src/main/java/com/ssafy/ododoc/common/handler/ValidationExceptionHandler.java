@@ -45,13 +45,13 @@ public class ValidationExceptionHandler {
                 .toList();
     }
 
-//    @ExceptionHandler(MissingServletRequestPartException.class)
-//    public List<ErrorResponse> missingServletRequestPartExceptionHandler(MissingServletRequestPartException e) {
-//        return List.of(ErrorResponse.builder()
-//                .message(e.getMessage())
-//                .errorType(e.getClass().getSimpleName())
-//                .fieldName(e.getRequestPartName())
-//                .status(HttpStatus.BAD_REQUEST)
-//                .build());
-//    }
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public List<ErrorResponse> missingServletRequestPartExceptionHandler(MissingServletRequestPartException e) {
+        return List.of(ErrorResponse.builder()
+                .message(e.getMessage())
+                .errorType(e.getClass().getSimpleName())
+                .fieldName(e.getRequestPartName())
+                .status(HttpStatus.BAD_REQUEST)
+                .build());
+    }
 }

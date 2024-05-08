@@ -15,7 +15,6 @@ import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,7 +27,6 @@ public class DirectoryService {
 
     private final DirectoryRepository directoryRepository;
     private final DirectoryClosureRepository directoryClosureRepository;
-    private final S3Util s3Util;
 
     public ProfileResponse getProfile(Member member) {
         return ProfileResponse.builder()
@@ -233,23 +231,6 @@ public class DirectoryService {
                 .trashbinTime(directory.getTrashbinTime())
                 .deletedTime(directory.getDeletedTime())
                 .type(directory.getType())
-                .build();
-    }
-
-    public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
-        Directory directory = directoryRepository.findById(directoryId)
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
-
-        checkAccess(directory, member);
-        checkIfDeleted(directory);
-
-        if(directory.getType().equals(DirectoryType.FOLDER)) {
-            throw new CannotUploadImageException("폴더에는 이미지를 업로드 할 수 없습니다.");
-        }
-
-        return ImageResponse.builder()
-                .id(directory.getId())
-                .imageUrl(s3Util.uploadImage(image))
                 .build();
     }
 

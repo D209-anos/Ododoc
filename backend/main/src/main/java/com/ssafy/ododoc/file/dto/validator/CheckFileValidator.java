@@ -1,6 +1,6 @@
-package com.ssafy.ododoc.directory.dto.validator;
+package com.ssafy.ododoc.file.dto.validator;
 
-import com.ssafy.ododoc.directory.dto.annotation.CheckFile;
+import com.ssafy.ododoc.file.dto.annotation.CheckFile;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
