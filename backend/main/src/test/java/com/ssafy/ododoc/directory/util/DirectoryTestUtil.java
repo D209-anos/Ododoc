@@ -28,11 +28,11 @@ public class DirectoryTestUtil extends TestBase {
 
     public Long 폴더_생성(String token, MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = mockMvc.perform(
-                post("/directory")
-                        .header(ApiTest.AUTH_HEADER, token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(rootId)))
-        )
+                        post("/directory")
+                                .header(ApiTest.AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(rootId)))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andReturn();
@@ -56,9 +56,9 @@ public class DirectoryTestUtil extends TestBase {
 
     public void 폴더_삭제_휴지통(String token, Long directoryId, MockMvc mockMvc) throws Exception {
         mockMvc.perform(
-                delete("/directory/{option}/{directoryId}", "trashbin", directoryId)
-                        .header(ApiTest.AUTH_HEADER, token)
-        )
+                        delete("/directory/{option}/{directoryId}", "trashbin", directoryId)
+                                .header(ApiTest.AUTH_HEADER, token)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200));
     }

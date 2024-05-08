@@ -57,8 +57,8 @@ public class DirectoryDocument {
     );
 
     public static final Snippet moveRequestFields = requestFields(
-      fieldWithPath("id").type(JsonFieldType.NUMBER).description("이동할 폴더/파일 아이디"),
-      fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).description("이동할 폴더/파일의 상위 폴더 아이디")
+            fieldWithPath("id").type(JsonFieldType.NUMBER).description("이동할 폴더/파일 아이디"),
+            fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).description("이동할 폴더/파일의 상위 폴더 아이디")
     );
 
     public static final Snippet moveResponseFields = responseFields(
