@@ -1,6 +1,6 @@
-package com.ssafy.ododoc.directory.dto.annotation;
+package com.ssafy.ododoc.file.dto.annotation;
 
-import com.ssafy.ododoc.directory.dto.validator.CheckFileValidator;
+import com.ssafy.ododoc.file.dto.validator.CheckFileValidator;
 import jakarta.validation.Constraint;
 
 import java.lang.annotation.ElementType;
