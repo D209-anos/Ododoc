@@ -1,6 +1,6 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
-import { BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems, Block, } from "@blocknote/core";
+import { BlockNoteSchema, defaultBlockSpecs, filterSuggestionItems, Block, uploadToTmpFilesDotOrg_DEV_ONLY, } from "@blocknote/core";
 import {
   BlockNoteView,
   useCreateBlockNote,
@@ -9,27 +9,33 @@ import {
   SideMenuController,
   SideMenu,
   RemoveBlockItem,
-  BlockColorsItem,
   DragHandleMenu,
   FormattingToolbarController,
   FormattingToolbar,
-  BlockTypeSelect,
-  ImageCaptionButton,
-  ReplaceImageButton,
-  BasicTextStyleButton,
-  TextAlignButton,
-  ColorStyleButton,
-  NestBlockButton,
-  UnnestBlockButton,
-  CreateLinkButton
 } from "@blocknote/react";
 import { CodeBlock, insertCode } from "./CodeBlock";
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import React, { useState, useEffect, useCallback } from 'react';
 import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
 import _, { isNull } from 'lodash';
 import axios from 'axios';
 import useImageUpload from "../../../hooks/editor/useImageUpload";
+import { BoldButton } from "./CustomTextBoldButton";
+import { CodeButton } from "./CustomTextCodeButton";
+import { ItalicButton } from "./CustomTextItalicButton";
+import { StrikeButton } from "./CustomTextStrikeButton";
+import { UnderlineButton } from "./CustomTextUnderlineButton";
+import { TextAlignButton } from "./CustomTextAlignButton";
+import { ColorStyleButton } from "./CustomColorButton"
+import { BlockColorsItem } from "./CustomBlockColorItem"
+import {
+  NestBlockButton,
+  UnnestBlockButton
+} from "./CustomNestBlockButtons"
+import { CreateLinkButton } from "./CustomCreateLinkButton"
+import { ImageCaptionButton } from "./CustomImageCaptionButton"
+import { ReplaceImageButton } from "./CustomReplaceImageButton"
+import { BlockTypeSelect } from "./CustomBlockTypeSelect"
 
 const Editor1 = () => {
   // 저장을 위해 에디터의 변동 사항을 확인하기 위한 hooks
@@ -41,6 +47,8 @@ const Editor1 = () => {
   // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
   // 파일 ID를 사용하여 데이터베이스에서 파일 내용을 불러오는 함수
   //서버에서 불러온 데이터를 해당 코드에 집어넣으면 됩니다
+  const { fileId } = useParams();
+  const navigate = useNavigate();
   const [content, setContent] = useState<Block[]>([
     {
       "id": "title-id",
@@ -95,22 +103,44 @@ const Editor1 = () => {
       "children": []
     },
     {
-      "id": "cc35351d-e276-46ad-b2a1-cb6de104b9b1",
-      // @ts-ignore
-      "type": "terminal",
-      "props": {
-        // @ts-ignore
-        "data": "ggggg"
-      },
+      "id": "39f00afc-e831-413e-8881-988402d4de8b",
+      //@ts-ignore
+      "type": "procode",
+      //@ts-ignore
+      "props": {},
       "children": []
     },
+    {
+      "id": "2a9131bd-4fe0-4524-ba6d-b0c7f11cbc7e",
+      "type": "paragraph",
+      "props": {
+        "textColor": "default",
+        "backgroundColor": "default",
+        "textAlignment": "left"
+      },
+      "content": [],
+      "children": []
+    }
   ]);
+
+  // // 파일 데이터를 서버에서 불러오는 함수
+  // useEffect(() => {
+  //   const fetchFileData = async () => {
+  //     try {
+  //       const response = await axios.get(`https://k10d209.p.ssafy.io/api/directory/${fileId}`);
+  //       // setContent(response.data); // 서버로부터 받은 데이터를 상태에 저장
+  //     } catch (error) {
+  //       console.error('Failed to fetch file data:', error);
+  //       navigate('/error'); // 에러 발생 시 에러 페이지로 리디렉션
+  //     }
+  //   };
+
+  //   fetchFileData();
+  // }, [fileId, navigate]);
+
   // 이미지 업로드 훅
   const { ImageUpload } = useImageUpload();
 
-  // sideBar에서 id값 꺼내기 위한 hook
-  const { fileId } = useParams();
-  // const { fileId } = state.id;
 
   //기본 에디터 + 코드블록 + 터미널블록 사용가능 스키마 설정
   const schema = BlockNoteSchema.create({
@@ -152,8 +182,10 @@ const Editor1 = () => {
       numberedListItem: "리스트",
     },
     // 우리 s3에 업로드하는 훅
+    // @ts-ignore
     initialContent: content,
-    uploadFile: ImageUpload
+    uploadFile: uploadToTmpFilesDotOrg_DEV_ONLY,
+    // uploadFile: ImageUpload
   });
 
   // 슬래시 메뉴 한글로 변환
@@ -200,7 +232,7 @@ const Editor1 = () => {
     if (event.key === 'Backspace') {
       // const selection = editor.getTextCursorPosition();
       const selection = editor.getTextCursorPosition();
-      
+
       console.log("선택한 블록" + selection.block.content);
       if (!selection || !selection.block.content) return;
       // if (blockIndex <= 0) return;  // 첫 번째 블록인 경우 이전 블록이 없음
@@ -210,13 +242,13 @@ const Editor1 = () => {
         console.log(1111);
         // 이전 블록이 코드블록인지 확인
         if (selection.prevBlock?.type === 'procode' || selection.prevBlock?.type === 'terminal') {
-        console.log(2222);
+          console.log(2222);
 
           event.preventDefault(); // 기본 동작 방지
           const confirmDelete = window.confirm("코드 블록을 삭제하시겠습니까?");
           if (confirmDelete) {
             // 사용자가 확인한 경우, 코드 블록 삭제
-        console.log(3333);
+            console.log(3333);
 
             editor.removeBlocks([selection.prevBlock?.id]);
           }
@@ -232,7 +264,6 @@ const Editor1 = () => {
       document.removeEventListener('keydown', handleBackspace);
     };
   }, [editor]); // 의존성 배열에 editor 추가
-
 
 
   return (
@@ -276,29 +307,11 @@ const Editor1 = () => {
 
               <ImageCaptionButton key={"imageCaptionButton"} />
               <ReplaceImageButton key={"replaceImageButton"} />
-
-              <BasicTextStyleButton
-                basicTextStyle={"bold"}
-                key={"boldStyleButton"}
-              />
-              <BasicTextStyleButton
-                basicTextStyle={"italic"}
-                key={"italicStyleButton"}
-              />
-              <BasicTextStyleButton
-                basicTextStyle={"underline"}
-                key={"underlineStyleButton"}
-              />
-              <BasicTextStyleButton
-                basicTextStyle={"strike"}
-                key={"strikeStyleButton"}
-              />
-              {/* Extra button to toggle code styles */}
-              <BasicTextStyleButton
-                key={"codeStyleButton"}
-                basicTextStyle={"code"}
-              />
-
+              <BoldButton key={"customBoldButton"} />
+              <ItalicButton key={"customItalicButton"} />
+              <UnderlineButton key={"customUnderlineButton"} />
+              <StrikeButton key={"customStrikeButton"} />
+              <CodeButton key={"customCodeButton"} />
               <TextAlignButton
                 textAlignment={"left"}
                 key={"textAlignLeftButton"}
