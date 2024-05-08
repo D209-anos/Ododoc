@@ -25,8 +25,6 @@ public class DataTypeHandlerService {
                 break;
 
             case OUTPUT:
-                System.out.println(dataType);
-                System.out.println(messageDto.getContent());
                 outputHandlerService.process(messageDto);
                 break;
 
