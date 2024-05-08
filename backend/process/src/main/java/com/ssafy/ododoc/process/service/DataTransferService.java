@@ -11,6 +11,9 @@ import com.ssafy.ododoc.process.dto.save.DefaultPropsDto;
 import com.ssafy.ododoc.process.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +24,10 @@ import java.util.UUID;
 public class DataTransferService {
 
     private final ObjectMapper objectMapper;
+    private final String URI = "http://localhost:8080/api/directory/test";
 
     public void transferDataForSave(MessageDto messageDto) {
-        System.out.println(makeFileBlock(messageDto));
-        // Todo : 메인서버로 저장 요청
+        sendRequest(makeFileBlock(messageDto), messageDto);
     }
 
     // 블럭으로 가공하는 로직
@@ -146,7 +149,22 @@ public class DataTransferService {
         return headerBlock;
     }
 
-    private void sendRequest() {
+    private void sendRequest(FileBlockDto fileBlockDto, MessageDto messageDto) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl(URI)
+                .defaultHeader("Content-type","application/json")
+                .defaultHeader("Authorization", messageDto.getAccessToken())
+                .build();
+
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("connectedFileId", messageDto.getConnectedFileId());
+        requestBody.add("fileBlock", fileBlockDto);
+
+        webClient.post()
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
 
     }
 
