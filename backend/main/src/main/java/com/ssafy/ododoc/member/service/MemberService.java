@@ -14,10 +14,12 @@ import com.ssafy.ododoc.member.util.GoogleOAuth2Utils;
 import com.ssafy.ododoc.member.util.KakaoOAuth2Utils;
 import com.ssafy.ododoc.member.util.NaverOAuth2Utils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final KakaoOAuth2Utils kakaoUtil;
@@ -28,6 +30,7 @@ public class MemberService {
     private final DirectoryClosureRepository directoryClosureRepository;
 
     public Directory getMemberInfo(String inputProvider, String code, String redirectUri) {
+        log.info("getMemberInfo 실행 : {} {} {}", inputProvider, code, redirectUri);
         OAuthProvider provider = OAuthProvider.getOAuthProvider(inputProvider);
         OAuthMemberInfo oAuthMemberInfo = getOAuthMemberInfo(provider, code, redirectUri);
 
@@ -48,6 +51,7 @@ public class MemberService {
     }
 
     private Directory createMemberAndDirectory(OAuthMemberInfo oAuthMemberInfo, OAuthProvider provider) {
+        log.info("createMemberAndDirectory : {} {}", oAuthMemberInfo, provider);
         Member member = memberRepository.save(Member.builder()
                 .code(oAuthMemberInfo.code())
                 .provider(provider)
