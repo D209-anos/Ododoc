@@ -777,7 +777,6 @@ public class DirectoryApiTest extends ApiTest {
                         "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 복원된 디렉토리 정보</b>가 반환됩니다." +
                         "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 디렉토리가 <b>삭제되지 않은 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
-                        "<br> - directoryId에 해당하는 디렉토리가 <b>이미 영구 삭제 된 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 디렉토리에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
                         "<br> - directoryId에 해당하는 디렉토리가 <b>이미 영구 삭제 되었거나 찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다.",
