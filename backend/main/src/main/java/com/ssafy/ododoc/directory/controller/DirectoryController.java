@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author 김주이
  */
@@ -101,6 +103,17 @@ public class DirectoryController {
     public DirectoryResponse getDirectory(@PathVariable @Min(value = 1, message = "Directory ID는 1 이상이어야 합니다.") Long rootId,
                                           @AuthenticationPrincipal Member member) {
         return directoryService.getDirectory(rootId, member);
+    }
+
+    /**
+     * 휴지통에 있는 디렉토리 조회 api
+     *
+     * @param member 로그인 한 멤버
+     * @return 휴지통 디렉토리 구조
+     */
+    @GetMapping("/trashbin")
+    public List<DirectoryResponse> getTrashbinDirectory(@AuthenticationPrincipal Member member) {
+        return directoryService.getTrashbinDirectory(member);
     }
 
     /**
