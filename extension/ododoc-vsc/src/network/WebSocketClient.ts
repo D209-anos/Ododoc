@@ -66,14 +66,12 @@ export default class WebSocketClient {
       }
 
       const messageData: MessageData = {
-        senderState: {
-          sourceApplication: "VSCODE",
-          accessToken: session.accessToken,
-        },
+        sourceApplication: "VSCODE",
+        accessToken: session.accessToken,
         connectedFileId: 1,
         dataType: dataType,
-        contents: message,
-        timestamp: new Date(),
+        content: message,
+        timestamp: new Date().toISOString(),
       };
 
       console.log("Sending message:", messageData);

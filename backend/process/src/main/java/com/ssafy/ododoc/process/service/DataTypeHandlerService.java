@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.process.service;
 
 import com.ssafy.ododoc.process.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.service.MessageHandler.OutputHandlerService;
 import com.ssafy.ododoc.process.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,19 +11,20 @@ import org.springframework.stereotype.Service;
 public class DataTypeHandlerService {
 
     private final DataTransferService dataTransferService;
+    private final OutputHandlerService outputHandlerService;
 
     public void handle(MessageDto messageDto){
 
         DataType dataType = messageDto.getDataType();
         switch (dataType){
             case SIGNAL:
-                System.out.println(dataType);
                 System.out.println(messageDto.getContent());
                 break;
 
             case OUTPUT:
                 System.out.println(dataType);
                 System.out.println(messageDto.getContent());
+                outputHandlerService.process(messageDto);
                 break;
 
             case ERROR:
@@ -39,6 +41,8 @@ public class DataTypeHandlerService {
                 System.out.println(dataType);
                 break;
         }
+
+        // main으로 데이터 전송 로직 추가
     }
 
     private void processSignal(MessageDto messageDto){

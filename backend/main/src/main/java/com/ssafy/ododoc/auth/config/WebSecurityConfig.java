@@ -48,6 +48,7 @@ public class WebSecurityConfig {
                 // Todo : 확인이 필요한 EndPoint 작성
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/directory/**").hasRole("USER")
+                        .requestMatchers("/file/**").hasRole("USER")
                         .anyRequest().permitAll())
                 .exceptionHandling(config -> config.authenticationEntryPoint(authenticationEntryPoint())
                         .accessDeniedHandler(jwtAccessDeniedHandler))
@@ -72,7 +73,8 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://k10d209.p.ssafy.io/api", "https://k10d209.p.ssafy.io"
+                "https://k10d209.p.ssafy.io/api", "https://k10d209.p.ssafy.io",
+                "http://localhost:8080/api", "http://localhost:3000"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));

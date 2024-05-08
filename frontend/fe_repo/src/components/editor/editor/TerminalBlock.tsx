@@ -34,7 +34,7 @@ export const TerminalBlock = createReactBlockSpec(
           id={block?.id}
           autoFocus
           placeholder={"Write your terminal code here..."}
-          style={{ width: "100%", resize: "vertical" }}
+          style={{ width: "100%", resize: "vertical", padding: "20px", backgroundColor:"#282c34" }}
           //@ts-ignore
           extensions={[langs[data?.language ? data?.language : "javascript"]()]}
           value={data}
@@ -50,7 +50,7 @@ export const TerminalBlock = createReactBlockSpec(
 );
 
 export const insertTerminal = () => ({
-  title: "Terminal",
+  title: "터미널",
   group: "Other",
   onItemClick: (editor: BlockNoteEditor) => {
     insertOrUpdateBlock(editor, {
@@ -60,5 +60,5 @@ export const insertTerminal = () => ({
   },
   aliases: ["Terminal"],
   icon: <MdCode />,
-  subtext: "Insert a Terminal block.",
+  subtext: "터미널 스니펫을 작성하세요",
 });

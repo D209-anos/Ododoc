@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../../assets/images/icon/pencil.png'
 import Line from '../../../assets/images/mark/line.png'
@@ -19,6 +19,7 @@ import { fetchDirectory } from '../../../api/service/directory';
 
 interface IContentItem {
     id: number;
+    parentId?: number | null;
     type: 'FOLDER' | 'FILE';
     name: string;
     contents?: IContentItem[] | string;
@@ -74,6 +75,12 @@ const dummyData: IContentItem = {
             "type": "FOLDER",
             "name": "밀정윷놀이 프로젝트",
             "contents": [
+                {
+                    "id": 45,
+                    "type": "FOLDER",
+                    "name": "얌얌 프로젝트",
+                    "contents": []
+                },
                 { "id": 999,
                 "type": "FILE",
                 "name": "Project Description",
@@ -92,14 +99,12 @@ const dummyData: IContentItem = {
 
 const SideBar: React.FC = () => {
     const navigate = useNavigate();
-    // const [contents, setContents] = useState<IContentItem[]>([]);
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
     const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
     const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
-    // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
-    const [userName, setUserName] = useState<string>(dummyData.name);                  // 사용자 이름 수정
+    const [userName, setUserName] = useState<string>(dummyData.name);                   // 사용자 이름 수정
     const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
     const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
 
@@ -107,7 +112,6 @@ const SideBar: React.FC = () => {
     const contextMenuRef = useRef<HTMLUListElement>(null);
     useHandleClickOutside(contextMenuRef, hideMenu);
 
-    // 디렉토리 조회
     // useEffect(() => {
     //     const loadDirectory = async () => {
     //         const rootId = 1;
@@ -131,8 +135,9 @@ const SideBar: React.FC = () => {
     // file 클릭
     const fileItemClick = (id: number): void => {
         navigate(`/editor/${id}`, {state: id})
-        // setSelectedId(id);
-        // console.log(id)
+        const parentId = findParentId(dummyData.contents as IContentItem[], id);
+        console.log("Select ID:", id)
+        console.log("Parent ID:", parentId)
     }
 
     // folder 클릭
@@ -141,6 +146,9 @@ const SideBar: React.FC = () => {
         // console.log(id)
     }
 
+    // 폴더 드래그 시작하는 함수
+
+
     // 사용자 이름 저장 함수
     const saveUserName = (objectId: number) => {
         setIsEditing(false);
@@ -148,6 +156,11 @@ const SideBar: React.FC = () => {
     };
 
     // 사용자 이름 수정 함수
+    // 항목 클릭
+    const handleItemClick = (id: number): void => {
+        navigate(`/editor/${id}`)
+        setSelectedId(id);
+    }
     const renderNameField = (): JSX.Element => {
         if (isEditing) {
             return (
@@ -169,36 +182,80 @@ const SideBar: React.FC = () => {
         );
     };
 
+    // 부모 ID를 찾는 함수
+    const findParentId = (contents: IContentItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
+        if (!contents || typeof contents === 'string') return undefined;
+
+        for (let item of contents) {
+            if (item.id === id) {
+                return parentId;
+            }
+            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
+                const foundParentId = findParentId(item.contents as IContentItem[], id, item.id);   // 재귀로 부모 찾기
+                if (foundParentId !== undefined) return foundParentId;
+            }
+        }
+        return undefined;
+    }
+
+    // parentId
+    const parentId = (id: number): void => {
+        findParentId(dummyData.contents as IContentItem[], id);
+        console.log("Select ID:", id)
+        console.log("Parent ID:", parentId)
+    }
+
     // 폴더 및 파일 하위 구조
-    const renderContents = (contents: IContentItem[] | undefined, indentLevel: number = 0): JSX.Element[] => {
+    const renderContents = (contents: IContentItem[] | undefined, parentId: number | null, indentLevel: number = 0): JSX.Element[] => {
         if (!contents) return [];
 
         return contents.map((item: IContentItem) => {
-            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
+            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 들여쓰기 클래스 조건적 적용
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
-                        <FolderItem item={item} toggleModal={toggleModal} modalActive={modalActive} renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} handleContextMenu={handleContextMenu} handleItemClick={folderItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
+                        <FolderItem 
+                            item={item}
+                            parentId={parentId}
+                            toggleModal={toggleModal} 
+                            modalActive={modalActive} 
+                            renderContents={() => renderContents(item.contents as IContentItem[], item.id, indentLevel + 1)} 
+                            handleContextMenu={handleContextMenu} 
+                            handleItemClick={folderItemClick} 
+                            selectedItem={selectedItem} 
+                            isContentEditing={isContentEditing} 
+                            setIsContentEditing={setIsContentEditing} 
+                            saveName={saveName}
+                        />
                     </div>
                 );
             } else {
                 return (
                     <div key={item.id} className={className}>
-                        <FileItem item={item} selected={item.id === selectedId} handleContextMenu={handleContextMenu} handleItemClick={fileItemClick} selectedItem={selectedItem} isContentEditing={isContentEditing} setIsContentEditing={setIsContentEditing} saveName={saveName}/>
+                        <FileItem 
+                            item={item} 
+                            parentId={item.id}
+                            selected={item.id === selectedId} 
+                            handleContextMenu={handleContextMenu} 
+                            handleItemClick={fileItemClick} 
+                            selectedItem={selectedItem} 
+                            isContentEditing={isContentEditing} 
+                            setIsContentEditing={setIsContentEditing} 
+                            saveName={saveName}/>
                     </div>
                 );
             }
         });
     };
 
-    // 선택된 항목 ID 찾기 함수
     const findItemById = (contents: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
-        if (!contents || typeof contents === 'string') return undefined;
+        if (!contents || typeof contents === 'string') return undefined; // Early return if contents is undefined or a string
 
         for (let item of contents) {
             if (item.id === id) {
                 return item;
             }
+            // Ensure we only recurse into contents if it is an array
             if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
                 const found = findItemById(item.contents, id);
                 if (found) return found;
@@ -209,7 +266,7 @@ const SideBar: React.FC = () => {
 
     // 우클릭 한 해당 항목의 정보를 setSelectedItem에 상태관리하는 함수
     const handleEdit = (id: number) => {
-        // console.log(`${id}`)
+        console.log(`${id}`)
         const itemToEdit = findItemById(dummyData.contents, id);
         if (itemToEdit) {
             setSelectedItem(itemToEdit);
@@ -242,7 +299,7 @@ const SideBar: React.FC = () => {
                 {renderNameField()}
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
-            {renderContents(dummyData.contents as IContentItem[])}
+            {renderContents(dummyData.contents as IContentItem[], null)}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 

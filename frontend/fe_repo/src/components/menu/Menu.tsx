@@ -63,6 +63,10 @@ function Menu() {
               <div className={`${menu.editorOpenBtn} ${showHome ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/')}>Home</div>
             </>
           )}
+          {/* <div className={`${menu.loginOpenBtn} ${showLogin ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => setLoginOpen(true)}>Login</div>
+          <div className={`${menu.startOpenBtn} ${showStart ? 'animate__animated animate__slideInRight' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/start')}>Start</div>
+          <div className={`${menu.editorOpenBtn} ${showEditor ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/editor')}>Editor</div>
+          <div className={`${menu.homeOpenBtn} ${showHome ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/')}>Home</div> */}
         </div>
       <Login isOpen={loginOpen} onClose={() => setLoginOpen(false)}/>
     </div>

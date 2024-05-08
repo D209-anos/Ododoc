@@ -3,20 +3,17 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 90px;
-    height: 55px;
+    width: 60px;
+    height: 25px;
     position: fixed;
     color: black;
     z-index: 1000;
     max-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .addElement {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
 }
@@ -27,11 +24,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 5px;
+}
+
+.columnLine {
+    width: 1.55rem;
+    height: 1.65rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .fileImage {
-    width: 1.45rem;
-    height: 1.55rem;
+    width: 1.75rem;
+    height: 1.85rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,17 +46,8 @@
 .imageWrapper {
     cursor: pointer;
     transition: transform 0.1s ease;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 4px;
 }
 
 .imageWrapper:hover {
-    transform: scale(1.07);
-}
-
-.title {
-    margin-left: 5px;
-    font-family: 'hanbitFont';
+    transform: scale(1.2);
 }

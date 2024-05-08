@@ -34,11 +34,11 @@ export const CodeBlock = createReactBlockSpec(
           id={block?.id}
           autoFocus
           placeholder={"Write your mermaid code here..."}
-          style={{ width: "100%", resize: "vertical" }}
+          style={{ width: "100%", resize: "vertical", padding: "20px", backgroundColor:"#e7f5ff" }}
           //@ts-ignore
           extensions={[langs[data?.language ? data?.language : "javascript"]()]}
           value={data}
-          theme={"light"}
+          theme={"none"}
           editable={editor.isEditable}
           width="100%"
           height="auto"
@@ -50,7 +50,7 @@ export const CodeBlock = createReactBlockSpec(
 );
 
 export const insertCode = () => ({
-  title: "Code",
+  title: "코드",
   group: "Other",
   onItemClick: (editor: BlockNoteEditor) => {
     insertOrUpdateBlock(editor, {
@@ -60,5 +60,5 @@ export const insertCode = () => ({
   },
   aliases: ["code"],
   icon: <MdCode />,
-  subtext: "Insert a code block.",
+  subtext: "코드 스니펫을 작성하세요",
 });

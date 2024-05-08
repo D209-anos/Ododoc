@@ -32,7 +32,7 @@ public class MemberTestUtil extends TestBase {
     public static String memberNickName = "아노쓰";
     public static String otherMemberCode = "3449714270";
     public static String otherMemberNickName = "다른닉네임";
-    public static String googleRedirectUrl = "https://k10d209.p.ssafy.io/api/oauth2/authorization/google";
+    public static String googleRedirectUrl = "http://localhost:8080/api/oauth2/authorization/google";
 
     public String 회원가입_토큰반환(MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
@@ -49,12 +49,17 @@ public class MemberTestUtil extends TestBase {
         return mvcResult.getResponse().getCookie("refreshToken");
     }
 
+    public Long 회원가입_루트아이디_반환(MockMvc mockMvc) throws Exception {
+        MvcResult mvcResult = 회원가입_및_로그인(mockMvc, memberCode);
+        return getValueFromJSONBody(mvcResult, "$.data.rootId", Long.class);
+    }
+
     private MvcResult 회원가입_및_로그인(MockMvc mockMvc, String code) throws Exception {
         return mockMvc.perform(
-                post("/oauth2/authorization/{provider}", "google")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(code)))
-        )
+                        post("/oauth2/authorization/{provider}", "google")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(code)))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(cookie().exists("refreshToken"))

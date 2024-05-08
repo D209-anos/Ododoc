@@ -41,4 +41,14 @@ public class DirectoryExceptionHandler {
     public List<ErrorResponse> notDeletedDirectoryExceptionHandler(NotDeletedDirectoryException e) {
         return makeErrorResponse(e, "directory");
     }
+
+    @ExceptionHandler(NotAllowedImageException.class)
+    public List<ErrorResponse> notAllowedImageExceptionHandler(NotAllowedImageException e) {
+        return makeErrorResponse(e, "image");
+    }
+
+    @ExceptionHandler(CannotUploadImageException.class)
+    public List<ErrorResponse> cannotUploadImageExceptionHandler(CannotUploadImageException e) {
+        return makeErrorResponse(e, "image");
+    }
 }

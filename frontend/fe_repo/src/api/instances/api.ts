@@ -12,9 +12,8 @@ api.interceptors.request.use(
     function (config) {
         const accessToken = localStorage.getItem("accessToken");
         if (accessToken) {
-            config.headers["Authorization"] = `${accessToken}`;
+            config.headers["Authorization"] = `Bearer ${accessToken}`;
         }
-        console.log(config.headers);
         return config;
     },
     // 토큰 없을 때: 에러 띄우기

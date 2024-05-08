@@ -29,15 +29,16 @@ public class MemberService {
     private final DirectoryRepository directoryRepository;
     private final DirectoryClosureRepository directoryClosureRepository;
 
-    public Member getMemberInfo(String inputProvider, String code, String redirectUri) {
+    public Directory getMemberInfo(String inputProvider, String code, String redirectUri) {
+        log.info("getMemberInfo 실행 : {} {} {}", inputProvider, code, redirectUri);
         OAuthProvider provider = OAuthProvider.getOAuthProvider(inputProvider);
         OAuthMemberInfo oAuthMemberInfo = getOAuthMemberInfo(provider, code, redirectUri);
 
         if(oAuthMemberInfo == null){
-            throw  new OAuthInfoNullException("존재하지않는 유저입니다.");
+            throw new OAuthInfoNullException("존재하지않는 유저입니다.");
         }
 
-        return memberRepository.findByCodeAndProvider(oAuthMemberInfo.code(), provider)
+        return directoryRepository.findRoot(oAuthMemberInfo, provider)
                 .orElseGet(() -> createMemberAndDirectory(oAuthMemberInfo, provider));
     }
 
@@ -49,7 +50,8 @@ public class MemberService {
         };
     }
 
-    private Member createMemberAndDirectory(OAuthMemberInfo oAuthMemberInfo, OAuthProvider provider) {
+    private Directory createMemberAndDirectory(OAuthMemberInfo oAuthMemberInfo, OAuthProvider provider) {
+        log.info("createMemberAndDirectory : {} {}", oAuthMemberInfo, provider);
         Member member = memberRepository.save(Member.builder()
                 .code(oAuthMemberInfo.code())
                 .provider(provider)
@@ -67,6 +69,6 @@ public class MemberService {
                 .descendant(root)
                 .build());
 
-        return member;
+        return root;
     }
 }

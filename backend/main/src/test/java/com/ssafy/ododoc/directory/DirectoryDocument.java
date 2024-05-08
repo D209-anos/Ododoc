@@ -57,8 +57,8 @@ public class DirectoryDocument {
     );
 
     public static final Snippet moveRequestFields = requestFields(
-      fieldWithPath("id").type(JsonFieldType.NUMBER).description("이동할 폴더/파일 아이디"),
-      fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).description("이동할 폴더/파일의 상위 폴더 아이디")
+            fieldWithPath("id").type(JsonFieldType.NUMBER).description("이동할 폴더/파일 아이디"),
+            fieldWithPath("parentId").optional().type(JsonFieldType.NUMBER).description("이동할 폴더/파일의 상위 폴더 아이디")
     );
 
     public static final Snippet moveResponseFields = responseFields(
@@ -68,7 +68,7 @@ public class DirectoryDocument {
     );
 
     public static final Snippet getPathFields = pathParameters(
-            parameterWithName("rootId").attributes(required()).description("삭제할 폴더/파일 아이디")
+            parameterWithName("rootId").attributes(required()).description("최상위 폴더 아이디")
     );
 
     public static final Snippet getResponseFields = responseFields(
@@ -97,5 +97,18 @@ public class DirectoryDocument {
             fieldWithPath("data.trashbinTime").optional().type(JsonFieldType.STRING).description("휴지통 삭제된 시간"),
             fieldWithPath("data.deletedTime").optional().type(JsonFieldType.STRING).description("영구 삭제된 시간"),
             fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE")
+    );
+
+    public static final Snippet getTrashbinResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data").type(JsonFieldType.ARRAY).description("휴지통 폴더/파일 리스트"),
+            fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
+            fieldWithPath("data[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
+            fieldWithPath("data[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트"),
+            fieldWithPath("data[].children[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
+            fieldWithPath("data[].children[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
+            fieldWithPath("data[].children[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data[].children[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트")
     );
 }

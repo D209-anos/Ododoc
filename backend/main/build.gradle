@@ -80,7 +80,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     // MongoDB & reactor-test
-//	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     testImplementation 'io.projectreactor:reactor-test'
 
     // redis
@@ -101,13 +101,15 @@ dependencies {
 
     // Spring Embedded Redis for Test
     implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
+
+    // S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 openapi3 {
     servers = [
-        // { url = "http://localhost:8080/api" },
-        // { url = "http://k10d209.p.ssafy.io:8080/api" },
-        { url = "https://k10d209.p.ssafy.io/api" }
+             { url = "http://localhost:8080/api" },
+             { url = "https://k10d209.p.ssafy.io/api" }
     ]
     title = "SSAFY D209 Ododoc API"
     description = "SSAFY 자율프로젝트 Ododoc 에서 사용할 API 문서입니다."
@@ -117,7 +119,6 @@ openapi3 {
 
     outputDirectory = "${buildDir}/resources/main/static/docs"
 }
-
 
 def querydslDir = 'src/main/generated'
 
