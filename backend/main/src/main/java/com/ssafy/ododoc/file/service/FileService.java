@@ -1,7 +1,7 @@
 package com.ssafy.ododoc.file.service;
 
 import com.ssafy.ododoc.common.util.S3Util;
-import com.ssafy.ododoc.directory.dto.response.ImageResponse;
+import com.ssafy.ododoc.file.dto.response.ImageResponse;
 import com.ssafy.ododoc.directory.entity.Directory;
 import com.ssafy.ododoc.directory.exception.CannotUploadImageException;
 import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
