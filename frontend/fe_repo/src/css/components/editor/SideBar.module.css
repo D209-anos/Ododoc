@@ -109,6 +109,19 @@
     /* user-select: none; */
 }
 
+.folderItem {
+    border: 3px solid #ccc;
+    padding: 10px;
+    margin-bottom: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.folder-item.drag-over {
+    border-color: blue;
+    background-color: #f0f8ff;
+    /* 드래그 오버시 배경 색상 변경 */
+}
+
 .folderWrapper {
     display: flex;
     flex-direction: row;
@@ -317,3 +330,4 @@
 .itemIndent {
     margin-left: 3vh;
 }
+

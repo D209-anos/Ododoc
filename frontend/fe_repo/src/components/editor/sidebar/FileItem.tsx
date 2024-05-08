@@ -12,6 +12,7 @@ interface IContentItem {
 
 interface FileItemProps {
     item: IContentItem;
+    parentId: number | null;
     selected: boolean;
     handleItemClick: (id: number) => void;
     handleContextMenu: (event: React.MouseEvent<HTMLDivElement>, id: number) => void;
@@ -22,7 +23,8 @@ interface FileItemProps {
 }
 
 const FileItem: React.FC<FileItemProps> = ({ 
-    item, 
+    item,
+    parentId,
     selected, 
     handleItemClick, 
     handleContextMenu, 
