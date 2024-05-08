@@ -35,6 +35,8 @@
     "hangul-js": "^0.2.6",
     "lodash": "^4.17.21",
     "novel": "^0.3.1",
+    "package": "^1.0.1",
+    "patch": "^0.0.1",
     "patch-package": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
