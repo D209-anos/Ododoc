@@ -1,6 +1,6 @@
 package com.ssafy.ododoc.file.controller;
 
-import com.ssafy.ododoc.directory.dto.response.ImageResponse;
+import com.ssafy.ododoc.file.dto.response.ImageResponse;
 import com.ssafy.ododoc.file.dto.annotation.CheckFile;
 import com.ssafy.ododoc.file.service.FileService;
 import com.ssafy.ododoc.member.entity.Member;

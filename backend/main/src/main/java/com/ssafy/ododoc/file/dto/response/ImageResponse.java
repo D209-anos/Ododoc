@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.directory.dto.response;
+package com.ssafy.ododoc.file.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
