@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { sendCodeToBackend } from '../../api/service/user';
+import { useSendCodeToBackend } from '../../api/service/user';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom'; 
 import CloseIcon from '@mui/icons-material/Close';
@@ -12,10 +12,11 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
-    const { accessToken, setAccessToken } = useAuth();
-    const loginBackground = useRef<HTMLDivElement>(null);
+    const { state, dispatch } = useAuth();
+    const { accessToken } = state;
     const navigate = useNavigate();          // 리다이렉트
     const [animation, setAnimation] = useState('animate__backInDown');
+    const loginBackground = useRef<HTMLDivElement>(null);
 
     // 인가 코드 추출하는 함수
     const getAuthorizationCode = (): string | null => {
@@ -29,6 +30,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         return urlParams.get('provider');
     }
 
+    const sendCodeToBackend = useSendCodeToBackend();
     useEffect(() => {
         // 인가 코드 받아옴
         const code = getAuthorizationCode();
@@ -41,10 +43,10 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         if (provider === 'kakao' || provider === 'google' || provider === 'naver' ){
             const url = redirectUri[provider]
             if (code && provider && url !== undefined) {
-                sendCodeToBackend(code, url, provider, setAccessToken);
+                sendCodeToBackend(code, url, provider);
             }
         }
-    }, [setAccessToken]);
+    }, []);
 
     // 로그인 성공 시 editor 화면으로 이동
     useEffect(() => {
@@ -52,7 +54,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
         if (accessToken) {
             navigate('/editor'); 
         }
-    }, [accessToken]);
+    }, [accessToken, navigate]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {

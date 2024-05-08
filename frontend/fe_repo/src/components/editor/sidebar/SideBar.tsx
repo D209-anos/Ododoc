@@ -16,6 +16,7 @@ import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
 import { fetchDirectory } from '../../../api/service/directory';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface IContentItem {
     id: number;
@@ -98,6 +99,9 @@ const dummyData: IContentItem = {
 };
 
 const SideBar: React.FC = () => {
+    const { state, dispatch } = useAuth();
+    const { accessToken, rootId, title } = state;
+
     const navigate = useNavigate();
     // const [contents, setContents] = useState<IContentItem[]>([]);
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
@@ -105,8 +109,7 @@ const SideBar: React.FC = () => {
     const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
     const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
     const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
-    // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
-    const [userName, setUserName] = useState<string>(dummyData.name);                  // 사용자 이름 수정
+    const [userName, setUserName] = useState<string>(title || '');                  // 사용자 이름 수정
     const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
     const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
 
@@ -115,21 +118,30 @@ const SideBar: React.FC = () => {
     useHandleClickOutside(contextMenuRef, hideMenu);
 
     // 디렉토리 조회
-    // useEffect(() => {
-    //     const loadDirectory = async () => {
-    //         const rootId = 1;
-    //         const directoryData = await fetchDirectory(rootId);
-    //         const token = localStorage.getItem('accessToken')
-    //         if (directoryData && token) {
-    //             console.log('데이터 들어왔따 ~~~')
-    //             console.log(directoryData)
-    //             setContents(directoryData.contents as IContentItem[]);
-    //             setUserName(directoryData.name);
-    //         }
-    //     };
+    useEffect(() => {
+        const loadDirectory = async () => {
+            const rootId = state.rootId;
+            const accessToken = state.accessToken;
+            const directoryData = await fetchDirectory(rootId);
 
-    //     loadDirectory();
-    // }, [])
+            if (directoryData && accessToken) {
+                console.log('데이터 들어왔따 ~~~')
+                console.log(directoryData)
+                // setContents(directoryData.contents as IContentItem[]);
+                setUserName(directoryData.name);
+            }
+        };
+        
+
+        loadDirectory();
+    }, [])
+
+
+    useEffect(() => {
+        if (title) {
+            setUserName(title);
+        }
+    })
 
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
@@ -138,9 +150,6 @@ const SideBar: React.FC = () => {
     // file 클릭
     const fileItemClick = (id: number): void => {
         navigate(`/editor/${id}`, {state: id})
-        const parentId = findParentId(dummyData.contents as IContentItem[], id);
-        console.log("Select ID:", id)
-        console.log("Parent ID:", parentId)
     }
 
     // folder 클릭
@@ -149,13 +158,11 @@ const SideBar: React.FC = () => {
         // console.log(id)
     }
 
-    // 폴더 드래그 시작하는 함수
-
-
     // 사용자 이름 저장 함수
     const saveUserName = (objectId: number) => {
         setIsEditing(false);
         // 사용자 이름 수정 API 호출 코드 작성
+        dispatch({ type: 'SET_AUTH_DETAILS', payload: { ...state, title: userName } })
     };
 
     // 사용자 이름 수정 함수
@@ -169,7 +176,7 @@ const SideBar: React.FC = () => {
             return (
                 <div>
                     <NameEditor 
-                        objectId={dummyData.id} 
+                        objectId={state.rootId || 0} 
                         name={userName} 
                         setName={setUserName} 
                         saveName={saveUserName}

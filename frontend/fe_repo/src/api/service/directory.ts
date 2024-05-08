@@ -8,7 +8,7 @@ interface IContentItem {
 }
 
 // directory 조회
-export const fetchDirectory = async (rootId: number): Promise<IContentItem | null> => {
+export const fetchDirectory = async (rootId: number | null): Promise<IContentItem | null> => {
     try {
         const response = await api.get<IContentItem>(`/directory/${rootId}`);
         return response.data;
