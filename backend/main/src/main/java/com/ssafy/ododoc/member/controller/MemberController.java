@@ -51,7 +51,7 @@ public class MemberController {
      * @param response 쿠키 저장을 위한 response
      * @return 로그인 한 회원의 JWT 정보, root Directory 정보
      */
-    @GetMapping("/authorization/{provider}")
+    @GetMapping(value = "/authorization/{provider}", produces = "application/json; charset=UTF-8")
     public LoginResponse login(@RequestParam String code,
                                @RequestParam(required = false) String redirectUri,
                                @PathVariable String provider,
