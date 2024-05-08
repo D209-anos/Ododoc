@@ -80,7 +80,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     // MongoDB & reactor-test
-//	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     testImplementation 'io.projectreactor:reactor-test'
 
     // redis
@@ -108,7 +108,8 @@ dependencies {
 
 openapi3 {
     servers = [
-            { url = "http://localhost:8080/api" }
+             { url = "http://localhost:8080/api" },
+             { url = "https://k10d209.p.ssafy.io/api" }
     ]
     title = "SSAFY D209 Ododoc API"
     description = "SSAFY 자율프로젝트 Ododoc 에서 사용할 API 문서입니다."
@@ -116,7 +117,7 @@ openapi3 {
     outputFileNamePrefix = 'open-api-3.0.1'
     format = "json"
 
-    outputDirectory = 'build/resources/main/static/docs'
+    outputDirectory = "${buildDir}/resources/main/static/docs"
 }
 
 def querydslDir = 'src/main/generated'
@@ -130,7 +131,7 @@ tasks.withType(GenerateSwaggerUI).configureEach {
 
     delete file('src/main/resources/static/docs/')
     copy {
-        from "build/resources/main/static/docs"
+        from "${buildDir}/resources/main/static/docs"
         into "src/main/resources/static/docs/"
     }
 }
@@ -168,7 +169,7 @@ tasks.named("bootJar") {
 
 tasks.register('copyDocument', Copy) {
     dependsOn asciidoctor
-    from file("$buildDir/docs/asciidoc")
+    from file("${buildDir}/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
 
