@@ -1,14 +1,14 @@
 package com.ssafy.ododoc.file.entity;
 
 import com.ssafy.ododoc.file.dto.Block;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
+@Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class File {

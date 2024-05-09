@@ -14,6 +14,6 @@ public class Block {
     private String id;
     private String type;
     private Props props;
-    private Content content;
+    private List<Content> content;
     private List<Block> children;
 }
