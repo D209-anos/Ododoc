@@ -1,14 +1,18 @@
 package com.ssafy.ododoc.file.service;
 
 import com.ssafy.ododoc.common.util.S3Util;
+import com.ssafy.ododoc.file.dto.response.FileResponse;
 import com.ssafy.ododoc.file.dto.response.ImageResponse;
 import com.ssafy.ododoc.directory.entity.Directory;
-import com.ssafy.ododoc.directory.exception.CannotUploadImageException;
+import com.ssafy.ododoc.file.exception.CannotUploadImageException;
 import com.ssafy.ododoc.directory.exception.DirectoryAccessDeniedException;
 import com.ssafy.ododoc.directory.exception.DirectoryAlreadyDeletedException;
 import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
 import com.ssafy.ododoc.directory.repository.DirectoryRepository;
 import com.ssafy.ododoc.directory.type.DirectoryType;
+import com.ssafy.ododoc.file.entity.File;
+import com.ssafy.ododoc.file.exception.FileBadRequestException;
+import com.ssafy.ododoc.file.repository.FileRepository;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileService {
 
     private final DirectoryRepository directoryRepository;
+    private final FileRepository fileRepository;
     private final S3Util s3Util;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
@@ -40,6 +45,30 @@ public class FileService {
         return ImageResponse.builder()
                 .id(directory.getId())
                 .imageUrl(s3Util.uploadImage(image))
+                .build();
+    }
+
+    public FileResponse getFile(Long directoryId, Member member) {
+        Directory directory = directoryRepository.findById(directoryId)
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 파일을 찾을 수 없습니다."));
+
+        if(!directory.getMember().equals(member)) {
+            throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
+        }
+
+        if(directory.getTrashbinTime() != null || directory.getDeletedTime() != null) {
+            throw new DirectoryAlreadyDeletedException("삭제된 파일입니다.");
+        }
+
+        if(directory.getType().equals(DirectoryType.FOLDER)) {
+            throw new FileBadRequestException("잘못된 요청입니다.");
+        }
+
+        File file = fileRepository.findByDirectoryId(directoryId);
+
+        return FileResponse.builder()
+                .directoryId(file.getDirectoryId())
+                .content(file.getContent())
                 .build();
     }
 }

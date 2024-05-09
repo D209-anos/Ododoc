@@ -1,6 +1,6 @@
 package com.ssafy.ododoc.common.util;
 
-import com.ssafy.ododoc.directory.exception.NotAllowedImageException;
+import com.ssafy.ododoc.file.exception.NotAllowedImageException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

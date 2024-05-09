@@ -1,5 +1,6 @@
 package com.ssafy.ododoc.file.controller;
 
+import com.ssafy.ododoc.file.dto.response.FileResponse;
 import com.ssafy.ododoc.file.dto.response.ImageResponse;
 import com.ssafy.ododoc.file.dto.annotation.CheckFile;
 import com.ssafy.ododoc.file.service.FileService;
@@ -32,5 +33,18 @@ public class FileController {
                                      @RequestPart(value = "image") @CheckFile MultipartFile image,
                                      @AuthenticationPrincipal Member member) {
         return fileService.uploadImage(directoryId, image, member);
+    }
+
+    /**
+     * 파일 내용 조회 api.
+     *
+     * @param directoryId 조회할 디렉토리 아이디
+     * @param member 로그인 한 멤버
+     * @return 파일 내용
+     */
+    @GetMapping("/{directoryId}")
+    public FileResponse getFile(@PathVariable @Min(value = 1, message = "Directory ID는 1 이상이어야 합니다.") Long directoryId,
+                                @AuthenticationPrincipal Member member) {
+        return fileService.getFile(directoryId, member);
     }
 }
