@@ -14,6 +14,8 @@ public class ContentDto {
 
     private String type;
     private String text;
-    private Objects styles;
+
+    @Builder.Default
+    private StyleDto styles = new StyleDto();
 
 }
