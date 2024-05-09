@@ -21,7 +21,8 @@ import java.util.List;
 public class DirectoryFrame extends Application {
 
     private final String baseUrl = "https://k10d209.p.ssafy.io/api/directory/";
-    private ContextMenu contextMenu = new ContextMenu();
+    private ContextMenu folderContextMenu = new ContextMenu();
+    private ContextMenu fileContextMenu = new ContextMenu();
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -44,10 +45,17 @@ public class DirectoryFrame extends Application {
         treeView.setCellFactory(tv -> new FileInfoCell());
 
         treeView.setOnMouseClicked(event -> {
+
+            // 오른쪽 마우스 클릭 시 빈 공간 일 경우 파일 및 폴더 생성
             if (event.getButton() == MouseButton.SECONDARY && treeView.getSelectionModel().getSelectedItem() == null) {
-                contextMenu.show(treeView, event.getScreenX(), event.getScreenY());
+                folderContextMenu.show(treeView, event.getScreenX(), event.getScreenY());
             } else {
-                contextMenu.hide();
+                folderContextMenu.hide();
+            }
+
+            // 왼쪽 마우스 클릭 시 빈공간일 경우 폴더 및 파일을 선택 비활성화
+            if(event.getButton() == MouseButton.PRIMARY && (event.getTarget() instanceof TreeCell<?> && ((TreeCell) event.getTarget()).isEmpty())){
+                treeView.getSelectionModel().clearSelection();
             }
         });
 
@@ -169,14 +177,17 @@ public class DirectoryFrame extends Application {
     private void makeContextMenu() {
         MenuItem addFolder = new MenuItem("폴더 생성");
         MenuItem addFile = new MenuItem("파일 생성");
-        contextMenu.getItems().addAll(addFolder, addFile);
+        folderContextMenu.getItems().addAll(addFolder, addFile);
+
+        MenuItem connectFile = new MenuItem("파일 연동");
+        fileContextMenu.getItems().add(connectFile);
 
         addFolder.setOnAction(e -> System.out.println("폴더 생성"));
         addFile.setOnAction(e -> System.out.println("파일 생성"));
+        connectFile.setOnAction(e -> System.out.println("파일 연동"));
     }
 
     class FileListener implements ChangeListener<TreeItem<FileInfo>> {
-
         @Override
         public void changed(ObservableValue<? extends TreeItem<FileInfo>> observableValue, TreeItem<FileInfo> oldValue, TreeItem<FileInfo> newValue) {
             if (newValue != null) {
@@ -185,7 +196,6 @@ public class DirectoryFrame extends Application {
                 System.out.println("ID: " + fileInfo.getId() + ", Type: " + fileInfo.getType());
             }
         }
-
     }
 
     class FileInfoCell extends TreeCell<FileInfo> {
@@ -200,9 +210,9 @@ public class DirectoryFrame extends Application {
                 setText(fileInfo.toString());
 
                 if(fileInfo.getType().equals("FOLDER")){
-                    setContextMenu(contextMenu);
-                } else{
-                    setContextMenu(null);
+                    setContextMenu(folderContextMenu);
+                } else if (fileInfo.getType().equals("FILE")){
+                    setContextMenu(fileContextMenu);
                 }
             }
         }
