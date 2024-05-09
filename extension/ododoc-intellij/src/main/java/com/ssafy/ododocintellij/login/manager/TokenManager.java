@@ -1,4 +1,4 @@
-package com.ssafy.ododocintellij.login.token;
+package com.ssafy.ododocintellij.login.manager;
 
 public class TokenManager {
 
@@ -30,4 +30,5 @@ public class TokenManager {
     public synchronized void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
 }

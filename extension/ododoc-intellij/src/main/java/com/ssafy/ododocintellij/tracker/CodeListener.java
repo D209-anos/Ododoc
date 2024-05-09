@@ -11,7 +11,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
-import com.ssafy.ododocintellij.login.token.TokenManager;
+import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
 import com.ssafy.ododocintellij.tracker.dto.RequestDto;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
