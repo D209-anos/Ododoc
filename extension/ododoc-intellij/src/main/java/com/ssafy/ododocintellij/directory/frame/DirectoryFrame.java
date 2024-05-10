@@ -1,13 +1,14 @@
 package com.ssafy.ododocintellij.directory.frame;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododocintellij.directory.dto.DirectoryDto;
 import com.ssafy.ododocintellij.directory.dto.ResultDto;
+import com.ssafy.ododocintellij.directory.dto.request.CreateRequestDto;
 import com.ssafy.ododocintellij.directory.entity.FileInfo;
+import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
@@ -15,31 +16,35 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public class DirectoryFrame extends Application {
 
-    private final String baseUrl = "https://k10d209.p.ssafy.io/api/directory/";
+    private Long currentDirectoryId;
+    private final String baseUrl = "https://k10d209.p.ssafy.io/api/directory";
+    private TreeView<FileInfo> treeView;
     private ContextMenu folderContextMenu = new ContextMenu();
     private ContextMenu fileContextMenu = new ContextMenu();
 
     @Override
     public void start(Stage stage) throws Exception {
         DirectoryInfoManager directoryInfoManager = DirectoryInfoManager.getInstance();
-        ResultDto resultDto = retrieveDirectory(directoryInfoManager.getRootId());
+        ResultDto resultDto = retrieveDirectory(directoryInfoManager.getRootId()).block();
 
         // 제목 설정
         stage.setTitle(" " + directoryInfoManager.getTitle());
+        currentDirectoryId = directoryInfoManager.getRootId();
 
         // 오른쪽 마우스 이벤트 목록 생성
         makeContextMenu();
 
         // 디렉토리 UI 생성
         TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
-        invisibleRoot = viewDirectory(resultDto.getData().getChildren(), invisibleRoot);
+        invisibleRoot = viewDirectory(((DirectoryDto)resultDto.getData()).getChildren(), invisibleRoot);
 
-        TreeView<FileInfo> treeView = new TreeView<>(invisibleRoot);
+        treeView = new TreeView<>(invisibleRoot);
         treeView.setShowRoot(false);
         treeView.getSelectionModel().selectedItemProperty().addListener(new FileListener());
         treeView.setCellFactory(tv -> new FileInfoCell());
@@ -47,15 +52,32 @@ public class DirectoryFrame extends Application {
         treeView.setOnMouseClicked(event -> {
 
             // 오른쪽 마우스 클릭 시 빈 공간 일 경우 파일 및 폴더 생성
-            if (event.getButton() == MouseButton.SECONDARY && treeView.getSelectionModel().getSelectedItem() == null) {
-                folderContextMenu.show(treeView, event.getScreenX(), event.getScreenY());
+            if (event.getButton() == MouseButton.SECONDARY) {
+                if(treeView.getSelectionModel().getSelectedItem() == null){
+                    folderContextMenu.show(treeView, event.getScreenX(), event.getScreenY());
+                    currentDirectoryId = directoryInfoManager.getRootId();
+                } else{
+                    currentDirectoryId = treeView.getSelectionModel().getSelectedItems().get(0).getValue().getId();
+                }
             } else {
                 folderContextMenu.hide();
             }
 
-            // 왼쪽 마우스 클릭 시 빈공간일 경우 폴더 및 파일을 선택 비활성화
-            if(event.getButton() == MouseButton.PRIMARY && (event.getTarget() instanceof TreeCell<?> && ((TreeCell) event.getTarget()).isEmpty())){
-                treeView.getSelectionModel().clearSelection();
+            // 왼쪽 마우스 클릭 시
+            if(event.getButton() == MouseButton.PRIMARY){
+                // 빈공간일 경우 폴더 및 파일을 선택 비활성화
+                if(event.getTarget() instanceof TreeCell<?> && ((TreeCell) event.getTarget()).isEmpty()){
+                    treeView.getSelectionModel().clearSelection();
+                    currentDirectoryId = directoryInfoManager.getRootId();
+                }
+                else{
+                    if(treeView.getSelectionModel().getSelectedItems().isEmpty()){
+                        currentDirectoryId = directoryInfoManager.getRootId();
+                    }
+                    else{
+                        currentDirectoryId = treeView.getSelectionModel().getSelectedItems().get(0).getValue().getId();
+                    }
+                }
             }
         });
 
@@ -64,85 +86,17 @@ public class DirectoryFrame extends Application {
         stage.show();
     }
 
-    private ResultDto retrieveDirectory(long rootId) throws JsonProcessingException {
-        TokenManager tokenManager = TokenManager.getInstance();
+    private Mono<ResultDto> retrieveDirectory(long rootId) {
         WebClient webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader("Content-type", "application/json")
-                .defaultHeader("Authorization", tokenManager.getAccessToken())
+                .defaultHeader("Authorization", TokenManager.getInstance().getAccessToken())
                 .build();
 
-        ResultDto resultDto = webClient.get()
-                .uri(rootId + "")
+        return webClient.get()
+                .uri("/" + rootId)
                 .retrieve()
-                .bodyToMono(ResultDto.class)
-                .block();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String temporaryDirectoryData = "{\n" +
-                "  \"status\": 200,\n" +
-                "  \"data\": {\n" +
-                "    \"id\": 1,\n" +
-                "    \"name\": \"아노쓰님의 정리공간\",\n" +
-                "    \"type\": \"FOLDER\",\n" +
-                "    \"children\": [\n" +
-                "      {\n" +
-                "        \"id\": 2,\n" +
-                "        \"name\": \"폴더\",\n" +
-                "        \"type\": \"FOLDER\",\n" +
-                "        \"children\": [\n" +
-                "          {\n" +
-                "            \"id\": 3,\n" +
-                "            \"name\": \"파일\",\n" +
-                "            \"type\": \"FILE\",\n" +
-                "            \"children\": []\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"id\": 4,\n" +
-                "            \"name\": \"폴더\",\n" +
-                "            \"type\": \"FOLDER\",\n" +
-                "            \"children\": [\n" +
-                "              {\n" +
-                "                \"id\": 5,\n" +
-                "                \"name\": \"파일\",\n" +
-                "                \"type\": \"FILE\",\n" +
-                "                \"children\": []\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"id\": 6,\n" +
-                "                \"name\": \"파일\",\n" +
-                "                \"type\": \"FILE\",\n" +
-                "                \"children\": []\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"id\": 7,\n" +
-                "                \"name\": \"폴더\",\n" +
-                "                \"type\": \"FOLDER\",\n" +
-                "                \"children\": [\n" +
-                "                  {\n" +
-                "                    \"id\": 8,\n" +
-                "                    \"name\": \"파일\",\n" +
-                "                    \"type\": \"FILE\",\n" +
-                "                    \"children\": []\n" +
-                "                  }\n" +
-                "                ]\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"id\": 4,\n" +
-                "        \"name\": \"파일\",\n" +
-                "        \"type\": \"FILE\",\n" +
-                "        \"children\": []\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}";
-        ResultDto resultDto1 = objectMapper.readValue(temporaryDirectoryData, ResultDto.class);
-
-        return resultDto1;
+                .bodyToMono(ResultDto.class);
     }
 
     private TreeItem<FileInfo> viewDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
@@ -182,9 +136,48 @@ public class DirectoryFrame extends Application {
         MenuItem connectFile = new MenuItem("파일 연동");
         fileContextMenu.getItems().add(connectFile);
 
-        addFolder.setOnAction(e -> System.out.println("폴더 생성"));
-        addFile.setOnAction(e -> System.out.println("파일 생성"));
-        connectFile.setOnAction(e -> System.out.println("파일 연동"));
+        addFolder.setOnAction(e -> createFolderAndFile("folder"));
+        addFile.setOnAction(e -> createFolderAndFile("file"));
+        connectFile.setOnAction(e -> connectFile());
+    }
+
+    private void connectFile() {
+        ConnectedFileManager connectedFileManager = ConnectedFileManager.getInstance();
+        connectedFileManager.setDirectoryId(currentDirectoryId);
+    }
+
+    private void createFolderAndFile(String type){
+        WebClient webClient = WebClient.builder()
+                .baseUrl(baseUrl)
+                .defaultHeader("Content-type", "application/json")
+                .defaultHeader("Authorization", TokenManager.getInstance().getAccessToken())
+                .build();
+
+        CreateRequestDto createRequestDto = new CreateRequestDto(currentDirectoryId, "", type);
+
+        webClient.post()
+                .bodyValue(createRequestDto)
+                .retrieve()
+                .bodyToMono(ResultDto.class)
+                .subscribe(resultDto -> {
+                    if (resultDto.getStatus() == 200) {
+                        refreshDirectoryView(); // 디렉토리 목록 갱신
+                    } else {
+                        System.out.println("디렉토리 생성 실패: ");
+                    }
+                }, error -> System.out.println("API 호출 실패: " + error.getMessage()));
+    }
+
+    private void refreshDirectoryView() {
+        retrieveDirectory(DirectoryInfoManager.getInstance().getRootId()).subscribe(resultDto -> {
+            Platform.runLater(() -> {
+                TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
+                invisibleRoot = viewDirectory(((DirectoryDto) resultDto.getData()).getChildren(), invisibleRoot);
+                treeView.setRoot(invisibleRoot);
+                treeView.setShowRoot(false);
+                treeView.refresh();
+            });
+        });
     }
 
     class FileListener implements ChangeListener<TreeItem<FileInfo>> {
@@ -202,13 +195,11 @@ public class DirectoryFrame extends Application {
         @Override
         protected void updateItem(FileInfo fileInfo, boolean empty) {
             super.updateItem(fileInfo, empty);
-
             if(empty || fileInfo == null) {
                 setText(null);
                 setContextMenu(null);
             } else{
                 setText(fileInfo.toString());
-
                 if(fileInfo.getType().equals("FOLDER")){
                     setContextMenu(folderContextMenu);
                 } else if (fileInfo.getType().equals("FILE")){

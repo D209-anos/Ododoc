@@ -23,11 +23,4 @@ public class ResultDto {
         this.data = data;
     }
 
-    @Override
-    public String toString() {
-        return "ResultDto{" +
-                "status=" + status +
-                ", data=" + data +
-                '}';
-    }
 }
