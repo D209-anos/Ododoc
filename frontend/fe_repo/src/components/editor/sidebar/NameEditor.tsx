@@ -8,7 +8,12 @@ interface NameEditorProps {
     saveName: (objectId: number, name: string) => void;     // 이름 저장 함수
 }
 
-const NameEditor: React.FC<NameEditorProps> = ({ objectId, name, setName, saveName }) => {
+const NameEditor: React.FC<NameEditorProps> = ({ 
+    objectId, 
+    name, 
+    setName, 
+    saveName,
+}) => {
     const [inputName, setInputName] = useState(name);
 
     // 파일 또는 폴더명 바꾸는 함수
