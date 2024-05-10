@@ -293,7 +293,7 @@ public class DirectoryService {
 
     private void checkIfDeleted(Directory directory) {
         if(directory.getTrashbinTime() != null || directory.getDeletedTime() != null) {
-            throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
+            throw new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다.");
         }
     }
 }
