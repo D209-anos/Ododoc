@@ -42,10 +42,10 @@ public class FileService {
         checkDirectory(directoryId, member);
 
         File file = fileRepository.findByDirectoryId(directoryId)
-                .orElseGet(() -> File.builder()
+                .orElseGet(() -> fileRepository.save(File.builder()
                         .directoryId(directoryId)
                         .content(new ArrayList<>())
-                        .build());
+                        .build()));
 
         return FileResponse.builder()
                 .directoryId(file.getDirectoryId())
