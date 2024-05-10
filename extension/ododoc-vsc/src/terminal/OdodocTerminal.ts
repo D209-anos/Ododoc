@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, ChildProcessWithoutNullStreams, exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -115,6 +115,12 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
       case "cd":
         this.changeDirectory(args.join(" "));
         break;
+      case "exit":
+        this.stopSubprocess();
+        break;
+      case "help":
+        this.showHelp();
+        break;
       default:
         this.executeSubprocess(cmd, args);
         break;
@@ -160,12 +166,25 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
     });
   }
 
+  showHelp() {
+    this.writeEmitter.fire(
+      "Available commands:\r\n" +
+        "  ls          List directory contents\r\n" +
+        "  cd          Change directory\r\n" +
+        "  exit        Terminate all subprocesses\r\n" +
+        "  help        Show this help message\r\n\n" +
+        `\x1b[33m${this.folderPath}\r\n\x1b[0m> `
+    );
+  }
+
   executeSubprocess(command: string, args: string[]) {
     if (this.ptyProcess) {
       const subprocess = spawn(command, args, {
         cwd: this.folderPath || process.cwd(),
         shell: true, // cmd or bash
       });
+
+      this.subprocesses.push(subprocess);
 
       subprocess.stdout.on("data", (data) => {
         const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
@@ -189,6 +208,16 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
         this.writeEmitter.fire(`\x1b[33m${this.folderPath} \r\n`);
         this.writeEmitter.fire("\x1b[0m> ");
       });
+    }
+  }
+
+  stopSubprocess() {
+    if (this.subprocesses.length > 0) {
+      this.subprocesses.forEach((subproc) => {
+        exec(`taskkill /PID ${subproc.pid} /T /F`);
+      });
+      this.subprocesses = [];
+      this.writeEmitter.fire("terminated.\r\n\n");
     }
   }
 
