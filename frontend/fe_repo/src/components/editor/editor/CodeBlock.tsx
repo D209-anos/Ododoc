@@ -14,7 +14,10 @@ export const CodeBlock = createReactBlockSpec(
       ...defaultBlockSpecs,
       data: {
         //@ts-ignore
-        language: "javascript",
+        language: {
+          default : "javascript",
+          values : ["javascript","python","java","csharp"]
+        },
         code: "",
       },
     },
