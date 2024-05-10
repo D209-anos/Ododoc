@@ -13,52 +13,50 @@ public class DataTypeHandlerService {
     private final DataTransferService dataTransferService;
     private final OutputHandlerService outputHandlerService;
 
-    public void handle(MessageDto messageDto){
+    public void handle(MessageDto MessageDto){
 
-        DataType dataType = messageDto.getDataType();
+        DataType dataType = MessageDto.getDataType();
+        System.out.println(dataType);
+        System.out.println(MessageDto.getContent());
         switch (dataType){
             case SIGNAL:
-                System.out.println(messageDto.getContent());
+                processSignal(MessageDto);
                 break;
 
             case OUTPUT:
-                System.out.println(dataType);
-                System.out.println(messageDto.getContent());
-                outputHandlerService.process(messageDto);
+                processOutput(MessageDto);
                 break;
 
             case ERROR:
-                System.out.println(dataType);
-                System.out.println(messageDto.getContent());
+                processError(MessageDto);
                 break;
 
-            case SCM:
-                System.out.println(dataType);
-                System.out.println(messageDto.getContent());
+            case SOURCECODE:
+                processSourcecode(MessageDto);
                 break;
 
             default:
-                System.out.println(dataType);
                 break;
         }
 
         // main으로 데이터 전송 로직 추가
     }
 
-    private void processSignal(MessageDto messageDto){
-        System.out.println(messageDto.toString());
+    private void processSignal(MessageDto MessageDto){
+        System.out.println(MessageDto.toString());
     }
 
-    private void processOutput(MessageDto messageDto) {
-        dataTransferService.transferDataForSave(messageDto);
+    private void processOutput(MessageDto MessageDto) {
+        MessageDto messageDto = outputHandlerService.handle(MessageDto);
+//        dataTransferService.transferDataForSave(MessageDto);
     }
 
-    private void processError(MessageDto messageDto){
-        dataTransferService.transferDataForSave(messageDto);
+    private void processError(MessageDto MessageDto){
+//        dataTransferService.transferDataForSave(MessageDto);
     }
 
-    private void processSCM(MessageDto messageDto) {
-        System.out.println(messageDto.toString());
+    private void processSourcecode(MessageDto MessageDto) {
+        System.out.println(MessageDto.toString());
     }
 
 }

@@ -6,8 +6,8 @@ import com.ssafy.ododoc.process.dto.receive.MessageDto;
 import com.ssafy.ododoc.process.dto.receive.ModifiedFileDto;
 import com.ssafy.ododoc.process.dto.save.BuildResultPropsDto;
 import com.ssafy.ododoc.process.dto.save.ContentDto;
-import com.ssafy.ododoc.process.dto.save.FileBlockDto;
 import com.ssafy.ododoc.process.dto.save.DefaultPropsDto;
+import com.ssafy.ododoc.process.dto.save.FileBlockDto;
 import com.ssafy.ododoc.process.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,21 +22,21 @@ public class DataTransferService {
 
     private final ObjectMapper objectMapper;
 
-    public void transferDataForSave(MessageDto messageDto) {
-        System.out.println(makeFileBlock(messageDto));
+    public void transferDataForSave(MessageDto MessageDto) {
+        System.out.println(makeFileBlock(MessageDto));
         // Todo : 메인서버로 저장 요청
     }
 
     // 블럭으로 가공하는 로직
-    private FileBlockDto makeFileBlock(MessageDto messageDto) {
-        IDEContentDto contentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
+    private FileBlockDto makeFileBlock(MessageDto MessageDto) {
+        IDEContentDto contentDto = objectMapper.convertValue(MessageDto.getContent(), IDEContentDto.class);
 
         /**
          *  코드 블럭 만들기
          */
         List<FileBlockDto> codeBlocks = new ArrayList<>();
         List<ModifiedFileDto> modifiedFileList = contentDto.getModifiedFiles();
-        for(ModifiedFileDto file : modifiedFileList){
+        for (ModifiedFileDto file : modifiedFileList) {
 
             // 변경된 코드 내용이 담긴 코드 블럭
             FileBlockDto codeBlock = FileBlockDto.builder()
@@ -125,7 +125,7 @@ public class DataTransferService {
         codeAndTerminalBlocks.add(codeHeaderBlock);
         codeAndTerminalBlocks.add(terminalHeaderBlock);
 
-        String headerText = messageDto.getDataType() == DataType.OUTPUT ? "빌드 성공" : "빌드 실패";
+        String headerText = MessageDto.getDataType() == DataType.OUTPUT ? "빌드 성공" : "빌드 실패";
         FileBlockDto headerBlock = FileBlockDto.builder()
                 .id(UUID.randomUUID().toString())
                 .type("heading")
