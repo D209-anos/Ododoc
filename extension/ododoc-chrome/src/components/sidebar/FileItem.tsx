@@ -11,6 +11,7 @@ interface IContentItem {
 
 interface FileItemProps {
     item: IContentItem;
+    parentId: number | null;
     selected: boolean;
     handleItemClick: (id: number) => void;
     selectedItem: IContentItem | null;
@@ -21,6 +22,7 @@ interface FileItemProps {
 
 const FileItem: React.FC<FileItemProps> = ({ 
     item, 
+    parentId,
     selected, 
     handleItemClick, 
     selectedItem,
