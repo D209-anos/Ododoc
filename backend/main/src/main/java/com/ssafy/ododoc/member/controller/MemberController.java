@@ -89,6 +89,30 @@ public class MemberController {
     }
 
     /**
+     *  Chrome extension 로그인
+     *
+     * @param code OAuth 인가코드
+     * @param provider OAuth Provider (kakao, google, naver)
+     * @param response 쿠키 저장을 위한 response
+     * redirect => accesstoken을 uri에 담아서
+     */
+    @GetMapping("/authorization/chrome/{provider}")
+    public void chromeLogin(@RequestParam String code,
+                         @PathVariable String provider,
+                         HttpServletResponse response) throws IOException {
+
+        log.debug("[chrome extension login 호출] : {} {}", provider, code);
+        Directory directory = memberService.getMemberInfo(provider, code, "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/" + provider);
+        LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
+        String encodedTitle = URLEncoder.encode(loginResponse.title(), StandardCharsets.UTF_8.toString());
+        String chromeUri = "chrome-extension://cbdkicalcllkaeiijblihjfbkofmkaed/index.html?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
+                "&rootId=" + loginResponse.rootId() + "&title=" + encodedTitle + "&type=" + loginResponse.type();
+        jwtProvider.setRefreshTokenForClient(response, directory.getMember());
+        response.sendRedirect(chromeUri);
+    }
+
+
+    /**
      * 로그아웃
      *
      * @param request
