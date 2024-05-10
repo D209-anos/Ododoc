@@ -1,4 +1,3 @@
-
 # 첫 번째 스테이지: 빌드 환경
 FROM node:20.12.2 as builder
 WORKDIR /app
