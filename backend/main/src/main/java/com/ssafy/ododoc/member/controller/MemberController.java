@@ -80,7 +80,7 @@ public class MemberController {
                          HttpServletResponse response) throws IOException {
 
         log.debug("[vscode용 login 호출] : {} {}", provider, code);
-        Directory directory = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
+        Directory directory = memberService.getMemberInfo(provider, code, "https://k10d209.p.ssafy.io/api/oauth2/authorization/vsc/" + provider);
 
         LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
         String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
