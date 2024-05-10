@@ -52,3 +52,18 @@ export const deleteDirectoryItem = async (option: string, directoryId: number) =
         throw error;
     }
 }
+
+// directory 수정
+export const editDirectoryItem = async (id: number, name: string) => {
+    try {
+        const response = await api.put('/directory/edit', {
+            id: id,
+            name: name
+        })
+        const data = response.data.data
+        return data
+    } catch (error) {
+        console.log('디렉토리 수정 에러:', error)
+        throw error;
+    }
+}

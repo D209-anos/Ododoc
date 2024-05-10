@@ -15,10 +15,9 @@ import FileItem from './FileItem';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
-import { fetchDirectory } from '../../../api/service/directory';
+import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
 import RootFolderNameEditor from '../sidebar/RootFolderNameEditor';
-import { deleteDirectoryItem } from '../../../api/service/directory';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -71,7 +70,7 @@ const SideBar: React.FC = () => {
         };
         
         loadDirectory();
-    }, [])
+    }, [accessToken, rootId])
 
     // 디렉토리 조회 (디렉토리 생성 후 조회)
     useEffect(() => {
@@ -105,6 +104,16 @@ const SideBar: React.FC = () => {
         // setSelectedId(id);
     }
 
+    // 이름 저장
+    const saveName = (newName: string) => {
+        if (selectedItem) {
+            selectedItem.name = newName;
+            setIsContentEditing(false);
+        } else {
+            console.error('No item selected.')
+        }
+    }
+
     // 사용자 이름 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isUsernameEditing) {
@@ -129,10 +138,17 @@ const SideBar: React.FC = () => {
     };
 
     // 사용자 이름 저장 함수 (해당 id의 이름 저장)
-    const saveUserName = (objectId: number) => {
-        setIsUsernameEditing(false);                // 수정은 끝났고
-        // 사용자 이름 수정 API 호출 코드 작성
-        dispatch({ type: 'SET_AUTH_DETAILS', payload: { ...state, title: userName } })
+    const saveUserName = async (objectId: number, newName: string) => {
+        try {
+            const data = await editDirectoryItem(objectId, newName);
+            console.log('닉넴 수정 완료:', data);
+            dispatch({ type: 'SET_AUTH_DETAILS', payload: { ...state, title: newName } })
+            setUserName(newName)
+        } catch (error) {
+            console.error('닉넴 수정 에러:', error)
+        } finally {
+            setIsUsernameEditing(false);
+        }
     };
 
     // 파일 클릭 시 router 이동
@@ -240,16 +256,6 @@ const SideBar: React.FC = () => {
             hideMenu();
         } else {
             console.error('Item not found.')
-        }
-    }
-
-    // 이름 저장
-    const saveName = (newName: string) => {
-        if (selectedItem) {
-            selectedItem.name = newName;
-            setIsContentEditing(false);
-        } else {
-            console.error('No item selected.')
         }
     }
 
