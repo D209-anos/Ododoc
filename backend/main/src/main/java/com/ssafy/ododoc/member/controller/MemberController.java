@@ -83,8 +83,9 @@ public class MemberController {
         Directory directory = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
 
         LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
+        String encodedTitle = URLEncoder.encode(loginResponse.title(), StandardCharsets.UTF_8.toString());
         String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
-                "&rootId=" + loginResponse.rootId() + "&title=" + loginResponse.title() + "&type=" + loginResponse.type();
+                "&rootId=" + loginResponse.rootId() + "&title=" + encodedTitle + "&type=" + loginResponse.type();
 
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());
         response.sendRedirect(vscodeUri);
