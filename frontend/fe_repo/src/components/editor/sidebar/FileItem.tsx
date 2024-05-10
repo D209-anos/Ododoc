@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FileImage from '../../../assets/images/icon/file.png';
 import NameEditor from './NameEditor';
 import { createDirectory } from '../../../api/service/directory';
+import { useFileContext } from '../../../contexts/FileContext';
 
 interface IContentItem {
     id: number;
@@ -15,26 +16,39 @@ interface FileItemProps {
     item: IContentItem;
     parentId: number | null;
     selected: boolean;
-    handleItemClick: (id: number) => void;
     handleContextMenu: (event: React.MouseEvent<HTMLDivElement>, id: number) => void;
+    handleItemClick: (id: number) => void;
     selectedItem: IContentItem | null;
     isContentEditing: boolean;
     setIsContentEditing: (editing: boolean) => void;
     saveName: (objectId: number, name: string) => void;
+    setCreateFileParentId: (id: number | null) => void;
+    addingFileId: number | null;
+    setAddingFileId: (id: number | null) => void;
+    isAddingSubFile: boolean;
+    setIsAddingSubFile: (isAdding: boolean) => void;
+    saveNewFile: (objectId: number, newName: string) => void;
 }
 
 const FileItem: React.FC<FileItemProps> = ({ 
     item,
     parentId,
-    selected, 
-    handleItemClick, 
+    selected,
     handleContextMenu, 
+    handleItemClick,
     selectedItem,
     isContentEditing,
-    setIsContentEditing,
-    saveName
+    saveName,
+    saveNewFile,
 }) => {
-    const [isHovered, setIsHovered] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);      // 파일 배경색 
+    const [newFileName, setNewFileName] = useState('');
+    const { addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile } = useFileContext();
+    
+    useEffect(() => {
+        console.log("addingFileId:", addingFileId);
+        console.log("isAddingSubFile:", isAddingSubFile);
+    }, [addingFileId, isAddingSubFile]);
 
     // 파일 배경색
     const getBackgroundColor = () => {
@@ -57,14 +71,14 @@ const FileItem: React.FC<FileItemProps> = ({
             return (
                 <div>
                     <NameEditor 
-                    objectId={selectedItem.id}
-                    name={selectedItem.name}
-                    setName={(newName) => {
-                        selectedItem.name = newName;
-                    }}
-                    saveName={saveName}
-                    createDirectory={createDirectory}
-                    type='FILE'
+                        objectId={selectedItem.id}
+                        name={selectedItem.name}
+                        setName={(newName) => {
+                            selectedItem.name = newName;
+                        }}
+                        saveName={saveName}
+                        createDirectory={createDirectory}
+                        type='FILE'
                     />
                 </div>
             )
@@ -86,11 +100,29 @@ const FileItem: React.FC<FileItemProps> = ({
             onMouseLeave={() => setIsHovered(false)}
         >
             <img src={FileImage} alt="file-icon" className={Sidebar.fileImage} />
-            {
-                isContentEditing && selectedItem && selectedItem.id === item.id ?
-                renderContentNameField() : 
-                <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.folderName}>{item.name}</div>
-            }
+            {isContentEditing && selectedItem && selectedItem.id === item.id ? (
+                renderContentNameField()
+            ) : (
+                <div style={{ fontFamily: 'hanbitFont' }} className={Sidebar.folderName}>
+                    {item.name}
+                </div>
+            )}
+            {addingFileId === item.id && isAddingSubFile && (
+                <div>
+                    <NameEditor 
+                        objectId={item.id}
+                        name=''
+                        setName={setNewFileName}
+                        saveName={(objectId, name) => {
+                            saveNewFile(objectId, name);
+                            setAddingFileId(null);
+                            setIsAddingSubFile(false);
+                        }}
+                        createDirectory={createDirectory}
+                        type='FILE'
+                    />
+                </div>
+            )}
         </div>
     );
 };
