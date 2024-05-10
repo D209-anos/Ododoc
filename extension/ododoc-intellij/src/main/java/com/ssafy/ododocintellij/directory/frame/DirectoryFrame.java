@@ -1,8 +1,8 @@
 package com.ssafy.ododocintellij.directory.frame;
 
-import com.ssafy.ododocintellij.directory.dto.DirectoryDto;
-import com.ssafy.ododocintellij.directory.dto.ResultDto;
 import com.ssafy.ododocintellij.directory.dto.request.CreateRequestDto;
+import com.ssafy.ododocintellij.directory.dto.response.DirectoryDto;
+import com.ssafy.ododocintellij.directory.dto.response.ResultDto;
 import com.ssafy.ododocintellij.directory.entity.FileInfo;
 import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
@@ -29,7 +29,7 @@ public class DirectoryFrame extends Application {
     private ContextMenu fileContextMenu = new ContextMenu();
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         DirectoryInfoManager directoryInfoManager = DirectoryInfoManager.getInstance();
         ResultDto resultDto = retrieveDirectory(directoryInfoManager.getRootId()).block();
 
@@ -42,15 +42,14 @@ public class DirectoryFrame extends Application {
 
         // 디렉토리 UI 생성
         TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
-        invisibleRoot = viewDirectory(((DirectoryDto)resultDto.getData()).getChildren(), invisibleRoot);
+        invisibleRoot = LoadDirectory(resultDto.getData().getChildren(), invisibleRoot);
 
         treeView = new TreeView<>(invisibleRoot);
         treeView.setShowRoot(false);
+        treeView.setEditable(true);
         treeView.getSelectionModel().selectedItemProperty().addListener(new FileListener());
-        treeView.setCellFactory(tv -> new FileInfoCell());
-
+        treeView.setCellFactory(tv -> new FileAndFolderTreeCell(folderContextMenu, fileContextMenu, this::refreshDirectoryView));
         treeView.setOnMouseClicked(event -> {
-
             // 오른쪽 마우스 클릭 시 빈 공간 일 경우 파일 및 폴더 생성
             if (event.getButton() == MouseButton.SECONDARY) {
                 if(treeView.getSelectionModel().getSelectedItem() == null){
@@ -99,7 +98,7 @@ public class DirectoryFrame extends Application {
                 .bodyToMono(ResultDto.class);
     }
 
-    private TreeItem<FileInfo> viewDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
+    private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
 
         for(DirectoryDto dto : children){
             FileInfo fileInfo = new FileInfo(dto.getId(), dto.getName(), dto.getType());
@@ -136,8 +135,8 @@ public class DirectoryFrame extends Application {
         MenuItem connectFile = new MenuItem("파일 연동");
         fileContextMenu.getItems().add(connectFile);
 
-        addFolder.setOnAction(e -> createFolderAndFile("folder"));
-        addFile.setOnAction(e -> createFolderAndFile("file"));
+        addFolder.setOnAction(e -> createFolderOrFile("folder"));
+        addFile.setOnAction(e -> createFolderOrFile("file"));
         connectFile.setOnAction(e -> connectFile());
     }
 
@@ -146,7 +145,7 @@ public class DirectoryFrame extends Application {
         connectedFileManager.setDirectoryId(currentDirectoryId);
     }
 
-    private void createFolderAndFile(String type){
+    private void createFolderOrFile(String type){
         WebClient webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader("Content-type", "application/json")
@@ -159,11 +158,11 @@ public class DirectoryFrame extends Application {
                 .bodyValue(createRequestDto)
                 .retrieve()
                 .bodyToMono(ResultDto.class)
-                .subscribe(resultDto -> {
-                    if (resultDto.getStatus() == 200) {
-                        refreshDirectoryView(); // 디렉토리 목록 갱신
+                .subscribe(result -> {
+                    if (result.getStatus() == 200) {
+                        refreshDirectoryView();
                     } else {
-                        System.out.println("디렉토리 생성 실패: ");
+                        System.out.println("생성 실패");
                     }
                 }, error -> System.out.println("API 호출 실패: " + error.getMessage()));
     }
@@ -172,13 +171,14 @@ public class DirectoryFrame extends Application {
         retrieveDirectory(DirectoryInfoManager.getInstance().getRootId()).subscribe(resultDto -> {
             Platform.runLater(() -> {
                 TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
-                invisibleRoot = viewDirectory(((DirectoryDto) resultDto.getData()).getChildren(), invisibleRoot);
+                invisibleRoot = LoadDirectory(resultDto.getData().getChildren(), invisibleRoot);
                 treeView.setRoot(invisibleRoot);
                 treeView.setShowRoot(false);
                 treeView.refresh();
             });
         });
     }
+
 
     class FileListener implements ChangeListener<TreeItem<FileInfo>> {
         @Override
@@ -191,21 +191,4 @@ public class DirectoryFrame extends Application {
         }
     }
 
-    class FileInfoCell extends TreeCell<FileInfo> {
-        @Override
-        protected void updateItem(FileInfo fileInfo, boolean empty) {
-            super.updateItem(fileInfo, empty);
-            if(empty || fileInfo == null) {
-                setText(null);
-                setContextMenu(null);
-            } else{
-                setText(fileInfo.toString());
-                if(fileInfo.getType().equals("FOLDER")){
-                    setContextMenu(folderContextMenu);
-                } else if (fileInfo.getType().equals("FILE")){
-                    setContextMenu(fileContextMenu);
-                }
-            }
-        }
-    }
 }

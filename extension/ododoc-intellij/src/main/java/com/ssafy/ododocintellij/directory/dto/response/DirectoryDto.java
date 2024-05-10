@@ -1,4 +1,4 @@
-package com.ssafy.ododocintellij.directory.dto;
+package com.ssafy.ododocintellij.directory.dto.response;
 
 import java.util.List;
 

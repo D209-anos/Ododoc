@@ -1,6 +1,4 @@
-package com.ssafy.ododocintellij.directory.dto;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+package com.ssafy.ododocintellij.directory.dto.response;
 
 public class ResultDto {
 
