@@ -69,23 +69,21 @@ function WithBaseFullSetup() {
   }, [editor]);
 
   useEffect(() => {
-    function handleSelectionChange() {
+    function handleEditorChange() {
+      // 에디터 전체의 현재 상태를 가져오는 로직 (예시)
+      // 에디터의 선택 영역이 있을 때만 getBlock을 호출
       if (editor.selection) {
-        // 여기서 editor.getBlock을 사용하여 선택된 블록의 상세 정보를 가져올 수 있습니다.
-        const block = editor.blocks;
-        if (block) {
-          //@ts-ignore
-          setBlocks([block]);
-        }
+        const block = editor.getEditorValue(); // 올바른 매개변수 형식을 전달
+        setBlocks(block);
       }
     }
 
-    editor.on('change', handleSelectionChange);
+    editor.on('change', handleEditorChange); // 에디터의 변경사항 감지
 
     return () => {
-      editor.off('change', handleSelectionChange);
+      editor.off('change', handleEditorChange); // 클린업 함수에서 이벤트 리스너 제거
     };
-  }, [editor]);
+  }, [editor]); // 의존성 배열에 editor 추가
 
 
 
