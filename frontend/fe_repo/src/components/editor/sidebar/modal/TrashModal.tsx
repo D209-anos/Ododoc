@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Trash from '../../../../css/components/editor/TrashModal.module.css'
 import ExitButton from '../../../../assets/images/mark/xbutton.png'
 import useHandleClickOutside from '../../../../hooks/useHandleClickOutside';
@@ -6,6 +6,8 @@ import TrashIcon from '../../../../assets/images/icon/trashIcon.png'
 import FileImage from '../../../../assets/images/icon/file.png'
 import FolderImage from '../../../../assets/images/icon/forder.png'
 import Swal from 'sweetalert2';
+import { useAuth } from '../../../../contexts/AuthContext';
+import { fetchTrashbin } from '../../../../api/service/directory';
 
 interface ModalProps {
     isOpen: boolean;
@@ -22,24 +24,27 @@ interface IContentItem {
 }
 
 // 임시 데이터
-const dummyData: IContentItem = {
-    "id": 1,
-    "type": "FOLDER",
-    "name": "sub-folder1",
-    "deletedate": "2024-04-30",
-    "contents": [
-        {
-            "id": 3,
-            "type": "FILE",
-            "name": "file3",
-            "deletedate": "2024-05-02",
-            "contents": "파일 3번입니다."
-        }
-    ],
-}
+// const dummyData: IContentItem = {
+//     "id": 1,
+//     "type": "FOLDER",
+//     "name": "sub-folder1",
+//     "deletedate": "2024-04-30",
+//     "contents": [
+//         {
+//             "id": 3,
+//             "type": "FILE",
+//             "name": "file3",
+//             "deletedate": "2024-05-02",
+//             "contents": "파일 3번입니다."
+//         }
+//     ],
+// }
 
 const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
+    const { state, dispatch } = useAuth();
+    const { accessToken } = state;
+    const [trashbinData, setTrashbinData] = useState<IContentItem[]>([]);
     useHandleClickOutside(modalRef, onClose);
 
     const clickExitButton = () => {
@@ -49,6 +54,23 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const handleItemClick = (item: IContentItem) => {
         handleRestore(item);
     }
+
+    //휴지통 조회
+    useEffect(() => {
+        const loadTrashbin = async () => {
+            if (accessToken) {
+                try {
+                    console.log("휴지통에 데이터 잘 들어옴")
+                    console.log(trashbinData)
+                    const data = await fetchTrashbin();
+                    setTrashbinData(data);
+                } catch (error) {
+                    console.error('휴지통 조회 에러:', error)
+                }
+            } 
+        };
+        loadTrashbin();
+    }, [])
 
     // 휴지통 복원 모달
     const handleRestore = (item: IContentItem) => {
@@ -71,20 +93,22 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null;
 
     // 삭제된 폴더 및 파일 리스트
-    const renderTopLevelContent = (content: IContentItem) => (
-        <div className={Trash.fileItem} key={content.id} onClick={() => handleItemClick(content)}>
-            <div className={Trash.nameWrapper}>
-                <img 
-                    src={content.type === 'FILE' ? FileImage : FolderImage} 
-                    alt={content.type === 'FILE' ? "file-image" : "folder-image"} 
-                    className={Trash.contentImage}
-                />
-                <p className={Trash.contentName}>{content.name}</p>
+    const renderTopLevelContent = (data: IContentItem[]) => {
+        return data.map((content) => (
+            <div className={Trash.fileItem} key={content.id} onClick={() => handleItemClick(content)}>
+                <div className={Trash.nameWrapper}>
+                    <img 
+                        src={content.type === 'FILE' ? FileImage : FolderImage} 
+                        alt={content.type === 'FILE' ? "file-image" : "folder-image"} 
+                        className={Trash.contentImage}
+                    />
+                    <p className={Trash.contentName}>{content.name}</p>
+                </div>
+                <p>{content.deletedate}</p>
+                <p>{content.type}</p>
             </div>
-            <p>{content.deletedate}</p>
-            <p>{content.type}</p>
-        </div>
-    );
+        ));
+    };
 
     return (
         // 휴지통
@@ -104,7 +128,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     <p>항목 유형</p>
                 </div>
                 {/* 휴지통에 버린 폴더 및 파일 리스트 */}
-                {renderTopLevelContent(dummyData)}
+                {trashbinData && renderTopLevelContent(trashbinData)}
                 {children}
             </div>
         </div>

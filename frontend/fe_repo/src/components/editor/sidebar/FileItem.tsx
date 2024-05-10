@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FileImage from '../../../assets/images/icon/file.png';
 import NameEditor from './NameEditor';
+import { createDirectory } from '../../../api/service/directory';
 
 interface IContentItem {
     id: number;
@@ -19,7 +20,7 @@ interface FileItemProps {
     selectedItem: IContentItem | null;
     isContentEditing: boolean;
     setIsContentEditing: (editing: boolean) => void;
-    saveName: (newName: string) => void;
+    saveName: (objectId: number, name: string) => void;
 }
 
 const FileItem: React.FC<FileItemProps> = ({ 
@@ -61,7 +62,9 @@ const FileItem: React.FC<FileItemProps> = ({
                     setName={(newName) => {
                         selectedItem.name = newName;
                     }}
-                    saveName={() => setIsContentEditing(false)}
+                    saveName={saveName}
+                    createDirectory={createDirectory}
+                    type='FILE'
                     />
                 </div>
             )

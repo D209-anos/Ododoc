@@ -19,8 +19,8 @@ const RootFolderNameEditor: React.FC<RootFolderNameEditorProps> = ({
     const [inputName, setInputName] = useState(name);
 
     useEffect(() => {
-        setName(inputName);
-    }, [inputName, setName])
+        setInputName(name)
+    }, [name]);
 
     // 파일 또는 폴더명 바꾸는 함수
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,9 +35,6 @@ const RootFolderNameEditor: React.FC<RootFolderNameEditorProps> = ({
 
     const handleNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log("들어오긴 하니?")
-        console.log(objectId)
-        console.log(inputName)
         try {
             const response = await createDirectory(objectId, inputName, 'FOLDER');
             console.log('폴더 생성 response:', response);
@@ -46,8 +43,6 @@ const RootFolderNameEditor: React.FC<RootFolderNameEditorProps> = ({
         } catch (error) {
             console.log('폴더 생성 에러:', error);
         }
-
-        
     };
 
     return (
