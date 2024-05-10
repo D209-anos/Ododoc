@@ -1,10 +1,7 @@
 package com.ssafy.ododocintellij.login.frame;
 
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
-import com.ssafy.ododocintellij.login.frame.oauth.GoogleLoginFrame;
-import com.ssafy.ododocintellij.login.frame.oauth.KakaoLoginFrame;
-import com.ssafy.ododocintellij.login.frame.oauth.NaverLoginFrame;
-import com.ssafy.ododocintellij.login.token.TokenManager;
+import com.ssafy.ododocintellij.login.manager.TokenManager;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,8 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class MainLoginFrame extends Stage {
@@ -47,56 +42,9 @@ public class MainLoginFrame extends Stage {
             }
         });
 
-        // 카카오 로그인 버튼
-        ImageView kakaoBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/kakao_login.png")));
-        kakaoBtnImageView.setFitWidth(183);
-        kakaoBtnImageView.setFitHeight(45);
-        Button kakaoLoginBtn = new Button("", kakaoBtnImageView);
-        kakaoLoginBtn.setStyle("-fx-background-color: transparent; -fx-padding: 3, 3, 3, 3;");
-
-        kakaoLoginBtn.setOnAction(e -> {
-            try {
-                onLogin("kakao");
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        // 네이버 로그인 버튼
-        ImageView naverBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/naver_login.png")));
-        naverBtnImageView.setFitWidth(183);
-        naverBtnImageView.setFitHeight(45);
-        Button naverLoginBtn = new Button("", naverBtnImageView);
-        naverLoginBtn.setStyle("-fx-background-color: transparent; -fx-padding: 3, 3, 3, 3;");
-
-        naverLoginBtn.setOnAction(e -> {
-            try {
-                onLogin("naver");
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        // 구글 로그인 버튼
-        ImageView googleBtnImageView = new ImageView(new Image(getClass().getResourceAsStream("/image/button/google_login.png")));
-        googleBtnImageView.setFitWidth(183);
-        googleBtnImageView.setFitHeight(45);
-        Button googleLoginBtn = new Button("", googleBtnImageView);
-        googleLoginBtn.setStyle("-fx-background-color: transparent; -fx-padding: 3, 3, 3, 3;");
-
-        googleLoginBtn.setOnAction(e -> {
-            try {
-                onLogin("google");
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        Button kakaoLoginBtn = makeButton("kakao"); // 카카오 로그인 버튼
+        Button naverLoginBtn = makeButton("naver"); // 네이버 로그인 버튼
+        Button googleLoginBtn = makeButton("google"); // 구글 로그인 버튼
 
         layout.getChildren().addAll(kakaoLoginBtn, naverLoginBtn, googleLoginBtn);
 
@@ -105,18 +53,23 @@ public class MainLoginFrame extends Stage {
         show();
     }
 
-    private void onLogin(String social) throws URISyntaxException, IOException {
-        switch (social){
-            case "kakao" -> {
-                new KakaoLoginFrame(this);
-            }
-            case "naver" -> {
-                new NaverLoginFrame(this);
-            }
-            case "google" -> {
-                new GoogleLoginFrame(this);
-            }
-        }
+    private void onLogin(String provider) {
+        new OauthLoginFrame(this, provider);
     }
 
+    private Button makeButton(String provider){
+        String iconImagePath = "/image/button/" + provider +"_login.png";
+        ImageView btnImageView = new ImageView(new Image(getClass().getResourceAsStream(iconImagePath)));
+        btnImageView.setFitWidth(183);
+        btnImageView.setFitHeight(45);
+        Button loginBtn = new Button("", btnImageView);
+        loginBtn.setStyle("-fx-background-color: transparent; -fx-padding: 3, 3, 3, 3;");
+
+        String upperProvider = provider.toUpperCase();
+        loginBtn.setOnAction(e -> {
+            onLogin(upperProvider);
+        });
+
+        return loginBtn;
+    }
 }

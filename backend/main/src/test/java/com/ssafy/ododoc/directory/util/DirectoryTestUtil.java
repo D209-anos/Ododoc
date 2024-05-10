@@ -24,14 +24,14 @@ public class DirectoryTestUtil extends TestBase {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    public Long 폴더_생성(String token, MockMvc mockMvc) throws Exception {
-        Long directoryId = 1L;
+    public final Long rootId = 1L;
 
+    public Long 폴더_생성(String token, MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                 post("/directory")
                         .header(ApiTest.AUTH_HEADER, token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(directoryId)))
+                        .content(objectMapper.writeValueAsString(directorySteps.폴더정보_생성(rootId)))
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
@@ -40,14 +40,12 @@ public class DirectoryTestUtil extends TestBase {
         return getValueFromJSONBody(mvcResult, "$.data.id", Long.class);
     }
 
-    public Long 파일_생성(String token, MockMvc mockMvc) throws Exception {
-        Long directoryId = 1L;
-
+    public Long 파일_생성(String token, Long parentId, MockMvc mockMvc) throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         post("/directory")
                                 .header(ApiTest.AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_생성_이름없음(directoryId)))
+                                .content(objectMapper.writeValueAsString(directorySteps.파일정보_생성_이름없음(parentId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))

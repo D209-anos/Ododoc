@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 /**
  * @author 이준희
  */
@@ -56,6 +58,26 @@ public class MemberController {
 
         jwtProvider.setRefreshTokenForClient(response, memberInfo);
         return jwtProvider.makeJwtTokenResponse(memberInfo);
+    }
+
+    /**
+     *  vscode extension 로그인
+     * @param code OAuth 인가코드
+     * @param provider OAuth Provider (kakao, google, naver)
+     * @param response 쿠키 저장을 위한 response
+     * redirect => accesstoken을 uri에 담아서
+     */
+    @GetMapping("/authorization/vsc/{provider}")
+    public void vscLogin(@RequestParam String code,
+                         @PathVariable String provider,
+                         HttpServletResponse response) throws IOException {
+
+        log.debug("[vscode용 login 호출] : {} {}", provider, code);
+        Member memberInfo = memberService.getMemberInfo(provider, code, "http://localhost:8080/api/oauth2/authorization/vsc/" + provider);
+        JwtTokenResponse jwtTokenResponse = jwtProvider.makeJwtTokenResponse(memberInfo);
+        String vscodeUri = "vscode://anos.ododoc-vsc/callback?token=" + jwtTokenResponse.accessToken() + "&provider=" + jwtTokenResponse.oAuthProvider();
+        jwtProvider.setRefreshTokenForClient(response, memberInfo);
+        response.sendRedirect(vscodeUri);
     }
 
     /**

@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
-import com.ssafy.ododocintellij.login.token.TokenManager;
+import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.tracker.CodeListener;
 import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
 import javafx.application.Platform;

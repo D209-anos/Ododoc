@@ -66,4 +66,24 @@ public class DirectoryDocument {
             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이동된 폴더/파일 아이디"),
             fieldWithPath("data.newParentId").optional().type(JsonFieldType.NUMBER).description("이동된 폴더/파일의 상위 폴더 아이디")
     );
+
+    public static final Snippet getPathFields = pathParameters(
+            parameterWithName("rootId").attributes(required()).description("삭제할 폴더/파일 아이디")
+    );
+
+    public static final Snippet getResponseFields = responseFields(
+            fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
+            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("rootId"),
+            fieldWithPath("data.name").type(JsonFieldType.STRING).description("폴더/파일 명"),
+            fieldWithPath("data.type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data.children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트"),
+            fieldWithPath("data.children[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
+            fieldWithPath("data.children[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
+            fieldWithPath("data.children[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data.children[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트"),
+            fieldWithPath("data.children[].children[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
+            fieldWithPath("data.children[].children[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
+            fieldWithPath("data.children[].children[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data.children[].children[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트")
+    );
 }

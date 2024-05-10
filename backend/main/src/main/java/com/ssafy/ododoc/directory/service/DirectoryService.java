@@ -194,6 +194,10 @@ public class DirectoryService {
                 .build();
     }
 
+    public DirectoryResponse getDirectory(Long rootId, Member member) {
+        return directoryClosureRepository.getDirectory(rootId, member);
+    }
+
     private void checkAccess(Directory directory, Member member) {
         if(!directory.getMember().equals(member)) {
             throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");

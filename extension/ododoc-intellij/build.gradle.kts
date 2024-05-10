@@ -15,6 +15,8 @@ dependencies {
   implementation("org.openjfx:javafx:21.0.3")
   implementation("com.googlecode.json-simple:json-simple:1.1.1")
   implementation("org.java-websocket:Java-WebSocket:1.5.2")
+  implementation ("org.springframework:spring-webflux:5.3.9")
+  implementation("io.projectreactor.netty:reactor-netty:1.0.17")
 }
 
 javafx {
