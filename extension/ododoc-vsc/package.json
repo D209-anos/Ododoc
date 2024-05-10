@@ -42,8 +42,22 @@
       {
         "command": "ododoc.showLoginWebView",
         "title": "Show Webview: Login"
+      },
+      {
+        "command": "ododoc.refreshTreeView",
+        "title": "Treeview: Refresh",
+        "icon": "$(refresh)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ododoc.refreshTreeView",
+          "when": "view == ododoc.main",
+          "group": "navigation"
+        }
+      ]
+    },
     "terminal": {
       "profiles": [
         {

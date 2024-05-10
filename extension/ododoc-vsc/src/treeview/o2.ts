@@ -5,15 +5,14 @@ import axios from "axios";
 import DirectoryItem from "./tree_items/DirectoryItem";
 
 export default class OdodocTreeProvider
-  implements vscode.TreeDataProvider<vscode.TreeItem>
+  implements vscode.TreeDataProvider<DirectoryItem>
 {
+  // TreeView를 새로 고침할 수 있도록 하는 이벤트 발생기
   private _onDidChangeTreeData: vscode.EventEmitter<
-    void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
-  > = new vscode.EventEmitter<
-    void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
-  >();
+    DirectoryItem | undefined | void
+  > = new vscode.EventEmitter<DirectoryItem | undefined | void>();
   public readonly onDidChangeTreeData: vscode.Event<
-    void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
+    DirectoryItem | undefined | void
   > = this._onDidChangeTreeData.event;
 
   private context: vscode.ExtensionContext;
@@ -32,14 +31,6 @@ export default class OdodocTreeProvider
         this.refresh();
       })
     );
-
-    // 새로고침 커맨드 등록
-
-    context.subscriptions.push(
-      vscode.commands.registerCommand("ododoc.refreshTreeView", () => {
-        this.refresh();
-      })
-    );
   }
 
   // TreeView를 새로 고침
@@ -49,34 +40,27 @@ export default class OdodocTreeProvider
   };
 
   // 각 TreeItem을 어떻게 표시할 것인지 정의
-  public getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+  public getTreeItem(element: DirectoryItem): vscode.TreeItem {
     return element;
   }
 
   // 트리 뷰에 표시할 노드들을 가져옴
-  public async getChildren(
-    element?: vscode.TreeItem
-  ): Promise<vscode.TreeItem[]> {
+  public async getChildren(element?: DirectoryItem): Promise<DirectoryItem[]> {
     const loggedInSession = await getLoggedInSession();
     if (loggedInSession) {
-      this.directoryCache = await this.loadDirectory(
-        loggedInSession.accessToken
-      );
+      if (!this.directoryCache) {
+        // 전체 디렉토리 구조를 한 번만 로드
+        this.directoryCache = await this.loadDirectory(
+          loggedInSession.accessToken
+        );
+      }
       if (this.directoryCache) {
-        // 비어있으면 없다 반환
-        if (element instanceof AccountsItem) {
-          // 계정 하위의 디렉토리 항목을 반환
-          return this.getDirectoryItemsFromCache(null); // Root items
-        } else if (element instanceof DirectoryItem) {
+        if (element) {
           // 특정 디렉토리의 하위 요소를 반환
           return this.getDirectoryItemsFromCache(element.itemId);
         } else {
-          // 최상위 계정 항목을 반환
-          const accountsItem = new AccountsItem(
-            this.directoryCache.name,
-            vscode.TreeItemCollapsibleState.Expanded
-          );
-          return [accountsItem];
+          // 루트 요소를 반환
+          return this.getDirectoryItemsFromCache(null);
         }
       }
     }

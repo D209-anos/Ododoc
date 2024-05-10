@@ -131,9 +131,10 @@ export default class JwtAuthenticationProvider
       const params = new URLSearchParams(uri.query);
       const token = params.get("token");
       const provider = params.get("provider");
+      const rootId = params.get("rootId");
 
-      if (token && provider) {
-        this.login(token, provider);
+      if (token && provider && rootId) {
+        this.login(token, provider, rootId);
       } else {
         vscode.window.showErrorMessage("토큰을 받아오지 못했습니다");
         console.log("토큰을 받아오지 못했습니다");
@@ -141,11 +142,12 @@ export default class JwtAuthenticationProvider
     }
   };
 
-  private login = async (token: string, provider: string) => {
+  private login = async (token: string, provider: string, rootId: string) => {
     try {
       this.token = token;
       this.provider = provider;
       const session = await this.createSession([]);
+      this.context.secrets.store("rootId", rootId);
       LoginWebView.getInstance(this.context).getSuccessContent(
         this.context.extensionUri
       );
