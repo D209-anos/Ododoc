@@ -4,6 +4,7 @@ import { MdCode } from "react-icons/md";
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { langs } from "@uiw/codemirror-extensions-langs";
 
+
 const TYPE = "procode";
 
 export const CodeBlock = createReactBlockSpec(
@@ -13,7 +14,10 @@ export const CodeBlock = createReactBlockSpec(
       ...defaultBlockSpecs,
       data: {
         //@ts-ignore
-        language: "javascript",
+        language: {
+          default : "javascript",
+          values : ["javascript","python","java","csharp"]
+        },
         code: "",
       },
     },
@@ -33,8 +37,8 @@ export const CodeBlock = createReactBlockSpec(
         <ReactCodeMirror
           id={block?.id}
           autoFocus
-          placeholder={"Write your mermaid code here..."}
-          style={{ width: "100%", resize: "vertical", padding: "20px", backgroundColor:"#e7f5ff" }}
+          placeholder={"코드를 작성하세요..."}
+          style={{ width: "100%", resize: "vertical", padding: "20px", backgroundColor:"#f7f6f3", borderRadius:"5px" }}
           //@ts-ignore
           extensions={[langs[data?.language ? data?.language : "javascript"]()]}
           value={data}

@@ -38,20 +38,25 @@ a:hover{
   font-family: 'GAMTANFont', sans-serif;
   color: white;
 }
-.cm-gutterElement{
+/* .cm-gutterElement{
   line-height: 30px;
 
 }
 .cm-content{
-  /* background-color: #e7f5ff; */
+  background-color: #e7f5ff;
   font-size: 20px;
 }
 
 .cm-line{
-  /* background-color: #e7f5ff; */
+  background-color: #e7f5ff;
   line-height: 30px;
 }
 
-/* .cm-activeLine{
-  background-color: #e7f5ff;
+.bn-inline-content{
+  min-width: 100%
+}
+
+.cm-activeLine{
+  background-color: black;
 } */
+

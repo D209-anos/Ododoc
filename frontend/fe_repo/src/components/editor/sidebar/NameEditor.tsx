@@ -8,24 +8,38 @@ interface NameEditorProps {
     saveName: (objectId: number, name: string) => void;     // 이름 저장 함수
 }
 
-const NameEditor: React.FC<NameEditorProps> = ({ objectId, name, setName, saveName }) => {
+const NameEditor: React.FC<NameEditorProps> = ({ 
+    objectId, 
+    name, 
+    setName, 
+    saveName,
+}) => {
     const [inputName, setInputName] = useState(name);
 
-    // 파일 또는 폴더명 바꾸는 함수
+    // 사용자 닉네임 바꾸는 함수
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputName(event.target.value)
     };
 
-    // 파일 또는 폴더명 수정 후 엔터 쳤을 때 실행되는 함수
-    const handleBlur = () => {
-        saveName(objectId, inputName);
-        setName(inputName);
-    }
+    // 사용자 닉네임 수정 후 엔터 쳤을 때 실행되는 함수
+    const handleBlur = async () => {
+        try {
+            await saveName(objectId, inputName);
+            setName(inputName)
+        } catch (error) {
+            console.log('닉넴 저장 중 오류 발생:', error);
+        }
+    };
 
-    const handleNameSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    // 사용자 닉네임 수정 후 제출
+    const handleNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        saveName(objectId, inputName);
-        setName(inputName);
+        try {
+            await saveName(objectId, inputName);
+            setName(inputName);
+        } catch (error) {
+            console.log('닉넴 저장 중 오류 발생:', error);
+        }
     };
 
     return (
