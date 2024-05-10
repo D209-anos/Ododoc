@@ -1,1 +1,17 @@
-.container{}
+.container{
+    max-width: 100%;
+}
+
+.editableTitle {
+    border: none;
+    outline: none;
+    padding: 0;
+    background: none;
+    font-size: 2em; /* 제목 크기 조정 */
+    font-weight: bold;
+    color: #333; /* 글자 색상 조정 */
+  }
+  
+  .editableTitle:focus {
+    outline: none; /* 편집 시 아웃라인 제거 */
+  }
