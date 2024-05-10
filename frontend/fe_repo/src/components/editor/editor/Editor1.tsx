@@ -15,87 +15,12 @@ import Code from '@yoopta/code';
 import ActionMenuList, { DefaultActionMenuRender } from '@yoopta/action-menu-list';
 import Toolbar, { DefaultToolbarRender } from '@yoopta/toolbar';
 import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
-import EditorStyle from '../../../css/components/editor/Editor1.module.css'
+import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css'
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { WITH_BASIC_INIT_VALUE } from './initValue';
-  // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
-  // 파일 ID를 사용하여 데이터베이스에서 파일 내용을 불러오는 함수
-  //서버에서 불러온 데이터를 해당 코드에 집어넣으면 됩니다
-  // const { fileId } = useParams();
-  // const navigate = useNavigate();
-  // const [content, setContent] = useState<Block[]>([
-  //   {
-  //     "id": "title-id",
-  //     "type": "heading",
-  //     "props": {
-  //       "textColor": "default",
-  //       "backgroundColor": "default",
-  //       "textAlignment": "left",
-  //       "level": 1
-  //     },
-  //     "content": [
-  //       {
-  //         "type": "text",
-  //         "text": "제목입니다22",
-  //         "styles": {}
-  //       }
-  //     ],
-  //     "children": []
-  //   },
-  //   // {
-  //   //   "id": "d837d32c-0fe2-4fc0-b87e-f9d28711f5ff",
-  //   //   "type": "paragraph",
-  //   //   "props": {
-  //   //     "textColor": "default",
-  //   //     "backgroundColor": "default",
-  //   //     "textAlignment": "left"
-  //   //   },
-  //   //   "content": [
-  //   //     {
-  //   //       "type": "text",
-  //   //       "text": "서버에서는 JSON 형식으로 데이터를 전송합니다",
-  //   //       "styles": {}
-  //   //     }
-  //   //   ],
-  //   //   "children": []
-  //   // },
-  //   // {
-  //   //   "id": "9556e88c-8273-44ad-b593-c27fcf11c870",
-  //   //   "type": "paragraph",
-  //   //   "props": {
-  //   //     "textColor": "default",
-  //   //     "backgroundColor": "default",
-  //   //     "textAlignment": "left"
-  //   //   },
-  //   //   "content": [
-  //   //     {
-  //   //       "type": "text",
-  //   //       "text": "이렇게 여러개의 데이터를 어떻게 initailContent에 집어 넣어야 하지?",
-  //   //       "styles": {}
-  //   //     }
-  //   //   ],
-  //   //   "children": []
-  //   // },
-  //   // {
-  //   //   "id": "39f00afc-e831-413e-8881-988402d4de8b",
-  //   //   //@ts-ignore
-  //   //   "type": "procode",
-  //   //   //@ts-ignore
-  //   //   "props": {},
-  //   //   "children": []
-  //   // },
-  //   // {
-  //   //   "id": "2a9131bd-4fe0-4524-ba6d-b0c7f11cbc7e",
-  //   //   "type": "paragraph",
-  //   //   "props": {
-  //   //     "textColor": "default",
-  //   //     "backgroundColor": "default",
-  //   //     "textAlignment": "left"
-  //   //   },
-  //   //   "content": [],
-  //   //   "children": []
-  //   // }
-  // ]);
+import { uploadToCloudinary } from '../../..//utils/cloudinary';
+
 
 const plugins = [
   Paragraph,
@@ -110,6 +35,45 @@ const plugins = [
   Code,
   Link,
   Embed,
+  Image.extend({
+    options: {
+      async onUpload(file) {
+        const data = await uploadToCloudinary(file, 'image');
+
+        return {
+          src: data.secure_url,
+          alt: 'cloudinary',
+          sizes: {
+            width: data.width,
+            height: data.height,
+          },
+        };
+      },
+    },
+  }),
+  Video.extend({
+    options: {
+      onUpload: async (file) => {
+        const data = await uploadToCloudinary(file, 'video');
+        return {
+          src: data.secure_url,
+          alt: 'cloudinary',
+          sizes: {
+            width: data.width,
+            height: data.height,
+          },
+        };
+      },
+    },
+  }),
+  File.extend({
+    options: {
+      onUpload: async (file) => {
+        const response = await uploadToCloudinary(file, 'auto');
+        return { src: response.url };
+      },
+    },
+  }),
 ];
 
 const TOOLS = {
@@ -134,7 +98,7 @@ function WithBaseFullSetup() {
   const editor = useMemo(() => createYooptaEditor(), []);
   const selectionRef = useRef(null);
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
-
+  const [title, setTitle] = useState('제목입니다');
   useEffect(() => {
     function handleChange(value: any) {
       console.log('value', value);
@@ -162,14 +126,22 @@ function WithBaseFullSetup() {
     };
   }, [editor]); // 의존성 배열에 editor 추가
 
-
+  const handleTitleChange = (event : any) => {
+    setTitle(event.target.innerText);
+  };
 
   return (
     <>
       <div
-        className={EditorStyle.container}
+        className={EditorDetailStyle.container}
         ref={selectionRef}
       >
+        <p>
+          <h1 contentEditable="true" onBlur={handleTitleChange} className={EditorDetailStyle.editableTitle}>
+            {title}
+          </h1>
+        </p>
+        <hr />
         <YooptaEditor
           editor={editor}
           //@ts-ignore

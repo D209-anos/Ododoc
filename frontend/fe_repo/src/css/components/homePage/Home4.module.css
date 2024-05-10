@@ -1,0 +1,171 @@
+.componentContainer{
+    height: 130vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.textWrapper{
+    width: 50%;
+    font-size: 45px;
+    color: black;
+    font-family: 'bmjuaFont';
+    display: flex;
+    flex-direction: column;
+    margin-left: 8vh;
+}
+
+.textTitle{
+    margin: 0;
+    width: 90%;
+}
+
+.textContent{
+    width: 90%;
+    font-size: 28px;
+    margin: 0;
+    margin-top: 15px;
+}
+
+.highlight{
+    color: #ff914d;
+}
+
+.imgWrapper{
+    width: 50%;
+    position: relative;
+    border: 1px solid black;
+}
+
+.img{
+    width: 100%;
+    height: 100%;
+    background: black;
+}
+
+.temp{
+    margin: 0;
+    font-family: 'bmjuaFont';
+    color: white;
+    font-size: 50px;
+}
+
+.summarySiteContent {
+    position: relative;
+}
+
+.googleSearchWrapper {
+    position: absolute;
+    top: 12vh;
+    left: 3%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.googleSearchText {
+    font-size: 22px;
+    font-family: 'hanbitFont';
+    margin-bottom: 40px;
+}
+
+.chromeSearchScreen {
+    width: 320px;
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+}
+
+.firstVector {
+    width: 110px;
+    height: 110px;
+    position: absolute;
+    top: 46vh;
+    left: 13%;
+}
+
+.blogScreen {
+    width: 480px;
+    height: 440px;
+    position: absolute;
+    left:26%;
+    top: 20vh;
+}
+
+.secondVector {
+    width: 110px;
+    height: 110px;
+    position: absolute;
+    top: 46vh;
+    left: 60%;
+    transform: rotate(-90deg);
+}
+
+.infoSearchText {
+    font-size: 25px;
+    font-family: 'hanbitFont';
+    position: absolute;
+    top: 60vh;
+    left: 19vh;
+}
+
+.ododocInfoText {
+    font-size: 25px;
+    font-family: 'hanbitFont';
+    position: absolute;
+    top: 50vh;
+    right: 27vh;
+}
+
+.ododocScreen {
+    width: 560px;
+    height: 370px;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    bottom: -40vh;
+    right: 6vh;
+    border-radius: 8px;
+    border: 1px solid rgb(214, 214, 214);
+    box-shadow: 5px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.ododocSummary {
+    font-family: 'hanbitFont';
+    position: absolute;
+    left: 22vh;
+    margin-left: 10px;
+}
+
+.ododocTerminal {
+    background-color: black;
+    width: 360px;
+    height: 90px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: cneter;
+    justify-content: center;
+}
+
+.errorMessage {
+    color: red;
+    font-size: 13px;
+    margin: 0;
+    margin-left: 10px;
+}
+
+.detailErrorMessage {
+    color: yellow;
+    font-size: 11px;
+    margin: 0;
+    margin-top: 6px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.ododocText {
+    margin: 0;
+    margin-right: 5px;
+    font-size: 11px;
+}
