@@ -39,7 +39,7 @@ public class DataTransferService {
          */
         List<FileBlockDto> codeBlocks = new ArrayList<>();
         List<ModifiedFileDto> modifiedFileList = contentDto.getModifiedFiles();
-        for(ModifiedFileDto file : modifiedFileList){
+        for (ModifiedFileDto file : modifiedFileList) {
 
             // 변경된 코드 내용이 담긴 코드 블럭
             FileBlockDto codeBlock = FileBlockDto.builder()

@@ -15,30 +15,52 @@ public class DataTypeHandlerService {
     private final DataTransferService dataTransferService;
     private final OutputHandlerService outputHandlerService;
 
-    public void handle(MessageDto messageDto) {
-        DataType dataType = messageDto.getDataType();
-        log.info("Data Type : {}", dataType);
-        log.info("Message Content : {}", messageDto.getContent());
+    public void handle(MessageDto messageDto){
 
+        DataType dataType = messageDto.getDataType();
+        System.out.println(dataType);
+        System.out.println(messageDto.getContent());
         switch (dataType){
             case SIGNAL:
+                processSignal(messageDto);
                 break;
 
             case OUTPUT:
-                outputHandlerService.process(messageDto);
+                processOutput(messageDto);
                 break;
 
             case ERROR:
+                processError(messageDto);
                 dataTransferService.transferDataForSave(messageDto);
                 break;
 
-            case SCM:
+            case SOURCECODE:
+                processSourcecode(messageDto);
                 break;
 
             default:
                 log.info("잘못된 데이터 타입");
                 break;
         }
+
+        // main으로 데이터 전송 로직 추가
+    }
+
+    private void processSignal(MessageDto MessageDto){
+        System.out.println(MessageDto.toString());
+    }
+
+    private void processOutput(MessageDto MessageDto) {
+        MessageDto messageDto = outputHandlerService.handle(MessageDto);
+//        dataTransferService.transferDataForSave(MessageDto);
+    }
+
+    private void processError(MessageDto MessageDto){
+//        dataTransferService.transferDataForSave(MessageDto);
+    }
+
+    private void processSourcecode(MessageDto MessageDto) {
+        System.out.println(MessageDto.toString());
     }
 
 }

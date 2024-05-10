@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Getter
 @ToString
@@ -14,7 +13,7 @@ public class MessageDto {
     private SourceApplicationType sourceApplication;
     private String accessToken;
     private DataType dataType;
-    private long connectedFileId;
+    private Long connectedFileId;
     private LocalDateTime timestamp;
     private Object content;
 }
