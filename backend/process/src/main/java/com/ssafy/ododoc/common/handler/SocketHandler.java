@@ -29,8 +29,8 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        MessageDto messageDto = objectMapper.readValue(message.getPayload(), MessageDto.class);
-        dataTypeHandlerService.handle(messageDto);
+        MessageDto MessageDto = objectMapper.readValue(message.getPayload(), MessageDto.class);
+        dataTypeHandlerService.handle(MessageDto);
     }
 
 }

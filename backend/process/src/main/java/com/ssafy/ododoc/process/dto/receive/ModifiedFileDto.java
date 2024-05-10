@@ -1,12 +1,12 @@
 package com.ssafy.ododoc.process.dto.receive;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class ModifiedFileDto {
 
     private String fileName;
