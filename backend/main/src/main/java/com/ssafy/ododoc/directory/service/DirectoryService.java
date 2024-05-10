@@ -217,26 +217,27 @@ public class DirectoryService {
         return directoryClosureRepository.getDirectory(rootId, member);
     }
 
-    public List<DirectoryResponse> getTrashbinDirectory(Member member) {
+    public List<TrashbinResponse> getTrashbinDirectory(Member member) {
         List<Directory> directoryList = directoryRepository.findAllByMemberAndTrashbinTimeIsNotNullAndDeletedTimeIsNull(member);
 
-        Map<Long, DirectoryResponse> responseMap = new HashMap<>();
+        Map<Long, TrashbinResponse> responseMap = new HashMap<>();
         directoryList.forEach(directory -> {
-            DirectoryResponse response = DirectoryResponse.builder()
+            TrashbinResponse response = TrashbinResponse.builder()
                     .id(directory.getId())
                     .name(directory.getName())
                     .type(directory.getType())
+                    .trashbinTime(directory.getTrashbinTime())
                     .children(new ArrayList<>())
                     .build();
 
             responseMap.put(directory.getId(), response);
         });
 
-        List<DirectoryResponse> responseList = new ArrayList<>();
+        List<TrashbinResponse> responseList = new ArrayList<>();
         directoryList.forEach(directory -> {
             if(directory.getParent() != null && directory.getParent().getTrashbinTime() != null && directory.getParent().getDeletedTime() == null) {
-                DirectoryResponse parent = responseMap.get(directory.getParent().getId());
-                DirectoryResponse child = responseMap.get(directory.getId());
+                TrashbinResponse parent = responseMap.get(directory.getParent().getId());
+                TrashbinResponse child = responseMap.get(directory.getId());
                 if(parent != null) {
                     parent.addChild(child);
                 }

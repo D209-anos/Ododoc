@@ -112,7 +112,7 @@ public class DirectoryController {
      * @return 휴지통 디렉토리 구조
      */
     @GetMapping("/trashbin")
-    public List<DirectoryResponse> getTrashbinDirectory(@AuthenticationPrincipal Member member) {
+    public List<TrashbinResponse> getTrashbinDirectory(@AuthenticationPrincipal Member member) {
         return directoryService.getTrashbinDirectory(member);
     }
 
