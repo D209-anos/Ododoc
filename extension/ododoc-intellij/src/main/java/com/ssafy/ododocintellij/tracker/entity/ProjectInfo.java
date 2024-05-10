@@ -16,16 +16,8 @@ public class ProjectInfo implements Cloneable{
         return psiFile;
     }
 
-    public void setPsiFile(PsiFile psiFile) {
-        this.psiFile = psiFile;
-    }
-
     public String getHash() {
         return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
     }
 
     @Override
