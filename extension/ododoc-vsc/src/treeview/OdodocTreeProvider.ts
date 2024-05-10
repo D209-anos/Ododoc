@@ -1,22 +1,35 @@
 import * as vscode from "vscode";
-import { AccountsItem } from "./tree_items/AccountsItem";
+import AccountsItem from "./tree_items/AccountsItem";
+import { getLoggedInSession } from "../authentication/AuthService";
 
 export default class OdodocTreeProvider
   implements vscode.TreeDataProvider<vscode.TreeItem>
 {
-  private secretStorage: vscode.SecretStorage;
-
   // 데이터 변경이 발생했을 때 TreeView를 새로 고침하도록 vscode에 알리는 데에 사용
-  onDidChangeTreeData?: vscode.Event<
+  private _onDidChangeTreeData: vscode.EventEmitter<
     void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
-  >;
+  > = new vscode.EventEmitter<
+    void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
+  >();
+  onDidChangeTreeData: vscode.Event<
+    void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
+  > = this._onDidChangeTreeData.event;
 
   constructor(context: vscode.ExtensionContext) {
-    this.secretStorage = context.secrets;
-    this.onDidChangeTreeData = new vscode.EventEmitter<
-      void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
-    >().event;
+    vscode.window.createTreeView("ododoc.main", {
+      treeDataProvider: this,
+    });
+    context.subscriptions.push(
+      vscode.authentication.onDidChangeSessions(() => {
+        this.refresh();
+      })
+    );
   }
+
+  refresh = (): void => {
+    console.log("refresh");
+    this._onDidChangeTreeData.fire();
+  };
 
   // 각 노드를 어떻게 표시할 것인지 정의
   getTreeItem(
@@ -26,19 +39,11 @@ export default class OdodocTreeProvider
   }
 
   // 트리 뷰에 표시할 노드들
-  getChildren(
-    element?: vscode.TreeItem
-  ): vscode.ProviderResult<vscode.TreeItem[]> {
-    if (this.isLogin()) {
-      return [AccountsItem];
+  async getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
+    const loggedInSession = await getLoggedInSession();
+    if (loggedInSession !== undefined) {
+      return [new AccountsItem(loggedInSession.account.label)];
     }
     return [];
-  }
-
-  isLogin(): boolean {
-    const token = this.secretStorage.get("authToken");
-    console.log(token);
-    // return token !== undefined && token !== null;
-    return false;
   }
 }

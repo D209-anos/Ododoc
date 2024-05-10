@@ -1,0 +1,106 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.trashWrapper {
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    height: 450px;
+    position: relative;
+}
+
+.exitButton {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 3vh;
+    right: 3vh;
+}
+
+.trashTitleWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 18px;
+}
+
+.trashIcon {
+    width: 3rem;
+    height: 3rem;
+}
+
+.trashTitle {
+    font-size: 23px;
+    margin-left: 1.3vh;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.deleteFileTitle {
+    display: grid;
+    grid-template-columns: 3fr 2fr 1fr;
+    justify-items: start;
+    padding: 0px 8px 0px 8px;
+    background-color: #fd9c5f;
+    border-bottom: 2px solid #d1d5db;
+    font-family: 'hanbitFont';
+    border-radius: 10px;
+}
+
+.deleteFileTitle:hover {
+    color: white;
+}
+
+.fileItem {
+    display: grid;
+    grid-template-columns: 3fr 2fr 1fr;
+    padding: 0px 8px 0px 8px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-family: 'hanbitFont';
+    font-size: 15px;
+    align-items: center;
+    background-color: rgb(250, 239, 239);
+    border-radius: 8px;
+}
+
+.fileItem:hover {
+    background-color: #ff914d;
+    color: white;
+}
+
+.fileItem p {
+    margin: 0;
+}
+
+.contentImage {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-right: 10px;
+}
+
+.fileImage {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.nameWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.fileName {
+    margin-left: 5vh;
+}

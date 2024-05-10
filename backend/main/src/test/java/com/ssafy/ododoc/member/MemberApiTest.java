@@ -24,22 +24,22 @@ public class MemberApiTest extends ApiTest {
     @Test
     void 로그인_성공_200() throws Exception {
         mockMvc.perform(
-                post("/oauth2/authorization/{provider}", "google")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(MemberTestUtil.memberCode)))
-        )
+                        post("/oauth2/authorization/{provider}", "google")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(MemberTestUtil.memberCode)))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(cookie().exists("refreshToken"))
                 .andDo(this::print)
                 .andDo(document(DEFAULT_RESTDOC_PATH, "소셜 로그인 처리 API 입니다." +
-                        "<br><br><b>소셜 로그인에서 받아온 정상적인 code와 타겟으로 하는 provider, 현재 처리하고 있는 redirect url</b>을" +
-                        "<br>request body에 담아 post 요청 해주세요." +
-                        "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 JWT Access Token 관련 정보들</b>이 반환됩니다." +
-                        "<br> - 추가로 <b>refresh token이 cookie에 반환</b>됩니다." +
-                        "<br> - <b>유효하지 않은 code나 redirect url</b>을 입력 시, <b>403 Forbidden</b>이 반환됩니다." +
-                        "<br> - <b>올바른 code와 redirect url</b>을 입력했지만, 사용자의 정보를 불러오는 데 실패했다면 <b>404 Not Found</b>가 반환됩니다." +
-                        "<br> - <b>google, naver, kakao</b> 이외 다른 provider 입력 시, <b>406 Not Acceptable</b>이 반환됩니다.",
+                                "<br><br><b>소셜 로그인에서 받아온 정상적인 code와 타겟으로 하는 provider, 현재 처리하고 있는 redirect url</b>을" +
+                                "<br>request body에 담아 post 요청 해주세요." +
+                                "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 JWT Access Token 관련 정보들</b>이 반환됩니다." +
+                                "<br> - 추가로 <b>refresh token이 cookie에 반환</b>됩니다." +
+                                "<br> - <b>유효하지 않은 code나 redirect url</b>을 입력 시, <b>403 Forbidden</b>이 반환됩니다." +
+                                "<br> - <b>올바른 code와 redirect url</b>을 입력했지만, 사용자의 정보를 불러오는 데 실패했다면 <b>404 Not Found</b>가 반환됩니다." +
+                                "<br> - <b>google, naver, kakao</b> 이외 다른 provider 입력 시, <b>406 Not Acceptable</b>이 반환됩니다.",
                         "소셜 로그인", MemberDocument.providerPathField,
                         MemberDocument.loginRequestField,
                         MemberDocument.loginResultResponseField));
@@ -49,10 +49,10 @@ public class MemberApiTest extends ApiTest {
     @Test
     void 로그인_유효하지않음_403() throws Exception {
         mockMvc.perform(
-                post("/oauth2/authorization/{provider}", "kakao")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(memberSteps.로그인_생성("123456")))
-        )
+                        post("/oauth2/authorization/{provider}", "kakao")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(memberSteps.로그인_생성("123456")))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(403))
                 .andDo(document(DEFAULT_RESTDOC_PATH, MemberDocument.providerPathField,
@@ -89,10 +89,10 @@ public class MemberApiTest extends ApiTest {
     void 로그아웃_성공_200() throws Exception {
         String accessToken = memberTestUtil.회원가입_토큰반환(mockMvc);
         mockMvc.perform(
-                get("/oauth2/logout")
-                        .header(AUTH_HEADER, accessToken)
+                        get("/oauth2/logout")
+                                .header(AUTH_HEADER, accessToken)
 
-        )
+                )
                 .andExpect(status().isOk())
                 .andExpect(cookie().maxAge("refreshToken",0))
                 .andDo(document(DEFAULT_RESTDOC_PATH, "소셜 로그아웃 처리 API 입니다." +
@@ -106,9 +106,9 @@ public class MemberApiTest extends ApiTest {
     void 액세스_토큰_재발급_성공_200() throws Exception {
         Cookie cookie = memberTestUtil.회원가입_쿠키반환(mockMvc);
         mockMvc.perform(
-                post("/oauth2/issue/access-token")
-                        .cookie(cookie)
-        )
+                        post("/oauth2/issue/access-token")
+                                .cookie(cookie)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andDo(document(DEFAULT_RESTDOC_PATH,"만료된 액세스 토큰 재발급 API 입니다." +
@@ -122,8 +122,8 @@ public class MemberApiTest extends ApiTest {
     @Test
     void 액세스_토큰_토큰없음_401() throws Exception {
         mockMvc.perform(
-                post("/oauth2/issue/access-token")
-        )
+                        post("/oauth2/issue/access-token")
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(401))
                 .andDo(this::print)

@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { v4 as uuid } from "uuid";
 import * as jwt from "jsonwebtoken";
 import LoginWebView from "./LoginWebView";
+import WebSocketClient from "../network/WebSocketClient";
 
 const AUTH_TYPE = "jwtProvider";
 const AUTH_NAME = "Ododoc";
@@ -59,7 +60,6 @@ export default class JwtAuthenticationProvider
         algorithms: ["HS256"],
       }) as any;
 
-      console.log("decoded: ", decoded);
       const session: vscode.AuthenticationSession = {
         id: uuid(),
         accessToken: this.token,
@@ -81,6 +81,8 @@ export default class JwtAuthenticationProvider
         changed: [],
       });
 
+      WebSocketClient.getInstance().connect();
+
       return session;
     } catch (error) {
       vscode.window.showErrorMessage(`로그인에 실패했습니다: ${error}`);
@@ -91,7 +93,7 @@ export default class JwtAuthenticationProvider
   public async getSessions(
     scopes?: string[]
   ): Promise<vscode.AuthenticationSession[]> {
-    const sessions = await this.context.secrets.get("jwtSessions");
+    const sessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (sessions) {
       return JSON.parse(sessions);
     }
@@ -99,7 +101,6 @@ export default class JwtAuthenticationProvider
   }
 
   public async removeSession(sessionId: string): Promise<void> {
-    console.log("삭제중~~");
     let sessions = await this.getSessions();
     if (sessions) {
       const sessionIdx = sessions.findIndex((s) => s.id === sessionId);
@@ -108,7 +109,7 @@ export default class JwtAuthenticationProvider
 
       await this.context.secrets.store(
         SESSIONS_SECRET_KEY,
-        JSON.stringify(session)
+        JSON.stringify(sessions)
       );
 
       if (session) {
@@ -117,6 +118,8 @@ export default class JwtAuthenticationProvider
           removed: [session],
           changed: [],
         });
+
+        WebSocketClient.getInstance().disconnect();
       }
     }
   }
@@ -124,35 +127,35 @@ export default class JwtAuthenticationProvider
   // arrow function으로 변경하면 this가 JwtAuthenticationProvider로 고정
   // 일반 함수였으면 this가 global일 것.
   public handleLoginUri = async (uri: vscode.Uri) => {
-    console.log("uri: ", uri.path, uri.query);
     if (uri.path === "/callback") {
       const params = new URLSearchParams(uri.query);
       const token = params.get("token");
       const provider = params.get("provider");
 
-      console.log("token: ", token, "provider: ", provider);
       if (token && provider) {
-        try {
-          this.token = token;
-          this.provider = provider;
-          const session = await this.createSession([]);
-          LoginWebView.getInstance(this.context).getSuccessContent();
-          vscode.window.showErrorMessage(
-            `성공~~ ${session.account.label}님 환영합니다! ${session.accessToken}`
-          );
-          console.log(
-            `성공~~ ${session.account.label}님 환영합니다! ${session.accessToken}`
-          );
-        } catch (error) {
-          vscode.window.showErrorMessage(
-            `로그인에 실패했습니다... =>  ${error}`
-          );
-          console.log(`로그인에 실패했습니다... =>  ${error}`);
-        }
+        this.login(token, provider);
       } else {
         vscode.window.showErrorMessage("토큰을 받아오지 못했습니다");
         console.log("토큰을 받아오지 못했습니다");
       }
+    }
+  };
+
+  private login = async (token: string, provider: string) => {
+    try {
+      this.token = token;
+      this.provider = provider;
+      const session = await this.createSession([]);
+      LoginWebView.getInstance(this.context).getSuccessContent(
+        this.context.extensionUri
+      );
+      vscode.window.showInformationMessage(
+        `${session.account.label}님 환영합니다!`
+      );
+      console.log("로그인 성공! => ", session);
+    } catch (error) {
+      vscode.window.showErrorMessage(`로그인에 실패했습니다... =>  ${error}`);
+      console.log(`로그인에 실패했습니다... =>  ${error}`);
     }
   };
 }
