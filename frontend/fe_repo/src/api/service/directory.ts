@@ -67,3 +67,15 @@ export const editDirectoryItem = async (id: number, name: string) => {
         throw error;
     }
 }
+
+// 휴지통 조회
+export const fetchTrashbin = async () => {
+    try {
+        const response = await api.get('/directory/trashbin')
+        const data = response.data.data
+        return data
+    } catch (error) {
+        console.error('휴지통 조회 에러:', error)
+        throw error;
+    }
+}

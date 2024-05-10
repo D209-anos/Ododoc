@@ -68,59 +68,59 @@ const Editor1 = () => {
       ],
       "children": []
     },
-    {
-      "id": "d837d32c-0fe2-4fc0-b87e-f9d28711f5ff",
-      "type": "paragraph",
-      "props": {
-        "textColor": "default",
-        "backgroundColor": "default",
-        "textAlignment": "left"
-      },
-      "content": [
-        {
-          "type": "text",
-          "text": "서버에서는 JSON 형식으로 데이터를 전송합니다",
-          "styles": {}
-        }
-      ],
-      "children": []
-    },
-    {
-      "id": "9556e88c-8273-44ad-b593-c27fcf11c870",
-      "type": "paragraph",
-      "props": {
-        "textColor": "default",
-        "backgroundColor": "default",
-        "textAlignment": "left"
-      },
-      "content": [
-        {
-          "type": "text",
-          "text": "이렇게 여러개의 데이터를 어떻게 initailContent에 집어 넣어야 하지?",
-          "styles": {}
-        }
-      ],
-      "children": []
-    },
-    {
-      "id": "39f00afc-e831-413e-8881-988402d4de8b",
-      //@ts-ignore
-      "type": "procode",
-      //@ts-ignore
-      "props": {},
-      "children": []
-    },
-    {
-      "id": "2a9131bd-4fe0-4524-ba6d-b0c7f11cbc7e",
-      "type": "paragraph",
-      "props": {
-        "textColor": "default",
-        "backgroundColor": "default",
-        "textAlignment": "left"
-      },
-      "content": [],
-      "children": []
-    }
+    // {
+    //   "id": "d837d32c-0fe2-4fc0-b87e-f9d28711f5ff",
+    //   "type": "paragraph",
+    //   "props": {
+    //     "textColor": "default",
+    //     "backgroundColor": "default",
+    //     "textAlignment": "left"
+    //   },
+    //   "content": [
+    //     {
+    //       "type": "text",
+    //       "text": "서버에서는 JSON 형식으로 데이터를 전송합니다",
+    //       "styles": {}
+    //     }
+    //   ],
+    //   "children": []
+    // },
+    // {
+    //   "id": "9556e88c-8273-44ad-b593-c27fcf11c870",
+    //   "type": "paragraph",
+    //   "props": {
+    //     "textColor": "default",
+    //     "backgroundColor": "default",
+    //     "textAlignment": "left"
+    //   },
+    //   "content": [
+    //     {
+    //       "type": "text",
+    //       "text": "이렇게 여러개의 데이터를 어떻게 initailContent에 집어 넣어야 하지?",
+    //       "styles": {}
+    //     }
+    //   ],
+    //   "children": []
+    // },
+    // {
+    //   "id": "39f00afc-e831-413e-8881-988402d4de8b",
+    //   //@ts-ignore
+    //   "type": "procode",
+    //   //@ts-ignore
+    //   "props": {},
+    //   "children": []
+    // },
+    // {
+    //   "id": "2a9131bd-4fe0-4524-ba6d-b0c7f11cbc7e",
+    //   "type": "paragraph",
+    //   "props": {
+    //     "textColor": "default",
+    //     "backgroundColor": "default",
+    //     "textAlignment": "left"
+    //   },
+    //   "content": [],
+    //   "children": []
+    // }
   ]);
 
   // // 파일 데이터를 서버에서 불러오는 함수

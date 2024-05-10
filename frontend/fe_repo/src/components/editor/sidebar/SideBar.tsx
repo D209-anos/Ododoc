@@ -17,7 +17,6 @@ import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
 import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
-import RootFolderNameEditor from '../sidebar/RootFolderNameEditor';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -53,6 +52,7 @@ const SideBar: React.FC = () => {
     const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);           // 폴더 생성 여부 (true / false)
     const [newFolderName, setNewFolderName] = useState<string>('');                     // 새로 바꾼 폴더 이름
     const [createFolderParentId, setCreateFolderParentId] = useState<number | null>(null);  // 생성한 폴더 부모 id (부모 id 넘겨줘야하니깐)
+    const [addingFolderId, setAddingFolderId] = useState<number | null>(null);
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -83,6 +83,7 @@ const SideBar: React.FC = () => {
         }
     }, [directoryData])
 
+    // 닉넴
     useEffect(() => {
         if (title) {
             setUserName(title);
@@ -92,6 +93,7 @@ const SideBar: React.FC = () => {
     // 특정 ID의 add-button 모달 여닫는 함수
     const toggleModal = (id: number): void => {
         setFolderAddModal(prev => ({ ...prev, [id]: !prev[id] }));
+        setCreateFolderParentId(id);        // add-button 모달을 열 때 폴더의 부모 ID 설정
     };
 
     // file 클릭    
@@ -101,40 +103,28 @@ const SideBar: React.FC = () => {
 
     // folder 클릭
     const folderItemClick = (id: number): void => {
-        // setSelectedId(id);
+        setSelectedId(id);
     }
 
-    // 이름 저장
-    const saveName = (newName: string) => {
-        if (selectedItem) {
-            selectedItem.name = newName;
+    // 폴더명 및 파일명 수정
+    const saveName = async (id: number, newName: string) => {
+        try {
+            const data = await editDirectoryItem(id, newName);
+            console.log('폴더명 수정 완료:', data);
+
+            setContents((prevContents) => {
+                const updatedContents = [...prevContents];
+                const itemToUpdate = findItemById(updatedContents, id);
+                if (itemToUpdate) {
+                    itemToUpdate.name = newName;
+                }
+                return updatedContents;
+            });
+
             setIsContentEditing(false);
-        } else {
-            console.error('No item selected.')
+        } catch (error) {
+            console.error('폴더명 수정 실패:', error);
         }
-    }
-
-    // 사용자 이름 수정 함수
-    const renderNameField = (): JSX.Element => {
-        if (isUsernameEditing) {
-            return (
-                <div>
-                    {/* 사용자 이름 수정 UI */}
-                    <NameEditor 
-                        objectId={rootId || 0} 
-                        name={userName} 
-                        setName={setUserName} 
-                        saveName={saveUserName}
-                    />
-                </div>
-            );
-        }
-        return (
-            <div onClick={() => setIsUsernameEditing(true)} className={Sidebar.nickname}>
-                {userName}
-                <img src={PencilImage} alt="pencil-image" className={Sidebar.pencil}/>
-            </div>
-        );
     };
 
     // 사용자 이름 저장 함수 (해당 id의 이름 저장)
@@ -151,12 +141,37 @@ const SideBar: React.FC = () => {
         }
     };
 
+
+    // 사용자 이름 수정 함수
+    const renderNameField = (): JSX.Element => {
+        if (isUsernameEditing) {
+            return (
+                <div>
+                    {/* 사용자 이름 수정 UI */}
+                    <NameEditor 
+                        objectId={rootId || 0} 
+                        name={userName}
+                        setName={setUserName} 
+                        saveName={saveUserName}
+                        createDirectory={createDirectory}
+                        type="FOLDER"
+                    />
+                </div>
+            );
+        }
+        return (
+            <div onClick={() => setIsUsernameEditing(true)} className={Sidebar.nickname}>
+                {userName}
+                <img src={PencilImage} alt="pencil-image" className={Sidebar.pencil}/>
+            </div>
+        );
+    };
+
     // 파일 클릭 시 router 이동
     const handleItemClick = (id: number): void => {
         navigate(`/editor/${id}`)
         setSelectedId(id);
     }
-
 
     // // 부모 ID를 찾는 함수
     // const findParentId = (children: MyDirectoryItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
@@ -207,6 +222,9 @@ const SideBar: React.FC = () => {
                             setIsContentEditing={setIsContentEditing} 
                             saveName={saveName}
                             setCreateFolderParentId={setCreateFolderParentId}
+                            setAddingFolderId={setAddingFolderId}
+                            addingFolderId={addingFolderId}
+                            saveNewFolder={saveNewFolder}
                         />
                     </div>
                 );
@@ -283,7 +301,7 @@ const SideBar: React.FC = () => {
     }
 
     // 새로운 폴더 저장
-    const saveNewFolder = () => {
+    const saveNewFolder = async (objectId: number, newName: string) => {
         const newFolder: IContentItemCreate = {
             id: Date.now(),
             parentId: createFolderParentId,
@@ -291,6 +309,8 @@ const SideBar: React.FC = () => {
             name: newFolderName,
             children: []
         };
+
+        await createDirectory(objectId, newName, 'FOLDER')
 
         setContents((prevContents) => {
             const updateContents = [...prevContents];
@@ -302,9 +322,12 @@ const SideBar: React.FC = () => {
                 newFolder.name = newFolderName;
                 updateContents.push(newFolder);
             }
-
             return updateContents;
         })
+
+        // directoryData 갱신
+        const updatedDirectoryData = await fetchDirectory(rootId);
+        setDirectoryData(updatedDirectoryData);
 
         setIsCreatingFolder(false);
         setNewFolderName('');
@@ -322,11 +345,13 @@ const SideBar: React.FC = () => {
             {isCreatingFolder && (
                 <div className={Sidebar.folderSpace}>
                     <div>
-                        <RootFolderNameEditor 
+                        <NameEditor 
                             objectId={rootId || 0}
                             name={newFolderName}
                             setName={setNewFolderName}
-                            saveNewFolder={saveNewFolder}
+                            saveName={saveNewFolder}
+                            createDirectory={createDirectory}
+                            type='FOLDER'
                         />
                     </div>
                 </div>
