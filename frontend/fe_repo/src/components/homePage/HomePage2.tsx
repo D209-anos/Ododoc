@@ -1,37 +1,46 @@
-import { useEffect, useRef } from 'react';
-import VisualScreen from '../../assets/images/visualScreen.png'
-import IntellijScreen from '../../assets/images/intellijScreen.png'
-import EditorScreen from '../../assets/images/editorpage.png'
-import Home2 from '../../css/components/Home2.module.css'
+import React, { useRef, useState } from 'react';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useScrollTrigger } from '../../hooks/useScrollTrigger';
+import VisualScreen from '../../assets/images/homePageImage/visualScreen.png'
+import IntellijScreen from '../../assets/images/homePageImage/intellijScreen.png'
+import EditorScreen from '../../assets/images/homePageImage/editorScreen.png'
+import Home2 from '../../css/components/homePage/Home2.module.css'
 
-function HomePage2() {
-    const elementRef = useRef(null);
+interface HomePage2Props {
+  setTypingCompleted: (completed: boolean) => void;
+}
 
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                const target = entry.target as HTMLElement;
-                if (entry.isIntersecting) {
-                    target.style.opacity = '1';
-                } else {
-                    target.style.opacity = '0';
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
+const HomePage2: React.FC<HomePage2Props> = ({ setTypingCompleted }) => {
+    const elementRef = useRef<HTMLElement>(null);
+    const [text, setText] = useState<string>('');
+    const fullText: string = "IntelliJ와 Visual Studio Code에서 빌드만 하면,\n깔끔히 정리된 문서를 제공해 드려요.\n개발 과정 중에 만난 이슈가 자동으로 정리됩니다.";
+    const textLength = fullText.length;
 
-        if (elementRef.current) {
-            observer.observe(elementRef.current);
-        }
+    // 글자 엔터 기능
+    const textLines = text.split('\n').map((line, index) => (
+        <React.Fragment key={index}>
+        {line}
+        <br />
+        </React.Fragment>
+    ));
 
-        return () => {
+    // 스크롤 타이핑 애니메이션
+    useScrollTrigger({ setText, setTypingCompleted, fullText, textLength, elementRef });
+
+    // 스크롤 opacity
+    useIntersectionObserver({
+        ref: elementRef,
+        onIntersect: () => {
             if (elementRef.current) {
-                observer.disconnect();
+                elementRef.current.style.opacity = '1';
             }
-        };
-    }, []);
-
+        },
+        onExit: () => {
+            if (elementRef.current) {
+                elementRef.current.style.opacity = '0';
+            }
+        },
+    });
 
     return (
         <section className={Home2.container} ref={elementRef}>
@@ -39,9 +48,13 @@ function HomePage2() {
                 <p className={Home2.bmjuaFont}>빌드 감지, 문서 정리를<br/> 자동으로</p>
             </div>
             <div className={`${Home2.halfContainerSide} ${Home2.imageSide}`}>
-                <img src={VisualScreen} alt="VisualScreen" className={Home2.visualImage} />
-                <img src={IntellijScreen} alt="IntellijScreen" className={Home2.intellijImage} />
-                <img src={EditorScreen} alt="EditorScreen" className={Home2.editorImage} />
+                <div style={{ backgroundImage: `url(${VisualScreen})` }} className={Home2.visualImage} />
+                <div style={{ backgroundImage: `url(${IntellijScreen})` }} className={Home2.intellijImage} />
+                <div style={{ backgroundImage: `url(${EditorScreen})` }} className={Home2.editorImage} >
+                    <p className={Home2.editorOverlayText}>
+                        {textLines}
+                    </p>
+                </div>
             </div>
         </section>
     )
