@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchDirectory } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
 import RootFolderNameEditor from '../sidebar/RootFolderNameEditor';
+import { deleteDirectoryItem } from '../../../api/service/directory';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -253,8 +254,19 @@ const SideBar: React.FC = () => {
     }
 
     // 폴더 또는 파일 삭제 버튼
-    const handleDelete = (id: number) => {
-        console.log(`${id}`)
+    const handleDelete = async (id: number) => {
+        try {
+            console.log(`delete id: ${id}`)
+            const data = await deleteDirectoryItem('trashbin', id)
+            console.log('삭제 성공:', data)
+
+            // 삭제로 디렉토리 목록 갱신
+            const updatedContents = contents.filter(item => item.id !== id);
+            setContents(updatedContents)
+        } catch (error) {
+            console.log('directory delete error:', error)
+        }
+
         hideMenu();
     }
 

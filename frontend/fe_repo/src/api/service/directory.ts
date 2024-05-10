@@ -39,3 +39,16 @@ export const createDirectory = async (parentId: number, name: string, type: stri
         throw error;
     }
 }
+
+// directory 삭제
+export const deleteDirectoryItem = async (option: string, directoryId: number) => {
+    try {
+        const response = await api.delete(`/directory/${option}/${directoryId}`)
+        const data = response.data.data
+
+        return data;
+    } catch (error) {
+        console.error('폴더 및 파일 삭제 에러:', error);
+        throw error;
+    }
+}

@@ -44,8 +44,6 @@ const FolderItem: React.FC<FolderItemProps> = ({
  }) => {
     const [isFolderOpen, setIsFolderOpen] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
-    const [isAddingFolder, setIsAddingFolder] = useState(false);        // 폴더 추가 여부
-
     // 폴더 하위 요소 여닫는 함수
     const toggleFolder = () => {
         setIsFolderOpen(!isFolderOpen);
@@ -135,12 +133,6 @@ const FolderItem: React.FC<FolderItemProps> = ({
         }
     }
 
-    // 폴더 추가
-    const handleAddFolder = () => {
-        setIsAddingFolder(true);
-        setCreateFolderParentId(item.id)
-    }
-
     return (
         <div 
             key={item.id} 
@@ -162,7 +154,6 @@ const FolderItem: React.FC<FolderItemProps> = ({
                 <div>
                     <img src={AddButton} alt="add-button" className={Sidebar.addButton} onClick={(e) => {
                         e.stopPropagation();
-                        handleAddFolder();
                         setCreateFolderParentId(item.id);
                         toggleModal(item.id);
                     }} />
@@ -174,14 +165,6 @@ const FolderItem: React.FC<FolderItemProps> = ({
                             <h2>Modal Title</h2>
                             <p>This is modal content!</p>
                         </FileAddModal>
-                    )}
-                    {isAddingFolder && (
-                        <FolderNameEditor 
-                            objectId={item.id}
-                            name=''
-                            setName={() => {}}
-                            saveNewFolder={() => setIsAddingFolder(false)}
-                        />
                     )}
                 </div>
             </div>
