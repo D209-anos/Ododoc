@@ -100,6 +100,3 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows
-
-# 빌드된 파일
-out/

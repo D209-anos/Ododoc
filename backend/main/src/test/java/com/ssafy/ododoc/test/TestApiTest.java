@@ -19,9 +19,9 @@ public class TestApiTest extends ApiTest {
         String name = "D209";
 
         mockMvc.perform(
-                        get("/test/hello/{name}", name)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+                get("/test/hello/{name}", name)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.value").value("Hello " + name))
                 .andDo(
@@ -38,9 +38,9 @@ public class TestApiTest extends ApiTest {
         test_entity_save("Ododoc", "Gumi InDong");
 
         mockMvc.perform(
-                        get("/test/jpa/{name}", gumi)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+                get("/test/jpa/{name}", gumi)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andDo(handler -> System.out.println(handler.getResponse().getContentAsString()));
@@ -55,9 +55,9 @@ public class TestApiTest extends ApiTest {
         test_entity_save("Ododoc", "Gumi InDong");
 
         MvcResult mvcResult = mockMvc.perform(
-                        get("/test/querydsl/{name}", "D209")
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
+                get("/test/querydsl/{name}", "D209")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1))
                 .andDo(handler -> System.out.println(handler.getResponse().getContentAsString()))
@@ -75,7 +75,7 @@ public class TestApiTest extends ApiTest {
                                 "<br>Negative Code 가 나가는 지 기술해 주시기 바랍니다.",
                         "Swagger 설명",
                         TestDocument.testPathField, TestDocument.queryDslResponseField
-                ))
+                        ))
                 .andReturn();
     }
 
@@ -86,10 +86,10 @@ public class TestApiTest extends ApiTest {
                 .build();
 
         mockMvc.perform(
-                        post("/test/save")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request))
-                )
+                post("/test/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+        )
                 .andExpect(status().isOk());
     }
 }

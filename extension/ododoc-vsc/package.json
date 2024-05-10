@@ -27,7 +27,7 @@
     "viewsWelcome": [
       {
         "view": "ododoc.main",
-        "contents": "ododoc에 로그인하여 서비스를 이용해 보세요! \n[ododoc 바로가기](https://k10d209.p.ssafy.io/). \n[😊Ododoc Login](command:ododoc.showLoginWebView)"
+        "contents": "ododoc에 로그인하여 서비스를 이용해 보세요! \n[ododoc 바로가기](http://k10d209.p.ssafy.io:3000/). \n[😊Ododoc Login](command:ododoc.showLoginWebView)"
       }
     ],
     "views": {

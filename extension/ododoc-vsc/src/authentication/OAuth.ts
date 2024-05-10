@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 
 export const oAuthLogin = async (provider: string): Promise<void> => {
   const redirectUri = encodeURIComponent(
-    `http://localhost:8080/api/oauth2/authorization/vsc/${provider}`
+    `http://localhost:8080/api/oauth2/authorization/${provider}`
   );
   const socialLoginUrl: { [key: string]: string } = {
     kakao: `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=a23282fc18f2b445d559dfe93fa96e6b&redirect_uri=${redirectUri}`,
