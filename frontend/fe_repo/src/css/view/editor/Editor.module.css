@@ -4,6 +4,10 @@
     flex-direction: row;
 }
 
+.sidebarWrapper{
+    z-index: 1000;
+}
+
 .editorWrapper{
     width: 66%;
     margin-left: 26.5%;

@@ -10,10 +10,11 @@ interface ModalProps {
     onClose: () => void;
     children: ReactNode;
     onAddFolder: () => void;
+    onAddFile: () => void;
 }
 
 const FileAddModal = forwardRef<HTMLImageElement, ModalProps>(
-    ({ isOpen, onClose, children, onAddFolder }, ref) => {
+    ({ isOpen, onClose, children, onAddFolder, onAddFile }, ref) => {
     const modalRef = useRef<HTMLDivElement>(null);          // 모달 외부 클릭 감지
     useHandleClickOutside(modalRef, onClose);
 
@@ -37,7 +38,10 @@ const FileAddModal = forwardRef<HTMLImageElement, ModalProps>(
                         <img src={FolderImage} alt="folder-image" className={Modal.folderImage}/>
                         <div className={Modal.title}>폴더 추가</div>
                     </div>
-                    <div className={Modal.imageWrapper}>
+                    <div className={Modal.imageWrapper} onClick={() => {
+                        onAddFile();
+                        onClose();
+                    }}>
                         <img src={FileImage} alt="file-image" className={Modal.fileImage}/>
                         <div className={Modal.title}>파일 추가</div>
                     </div>

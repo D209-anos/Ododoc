@@ -51,8 +51,13 @@ const SideBar: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<MyDirectoryItem | null>(null);     // 선택된 파일 또는 폴더의 구조
     const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);           // 폴더 생성 여부 (true / false)
     const [newFolderName, setNewFolderName] = useState<string>('');                     // 새로 바꾼 폴더 이름
+    const [isCreatingFile, setIsCreatingFile] = useState<boolean>(false);               // 파일 생성 여부 (true / false)
+    const [newFileName, setNewFileName] = useState<string>('');                         // 새로 바꾼 파일 이름
     const [createFolderParentId, setCreateFolderParentId] = useState<number | null>(null);  // 생성한 폴더 부모 id (부모 id 넘겨줘야하니깐)
-    const [addingFolderId, setAddingFolderId] = useState<number | null>(null);
+    const [createFileParentId, setCreateFileParentId] = useState<number | null>(null);      // 생성한 파일 부모 id
+    const [addingFolderId, setAddingFolderId] = useState<number | null>(null);          // 추가한 폴더 ID
+    const [addingFileId, setAddingFileId] = useState<number | null>(null);
+    const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -94,6 +99,7 @@ const SideBar: React.FC = () => {
     const toggleModal = (id: number): void => {
         setFolderAddModal(prev => ({ ...prev, [id]: !prev[id] }));
         setCreateFolderParentId(id);        // add-button 모달을 열 때 폴더의 부모 ID 설정
+        setCreateFileParentId(id);
     };
 
     // file 클릭    
@@ -110,7 +116,7 @@ const SideBar: React.FC = () => {
     const saveName = async (id: number, newName: string) => {
         try {
             const data = await editDirectoryItem(id, newName);
-            console.log('폴더명 수정 완료:', data);
+            console.log('폴더명/파일명 수정 완료:', data);
 
             setContents((prevContents) => {
                 const updatedContents = [...prevContents];
@@ -123,7 +129,7 @@ const SideBar: React.FC = () => {
 
             setIsContentEditing(false);
         } catch (error) {
-            console.error('폴더명 수정 실패:', error);
+            console.error('폴더명/파일명 수정 실패:', error);
         }
     };
 
@@ -173,29 +179,6 @@ const SideBar: React.FC = () => {
         setSelectedId(id);
     }
 
-    // // 부모 ID를 찾는 함수
-    // const findParentId = (children: MyDirectoryItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
-    //     if (!children || typeof children === 'string') return undefined;            // 폴더가 아니라 파일
-
-    //     for (let item of children) {
-    //         if (item.id === id) {
-    //             return parentId;
-    //         }
-    //         if (item.type === 'FOLDER' && Array.isArray(item.children)) {
-    //             const foundParentId = findParentId(item.children as MyDirectoryItem[], id, item.id);   // 재귀로 부모 찾기
-    //             if (foundParentId !== undefined) return foundParentId;
-    //         }
-    //     }
-    //     return undefined;
-    // }
-
-    // // parentId
-    // const parentId = (id: number): void => {
-    //     const foundParentId = findParentId(contents, id);
-    //     console.log("Select ID:", id)
-    //     console.log("Parent ID:", parentId)
-    // }
-
     // 폴더 및 파일 하위 구조
     const renderContents = (
         children: MyDirectoryItem[] | undefined, 
@@ -206,6 +189,7 @@ const SideBar: React.FC = () => {
 
         return children.map((item: MyDirectoryItem) => {
             const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
+            console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
@@ -214,7 +198,7 @@ const SideBar: React.FC = () => {
                             parentId={parentId}
                             toggleModal={toggleModal} 
                             folderAddModal={folderAddModal} 
-                            renderContents={() => renderContents(item.children as MyDirectoryItem[], item.id, indentLevel + 1)} 
+                            renderContents={(contents) => renderContents(contents, item.id, indentLevel + 1)}
                             handleContextMenu={handleContextMenu} 
                             handleItemClick={folderItemClick} 
                             selectedItem={selectedItem} 
@@ -225,7 +209,13 @@ const SideBar: React.FC = () => {
                             setAddingFolderId={setAddingFolderId}
                             addingFolderId={addingFolderId}
                             saveNewFolder={saveNewFolder}
+                            setAddingFileId={setAddingFileId}
+                            addingFileId={addingFileId}
+                            saveNewFile={saveNewFile}
+                            isAddingSubFile={isAddingSubFile}
+                            setIsAddingSubFile={setIsAddingSubFile}
                         />
+                        {item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
                 );
             } else {
@@ -234,14 +224,21 @@ const SideBar: React.FC = () => {
                         <FileItem 
                             item={item} 
                             parentId={item.id}
-                            selected={item.id === selectedId} 
-                            handleContextMenu={handleContextMenu} 
-                            handleItemClick={fileItemClick} 
-                            selectedItem={selectedItem} 
+                            selected={item.id === selectedId}
+                            handleContextMenu={handleContextMenu}
+                            handleItemClick={fileItemClick}
+                            selectedItem={selectedItem}
                             isContentEditing={isContentEditing} 
                             setIsContentEditing={setIsContentEditing} 
                             saveName={saveName}
+                            setCreateFileParentId={setCreateFileParentId}
+                            addingFileId={addingFileId}
+                            setAddingFileId={setAddingFileId}
+                            isAddingSubFile={isAddingSubFile}
+                            setIsAddingSubFile={setIsAddingSubFile}
+                            saveNewFile={saveNewFile}
                         />
+                        {item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
                 );
             }
@@ -285,13 +282,34 @@ const SideBar: React.FC = () => {
             console.log('삭제 성공:', data)
 
             // 삭제로 디렉토리 목록 갱신
-            const updatedContents = contents.filter(item => item.id !== id);
+            // const updatedContents = contents.filter(item => item.id !== id);
+            const updatedContents = removeItemFromDirectory(contents, id);
             setContents(updatedContents)
+
+            const updatedDirectoryData = await fetchDirectory(rootId);
+            setDirectoryData(updatedDirectoryData);
         } catch (error) {
             console.log('directory delete error:', error)
         }
 
         hideMenu();
+    }
+
+    // directory에서 아이템 제거
+    const removeItemFromDirectory = (directory: MyDirectoryItem[], id: number): MyDirectoryItem[] => {
+        return directory.reduce((acc: MyDirectoryItem[], item: MyDirectoryItem) => {
+            if (item.id === id) {
+                return acc;
+            }
+
+            if (item.children && Array.isArray(item.children)) {
+                const updatedChildren = removeItemFromDirectory(item.children, id);
+                if (updatedChildren.length !== item.children.length) {
+                    return [...acc, { ...item, children: updatedChildren }];
+                }
+            }
+            return [...acc, item];
+        }, []);
     }
 
     // make-file-button 클릭 시 폴더 생성되는 함수
@@ -329,9 +347,47 @@ const SideBar: React.FC = () => {
         const updatedDirectoryData = await fetchDirectory(rootId);
         setDirectoryData(updatedDirectoryData);
 
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+
         setIsCreatingFolder(false);
         setNewFolderName('');
         setCreateFolderParentId(null);
+    }
+
+    // 새로운 파일 저장
+    const saveNewFile = async (objectId: number, newName: string) => {
+        const newFile: IContentItemCreate = {
+            id: Date.now(),
+            parentId: createFileParentId,
+            type: 'FILE',
+            name: newFileName,
+            children: ''
+        };
+
+        await createDirectory(objectId, newName, 'FILE')
+
+        setContents((prevContents) => {
+            const updateContents = [...prevContents];
+            const parentIndex = updateContents.findIndex(item => item.id === createFileParentId);
+
+            if (parentIndex !== -1 && Array.isArray(updateContents[parentIndex].children)) {
+                (updateContents[parentIndex].children as MyDirectoryItem[]).push(newFile);
+            } else {
+                newFile.name = newFileName;
+                updateContents.push(newFile);
+            }
+            return updateContents;
+        })
+
+        // directoryData 갱신
+        const updatedDirectoryData = await fetchDirectory(rootId);
+        setDirectoryData(updatedDirectoryData);
+
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+
+        setIsCreatingFile(false);
+        setNewFileName('');
+        setCreateFileParentId(null);
     }
 
     return (
@@ -342,7 +398,7 @@ const SideBar: React.FC = () => {
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
             {renderContents(contents, null)}
-            {isCreatingFolder && (
+            {/* {isCreatingFolder && (
                 <div className={Sidebar.folderSpace}>
                     <div>
                         <NameEditor 
@@ -355,7 +411,21 @@ const SideBar: React.FC = () => {
                         />
                     </div>
                 </div>
-            )}
+            )} */}
+            {/* {isCreatingFile && (
+                <div className={Sidebar.fileSpace}>
+                    <div>
+                        <NameEditor 
+                            objectId={rootId || 0}
+                            name={newFileName}
+                            setName={setNewFileName}
+                            saveName={saveNewFile}
+                            createDirectory={createDirectory}
+                            type='FILE'
+                        />
+                    </div>
+                </div>
+            )} */}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 

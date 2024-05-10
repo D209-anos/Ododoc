@@ -7,7 +7,9 @@ import Editor1 from '../components/editor/editor/Editor1';
 function Editor() {
     return (
         <div className={EditorStyle.editorContainer}>
-            <SideBar />
+            <div className={EditorStyle.sidebarWrapper}>
+                <SideBar />
+            </div>
             <div className={EditorStyle.editorWrapper}>
             <Routes>
                 {/* <Route index element={<Mypage/>} /> */}

@@ -180,6 +180,7 @@ function WithBaseFullSetup() {
           //@ts-ignore
           value={WITH_BASIC_INIT_VALUE}
           autoFocus
+          style={{ zIndex: 0, important: 'true' }}
         />
       </div>
       <div>

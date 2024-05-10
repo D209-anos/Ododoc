@@ -122,14 +122,16 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     <p className={Trash.trashTitle} style={{ fontFamily: 'hanbitFont' }}>휴지통</p>
                 </div>
                 <hr />
-                <div className={Trash.deleteFileTitle}>
-                    <p className={Trash.fileName}>파일명</p>
-                    <p>삭제된 날짜</p>
-                    <p>항목 유형</p>
+                <div className={Trash.deleteFileWrapper}>
+                    <div className={Trash.deleteFileTitle}>
+                        <p className={Trash.fileName}>파일명</p>
+                        <p>삭제된 날짜</p>
+                        <p>항목 유형</p>
+                    </div>
+                    {/* 휴지통에 버린 폴더 및 파일 리스트 */}
+                    {trashbinData && renderTopLevelContent(trashbinData)}
+                    {children}
                 </div>
-                {/* 휴지통에 버린 폴더 및 파일 리스트 */}
-                {trashbinData && renderTopLevelContent(trashbinData)}
-                {children}
             </div>
         </div>
     )

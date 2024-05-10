@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FolderImage from '../../../assets/images/icon/forder.png'
 import AddButton from '../../../assets/images/mark/addbutton.png'
 import FileAddModal from '../sidebar/modal/FileAddModal'
 import NameEditor from './NameEditor';
 import { createDirectory } from '../../../api/service/directory';
+import { useFileContext } from '../../../contexts/FileContext';
 
 interface IContentItem {
     id: number;
@@ -29,29 +30,48 @@ interface FolderItemProps {
     setAddingFolderId: (id: number | null) => void;
     addingFolderId: number | null;
     saveNewFolder: (objectId: number, newName: string) => void;
+    setAddingFileId: (id: number | null) => void;
+    addingFileId: number | null;
+    saveNewFile: (objectId: number, newName: string) => void;
+    isAddingSubFile: boolean;
+    setIsAddingSubFile: (isAdding: boolean) => void;
 }
 
 const FolderItem: React.FC<FolderItemProps> = ({ 
     item, 
     parentId, 
     toggleModal, 
-    folderAddModal, 
+    folderAddModal,
     renderContents, 
-    handleContextMenu, 
-    handleItemClick, 
-    selectedItem, 
+    handleContextMenu,
+    handleItemClick,
+    selectedItem,
     isContentEditing, 
     setIsContentEditing, 
     saveName, 
     setCreateFolderParentId,
     setAddingFolderId,
     addingFolderId,
-    saveNewFolder
+    saveNewFolder,
+    setAddingFileId,
+    addingFileId,
+    saveNewFile,
+    isAddingSubFile,
+    setIsAddingSubFile,
  }) => {
-    const [isFolderOpen, setIsFolderOpen] = useState(false);
-    const [isDragOver, setIsDragOver] = useState(false);
-    const [isAddingSubFolder, setIsAddingSubFolder] = useState(false);
-    const [newFolderName, setNewFolderName] = useState('');
+    const [isFolderOpen, setIsFolderOpen] = useState(false);            // add-button 여닫는 여부
+    const [isDragOver, setIsDragOver] = useState(false);                // 드래그
+    const [isAddingSubFolder, setIsAddingSubFolder] = useState(false);  // 폴더 추가 상태
+    const [newFolderName, setNewFolderName] = useState('');             // 폴더 이름 상태
+    // const [isAddingSubFile, setIsAddingSubFile] = useState(false);      // 파일 추가 상태
+    // const [newFileName, setNewFileName] = useState('');                 // 파일 이름 상태
+    
+
+
+    useEffect(() => {
+        console.log("addingFileId:", addingFolderId);
+        console.log("isAddingSubFile:", isAddingSubFolder);
+    }, [addingFolderId, isAddingSubFolder]);
 
     // 폴더 하위 요소 여닫는 함수
     const toggleFolder = () => {
@@ -168,7 +188,6 @@ const FolderItem: React.FC<FolderItemProps> = ({
                         className={Sidebar.addButton} 
                         onClick={(e) => {
                             e.stopPropagation();
-                            setCreateFolderParentId(item.id);
                             toggleModal(item.id);
                         }} 
                     />
@@ -178,6 +197,11 @@ const FolderItem: React.FC<FolderItemProps> = ({
                             onClose={() => toggleModal(item.id)}
                             onAddFolder={() => {
                                 setAddingFolderId(item.id);
+                                setIsAddingSubFolder(true);
+                            }}
+                            onAddFile={() => {
+                                setAddingFileId(item.id);
+                                setIsAddingSubFile(true);
                             }}
                         >
                             <h2>Modal Title</h2>
@@ -186,8 +210,7 @@ const FolderItem: React.FC<FolderItemProps> = ({
                     )}
                 </div>
             </div>
-            {isFolderOpen && item.contents && Array.isArray(item.contents) && renderContents(item.contents)}
-            {addingFolderId === item.id && (
+            {addingFolderId === item.id && isAddingSubFolder && (
                 <div>
                     <NameEditor 
                         objectId={item.id}
@@ -196,12 +219,29 @@ const FolderItem: React.FC<FolderItemProps> = ({
                         saveName={(objectId, name) => {
                             saveNewFolder(objectId, name);      // 새로운 폴더 생성 함수 호출
                             setAddingFolderId(null);            // 폴더 추가 완료 후 상태 초기화
+                            setIsAddingSubFolder(false);
                         }}
                         createDirectory={createDirectory}
                         type='FOLDER'
                     />
                 </div>
             )}
+            {/* {addingFileId === item.id && isAddingSubFile && (
+                <div>
+                    <NameEditor 
+                        objectId={item.id}
+                        name=''
+                        setName={setNewFileName}
+                        saveName={(objectId, name) => {
+                            saveNewFile(objectId, name);
+                            setAddingFileId(null);
+                            setIsAddingSubFile(false);
+                        }}
+                        createDirectory={createDirectory}
+                        type='FILE'
+                    />
+                </div>
+            )} */}
         </div>
     );
 };
