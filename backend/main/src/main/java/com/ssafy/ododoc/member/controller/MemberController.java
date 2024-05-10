@@ -104,11 +104,13 @@ public class MemberController {
         log.debug("[chrome extension login 호출] : {} {}", provider, code);
         Directory directory = memberService.getMemberInfo(provider, code, "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/" + provider);
         LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
+        String encodedTitle = URLEncoder.encode(loginResponse.title(), StandardCharsets.UTF_8.toString());
         String chromeUri = "chrome-extension://cbdkicalcllkaeiijblihjfbkofmkaed/index.html?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
-                "&rootId=" + loginResponse.rootId() + "&title=" + loginResponse.title() + "&type=" + loginResponse.type();
+                "&rootId=" + loginResponse.rootId() + "&title=" + encodedTitle + "&type=" + loginResponse.type();
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());
         response.sendRedirect(chromeUri);
     }
+
 
     /**
      * 로그아웃
