@@ -82,16 +82,16 @@ public class FileService {
         Directory directory = directoryRepository.findById(directoryId)
                 .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
 
-        if(!directory.getMember().equals(member)) {
-            throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
+        if(directory.getType().equals(DirectoryType.FOLDER)) {
+            throw new FileBadRequestException("잘못된 요청입니다.");
         }
 
         if(directory.getTrashbinTime() != null || directory.getDeletedTime() != null) {
-            throw new DirectoryAlreadyDeletedException("이미 삭제된 폴더/파일입니다.");
+            throw new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다.");
         }
 
-        if(directory.getType().equals(DirectoryType.FOLDER)) {
-            throw new FileBadRequestException("잘못된 요청입니다.");
+        if(!directory.getMember().equals(member)) {
+            throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
         }
     }
 }

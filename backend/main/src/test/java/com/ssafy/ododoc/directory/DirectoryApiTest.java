@@ -77,7 +77,7 @@ public class DirectoryApiTest extends ApiTest {
                         "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
                         "<br> - parentId에 해당하는 폴더에 접근 권한이 없을 경우, <b>403 Forbidden</b>이 반환됩니다." +
                         "<br> - parentId에 해당하는 폴더를 찾을 수 없을 경우, <b>404 Not Found</b>가 반환됩니다." +
-                        "<br> - parentId에 해당하는 폴더가 이미 삭제(휴지통, 영구삭제) 되었다면, <b>409 Conflict</b>가 반환됩니다.",
+                        "<br> - parentId에 해당하는 폴더가 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
                         "디렉토리(폴더/파일) 생성", CommonDocument.AccessTokenHeader,
                         DirectoryDocument.createRequestFields, DirectoryDocument.createResponseFields
                         ));
@@ -243,7 +243,7 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리_생성_삭제된상위폴더_409() throws Exception {
+    void 디렉토리_생성_삭제된상위폴더_404() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
@@ -257,7 +257,7 @@ public class DirectoryApiTest extends ApiTest {
                         .content(objectMapper.writeValueAsString(directorySteps.파일정보_생성_이름없음(directoryId)))
         )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.status").value(404))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         DirectoryDocument.createRequestFields));
     }
@@ -424,7 +424,7 @@ public class DirectoryApiTest extends ApiTest {
                                 "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
                                 "<br> - id에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
                                 "<br> - id에 해당하는 폴더/파일을 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
-                                "<br> - id에 해당하는 폴더/파일이 <b>이미 삭제(휴지통, 영구삭제) 되었다면</b>, <b>409 Conflict</b>가 반환됩니다.",
+                                "<br> - id에 해당하는 폴더/파일이 <b>이미 삭제(휴지통, 영구삭제) 되었다면</b>, <b>404 Not Found</b>가 반환됩니다.",
                         "디렉토리(폴더/파일)명 변경", CommonDocument.AccessTokenHeader,
                         DirectoryDocument.editRequestFields, DirectoryDocument.editResponseFields
                         ));
@@ -520,7 +520,7 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리명_변경_삭제된디렉토리_409() throws Exception {
+    void 디렉토리명_변경_삭제된디렉토리_404() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
@@ -534,7 +534,7 @@ public class DirectoryApiTest extends ApiTest {
                         .content(objectMapper.writeValueAsString(directorySteps.변경디렉토리_생성(directoryId)))
         )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.status").value(404))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         DirectoryDocument.editRequestFields));
     }
@@ -647,7 +647,7 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리_이동_없는파일_400() throws Exception {
+    void 디렉토리_이동_없는파일_404() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long parentId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
@@ -666,7 +666,7 @@ public class DirectoryApiTest extends ApiTest {
     }
 
     @Test
-    void 디렉토리_이동_삭제폴더_400() throws Exception {
+    void 디렉토리_이동_삭제폴더_404() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long id = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
@@ -681,7 +681,7 @@ public class DirectoryApiTest extends ApiTest {
                         .content(objectMapper.writeValueAsString(directorySteps.디렉토리이동_생성(id, parentId)))
         )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.status").value(404))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         DirectoryDocument.moveRequestFields));
     }
