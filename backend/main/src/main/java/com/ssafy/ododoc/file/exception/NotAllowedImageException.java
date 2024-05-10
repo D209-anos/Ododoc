@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.directory.exception;
+package com.ssafy.ododoc.file.exception;
 
 import com.ssafy.ododoc.common.exception.CustomException;
 import org.springframework.http.HttpStatus;

@@ -5,13 +5,14 @@ import com.ssafy.ododoc.common.CommonDocument;
 import com.ssafy.ododoc.common.MemberTestUtil;
 import com.ssafy.ododoc.common.MockMultipartTestUtil;
 import com.ssafy.ododoc.directory.util.DirectoryTestUtil;
+import com.ssafy.ododoc.file.util.FileTestUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,12 @@ public class FileApiTest extends ApiTest {
 
     @Autowired
     private MockMultipartTestUtil mockMultipartTestUtil;
+
+    @Autowired
+    private FileTestUtil fileTestUtil;
+
+    @Autowired
+    private FileSteps fileSteps;
 
     @Test
     void 파일_이미지_업로드_성공_200() throws Exception {
@@ -204,7 +211,7 @@ public class FileApiTest extends ApiTest {
     }
 
     @Test
-    void 파일_이미지_업로드_삭제된파일_409() throws Exception {
+    void 파일_이미지_업로드_삭제된파일_404() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
@@ -223,7 +230,7 @@ public class FileApiTest extends ApiTest {
                                 .header(AUTH_HEADER, token)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.status").value(404))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         FileDocument.imagePathFields
                 ));
@@ -251,5 +258,312 @@ public class FileApiTest extends ApiTest {
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
                         FileDocument.imagePathFields
                 ));
+    }
+
+    @Test
+    void 파일_저장_성공_200() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                post("/file/{actionType}", "save")
+                        .header(AUTH_HEADER, token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, "파일을 수정/저장하는 API 입니다." +
+                        "<br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>post 요청</b> 해주세요." +
+                        "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 저장된 파일 내용</b>이 반환됩니다." +
+                        "<br> - actionType은 <b>save 또는 add</b>만 가능합니다. <b>클라이언트에서는 save를, 플러그인에서는 add</b>를 입력해 주세요." +
+                        "<br>   그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - <b>content는 null일 수 없습니다. 비어있다면 빈 배열</b>을 보내주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
+                        "파일 수정/저장", CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields, FileDocument.fileResponseFields));
+    }
+
+    @Test
+    void 파일_저장_잘못된actionType_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "저장")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_잘못된아이디_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+
+        Long wrongDirectoryId = -1L;
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(wrongDirectoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_폴더_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_contentNull_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_Null_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_토큰없음_401() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(401))
+                .andDo(document(DEFAULT_RESTDOC_PATH, FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_권한없음_403() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        String otherToken = memberTestUtil.회원가입_다른유저_토큰반환(mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, otherToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(403))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_없는파일_404() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long directoryId = 99999L;
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_저장_삭제파일_404() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        directoryTestUtil.디렉토리_삭제_휴지통(token, directoryId, mockMvc);
+
+        mockMvc.perform(
+                        post("/file/{actionType}", "save")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.filePathFields));
+    }
+
+    @Test
+    void 파일_조회_성공_200() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        fileTestUtil.파일_저장(token, directoryId, mockMvc);
+
+        mockMvc.perform(
+                get("/file/{directoryId}", directoryId)
+                        .header(AUTH_HEADER, token)
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andDo(this::print)
+                .andDo(document(DEFAULT_RESTDOC_PATH, "파일을 조회하는 API 입니다." +
+                        "<br><b>header에 올바른 JWT accessToken</b>을, <b>path에 올바른 directoryId</b>를 담아 <b>get 요청</b> 해주세요." +
+                        "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 파일 내용</b>이 반환됩니다." +
+                        "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
+                        "<br> - directoryId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
+                        "파일 조회", CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields, FileDocument.fileResponseFields));
+    }
+
+    @Test
+    void 파일_조회_잘못된아이디_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long directoryId = -1L;
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields));
+    }
+
+    @Test
+    void 파일_조회_폴더_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields));
+    }
+
+    @Test
+    void 파일_조회_토큰없음_401() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        fileTestUtil.파일_저장(token, directoryId, mockMvc);
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(401))
+                .andDo(document(DEFAULT_RESTDOC_PATH, FileDocument.getfilePathFields));
+    }
+
+    @Test
+    void 파일_조회_권한없음_403() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        fileTestUtil.파일_저장(token, directoryId, mockMvc);
+
+        String otherToken = memberTestUtil.회원가입_다른유저_토큰반환(mockMvc);
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                                .header(AUTH_HEADER, otherToken)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(403))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields));
+    }
+
+    @Test
+    void 파일_조회_없는파일_404() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long directoryId = 99999L;
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields));
+    }
+
+    @Test
+    void 파일_조회_삭제파일_404() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        fileTestUtil.파일_저장(token, directoryId, mockMvc);
+
+        directoryTestUtil.디렉토리_삭제_휴지통(token, directoryId, mockMvc);
+
+        mockMvc.perform(
+                        get("/file/{directoryId}", directoryId)
+                                .header(AUTH_HEADER, token)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(404))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.getfilePathFields));
     }
 }
