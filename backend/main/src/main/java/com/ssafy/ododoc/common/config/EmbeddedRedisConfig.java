@@ -62,9 +62,9 @@ public class EmbeddedRedisConfig {
         StringBuilder pidInfo = new StringBuilder();
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            while((line = reader.readLine()) != null) {
-                pidInfo.append(line);
-            }
+           while((line = reader.readLine()) != null) {
+               pidInfo.append(line);
+           }
         } catch(Exception ignored) {}
 
         return !StringUtils.isEmpty(pidInfo.toString());

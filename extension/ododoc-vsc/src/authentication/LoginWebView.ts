@@ -6,6 +6,7 @@ export default class LoginWebView {
   private panel: vscode.WebviewPanel | undefined;
 
   private constructor(context: vscode.ExtensionContext) {
+    console.log(context, "만들었어~`");
     context.subscriptions.push(
       vscode.commands.registerCommand("ododoc.showLoginWebView", () =>
         this.showLoginWebViewCommand(context)
@@ -15,6 +16,7 @@ export default class LoginWebView {
 
   public static getInstance(context: vscode.ExtensionContext): LoginWebView {
     if (!LoginWebView.instance) {
+      console.log(context, "만들게~`");
       LoginWebView.instance = new LoginWebView(context);
     }
     return LoginWebView.instance;
@@ -44,7 +46,7 @@ export default class LoginWebView {
   }
 
   private getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
-    const ododocLogoUri = webview.asWebviewUri(
+    const OdodocLogoUri = webview.asWebviewUri(
       vscode.Uri.joinPath(extensionUri, "images", "ododocLogo.png")
     );
     const kakaoLogoUri = webview.asWebviewUri(
@@ -103,7 +105,7 @@ export default class LoginWebView {
     <body>
       <div class="container">
         <h1>Login</h1>
-        <img class="ododoc-logo" src="${ododocLogoUri}" alt="Ododoc Logo" />
+        <img class="ododoc-logo" src="${OdodocLogoUri}" alt="Ododoc Logo" />
         <div class="login-btn-container">
           <button id="login-naver" class="login-btn">
             <img class="social-logo" src="${naverLogoUri}" alt="Naver">
@@ -138,14 +140,10 @@ export default class LoginWebView {
     `;
   }
 
-  public getSuccessContent(extensionUri: vscode.Uri) {
+  public getSuccessContent() {
     if (!this.panel) {
       return;
     }
-    const ododocLogoGifUri = this.panel.webview.asWebviewUri(
-      vscode.Uri.joinPath(extensionUri, "images", "ododocLogo.gif")
-    );
-
     this.panel.webview.html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -153,26 +151,10 @@ export default class LoginWebView {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login Successful</title>
-        <style>
-        .container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          background-color: #ffffff;
-        }
-
-        .success-h1 {
-          color: #000000;
-        }
-        </style>
       </head>
       <body>
-        <div class="container">
-          <h1>Login Success</h1>
-          <img class="ododoc-logo" src="${ododocLogoGifUri}" alt="Ododoc Logo" />
-        </div>
+        <h1>로그인에 성공했습니다!</h1>
+        <p>코딩해라</p>
       </body>
       </html>
     `;

@@ -56,10 +56,10 @@ public class MemberTestUtil extends TestBase {
 
     private MvcResult 회원가입_및_로그인(MockMvc mockMvc, String code) throws Exception {
         return mockMvc.perform(
-                        post("/oauth2/authorization/{provider}", "google")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(code)))
-                )
+                post("/oauth2/authorization/{provider}", "google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberSteps.로그인_생성(code)))
+        )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(cookie().exists("refreshToken"))

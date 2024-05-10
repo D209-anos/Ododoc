@@ -128,4 +128,5 @@ public class DirectoryController {
                                             @AuthenticationPrincipal Member member) {
         return directoryService.restoreDirectory(directoryId, member);
     }
+
 }
