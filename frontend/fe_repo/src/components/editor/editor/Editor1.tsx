@@ -15,7 +15,7 @@ import Code from '@yoopta/code';
 import ActionMenuList, { DefaultActionMenuRender } from '@yoopta/action-menu-list';
 import Toolbar, { DefaultToolbarRender } from '@yoopta/toolbar';
 import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
-import EditorStyle from '../../../css/components/editor/Editor1.module.css'=
+import EditorStyle from '../../../css/components/editor/Editor1.module.css'
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { WITH_BASIC_INIT_VALUE } from './initValue';
   // db에서 파일의 id를 통해 content를 조회 api 호출하는 함수
