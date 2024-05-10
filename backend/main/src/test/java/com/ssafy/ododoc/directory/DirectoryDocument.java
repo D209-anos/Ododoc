@@ -105,10 +105,12 @@ public class DirectoryDocument {
             fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
             fieldWithPath("data[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
             fieldWithPath("data[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data[].trashbinTime").type(JsonFieldType.STRING).description("휴지통 삭제 시간"),
             fieldWithPath("data[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트"),
             fieldWithPath("data[].children[].id").type(JsonFieldType.NUMBER).description("폴더/파일 아이디"),
             fieldWithPath("data[].children[].name").type(JsonFieldType.STRING).description("폴더/파일 명"),
             fieldWithPath("data[].children[].type").type(JsonFieldType.STRING).description("FOLDER 또는 FILE"),
+            fieldWithPath("data[].children[].trashbinTime").type(JsonFieldType.STRING).description("휴지통 삭제 시간"),
             fieldWithPath("data[].children[].children").type(JsonFieldType.ARRAY).description("하위 폴더 리스트")
     );
 }
