@@ -8,8 +8,13 @@ import LoginLoading from '../src/components/socialLogin/LoginLoading';
 import Editor1 from './components/editor/editor/Editor1';
 import Mypage from './view/Profile';
 import PrivateRoute from './components/socialLogin/PrivateRouteProps';
+import React from 'react';
+import { useFileContext } from './contexts/FileContext';
+import SideBar from './components/editor/sidebar/SideBar';
 
-function App() {
+const App: React.FC = () => {
+  const { addingFileId, isAddingSubFile } = useFileContext();
+  console.log("App Component:", { addingFileId, isAddingSubFile });
 
   return (
     <Router>

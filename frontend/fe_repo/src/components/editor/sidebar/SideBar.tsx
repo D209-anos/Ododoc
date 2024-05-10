@@ -10,13 +10,13 @@ import SettingModal from './modal/SettingModal'
 import ContextMenu from './ContextMenu';
 import useHandleClickOutside from '../../../hooks/useHandleClickOutside';
 import useContextMenu from '../../../hooks/useContextMenu';
-import FolderItem from './FolderItem';
-import FileItem from './FileItem';
+import Item from '../sidebar/FolderItem';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
 import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useFileContext } from '../../../contexts/FileContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -76,6 +76,8 @@ const SideBar: React.FC = () => {
         
         loadDirectory();
     }, [accessToken, rootId])
+
+    
 
     // 디렉토리 조회 (디렉토리 생성 후 조회)
     useEffect(() => {
@@ -181,68 +183,41 @@ const SideBar: React.FC = () => {
 
     // 폴더 및 파일 하위 구조
     const renderContents = (
-        children: MyDirectoryItem[] | undefined, 
-        parentId: number | null, 
+        children: MyDirectoryItem[] | undefined,
+        parentId: number | null,
         indentLevel: number = 0
     ): JSX.Element[] => {
         if (!children) return [];
 
-        return children.map((item: MyDirectoryItem) => {
-            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
-            console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
-            if (item.type === 'FOLDER') {
+        return children
+            .map((item: MyDirectoryItem) => {
+                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`;
+                console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
                 return (
                     <div key={item.id} className={className}>
-                        <FolderItem 
+                        <Item
                             item={item}
                             parentId={parentId}
-                            toggleModal={toggleModal} 
-                            folderAddModal={folderAddModal} 
+                            toggleModal={toggleModal}
+                            folderAddModal={folderAddModal}
                             renderContents={(contents) => renderContents(contents, item.id, indentLevel + 1)}
-                            handleContextMenu={handleContextMenu} 
-                            handleItemClick={folderItemClick} 
-                            selectedItem={selectedItem} 
-                            isContentEditing={isContentEditing} 
-                            setIsContentEditing={setIsContentEditing} 
+                            handleContextMenu={handleContextMenu}
+                            handleItemClick={item.type === 'FOLDER' ? folderItemClick : fileItemClick}
+                            selectedItem={selectedItem}
+                            isContentEditing={isContentEditing}
+                            setIsContentEditing={setIsContentEditing}
                             saveName={saveName}
                             setCreateFolderParentId={setCreateFolderParentId}
+                            saveNewFolder={saveNewFolder}
                             setAddingFolderId={setAddingFolderId}
                             addingFolderId={addingFolderId}
-                            saveNewFolder={saveNewFolder}
-                            setAddingFileId={setAddingFileId}
-                            addingFileId={addingFileId}
-                            saveNewFile={saveNewFile}
-                            isAddingSubFile={isAddingSubFile}
-                            setIsAddingSubFile={setIsAddingSubFile}
-                        />
-                        {item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
-                    </div>
-                );
-            } else {
-                return (
-                    <div key={item.id} className={className}>
-                        <FileItem 
-                            item={item} 
-                            parentId={item.id}
-                            selected={item.id === selectedId}
-                            handleContextMenu={handleContextMenu}
-                            handleItemClick={fileItemClick}
-                            selectedItem={selectedItem}
-                            isContentEditing={isContentEditing} 
-                            setIsContentEditing={setIsContentEditing} 
-                            saveName={saveName}
-                            setCreateFileParentId={setCreateFileParentId}
-                            addingFileId={addingFileId}
-                            setAddingFileId={setAddingFileId}
-                            isAddingSubFile={isAddingSubFile}
-                            setIsAddingSubFile={setIsAddingSubFile}
                             saveNewFile={saveNewFile}
                         />
                         {item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
                 );
-            }
-        });
+            })
+            .filter(Boolean) as JSX.Element[];
     };
 
     // 선택된 항목 ID 찾기 함수

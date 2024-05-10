@@ -23,10 +23,6 @@ interface FileItemProps {
     setIsContentEditing: (editing: boolean) => void;
     saveName: (objectId: number, name: string) => void;
     setCreateFileParentId: (id: number | null) => void;
-    addingFileId: number | null;
-    setAddingFileId: (id: number | null) => void;
-    isAddingSubFile: boolean;
-    setIsAddingSubFile: (isAdding: boolean) => void;
     saveNewFile: (objectId: number, newName: string) => void;
 }
 
@@ -39,17 +35,14 @@ const FileItem: React.FC<FileItemProps> = ({
     selectedItem,
     isContentEditing,
     saveName,
+    setCreateFileParentId,
     saveNewFile,
 }) => {
     const [isHovered, setIsHovered] = useState(false);      // 파일 배경색 
     const [newFileName, setNewFileName] = useState('');
+
     const { addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile } = useFileContext();
     
-    useEffect(() => {
-        console.log("addingFileId:", addingFileId);
-        console.log("isAddingSubFile:", isAddingSubFile);
-    }, [addingFileId, isAddingSubFile]);
-
     // 파일 배경색
     const getBackgroundColor = () => {
         if (selected) return '#ff914d';

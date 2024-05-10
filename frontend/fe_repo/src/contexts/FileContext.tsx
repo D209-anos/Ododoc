@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+// src/contexts/FileContext.tsx
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface FileContextType {
     addingFileId: number | null;
@@ -7,25 +8,23 @@ interface FileContextType {
     setIsAddingSubFile: (isAdding: boolean) => void;
 }
 
-// 초기 상태
-const initialFileContext: FileContextType = {
-    addingFileId: null,
-    isAddingSubFile: false,
-    setAddingFileId: () => {},
-    setIsAddingSubFile: () => {}
-};
+const FileContext = createContext<FileContextType | undefined>(undefined);
 
-const FileContext = createContext<FileContextType>(initialFileContext);
-
-export const FileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [addingFileId, setAddingFileId] = useState<number | null>(null);
     const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
 
     return (
-        <FileContext.Provider value={{ addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile}}>
+        <FileContext.Provider value={{ addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile }}>
             {children}
         </FileContext.Provider>
-    )
-}
+    );
+};
 
-export const useFileContext = () => useContext(FileContext);
+export const useFileContext = (): FileContextType => {
+    const context = useContext(FileContext);
+    if (!context) {
+        throw new Error('useFileContext must be used within a FileProvider');
+    }
+    return context;
+};
