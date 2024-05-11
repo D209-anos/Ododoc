@@ -327,6 +327,8 @@ const SideBar: React.FC = () => {
 
         setContents(updatedDirectoryData?.children as MyDirectoryItem[])
 
+        setOpenFolders(prev => ({ ...prev, [createFolderParentId!]: true }));
+
         setIsCreatingFolder(false);
         setNewFolderName('');
         setCreateFolderParentId(null);
@@ -362,6 +364,8 @@ const SideBar: React.FC = () => {
         setDirectoryData(updatedDirectoryData);
 
         setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+
+        setOpenFolders(prev => ({ ...prev, [createFileParentId!]: true }));
 
         setIsCreatingFile(false);
         setNewFileName('');
