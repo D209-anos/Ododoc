@@ -196,12 +196,25 @@ public class OauthLoginFrame extends Stage {
                         throw new RuntimeException(e);
                     }
 
+                    webEngine.executeScript("document.body.style.display = 'none';");
+
                     // 쿠키의 refresh 토큰을 싱글톤 객체에 저장
                     cookieManager.getCookieStore().getCookies().forEach(cookie -> {
                         if (cookie.getName().equals("refreshToken")) {
                             tokenManager.setRefreshToken(cookie.getValue());
                         }
                     });
+
+                    // 로그인 성공 여부 다시 확인
+                    if(tokenManager.getAccessToken() == null || tokenManager.getRefreshToken() == null){
+                        Platform.runLater(() -> {
+                            alert.showAndWait();
+                            close();
+                            cookieManager.getCookieStore().removeAll();
+                        });
+
+                        return;
+                    }
 
                     // 지금 현재 등록되어 있는 모든 프로젝트들에게 codeListener 추가하기
                     addCodeListener(ProjectProvider.getInstance());
