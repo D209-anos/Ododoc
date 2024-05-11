@@ -3,7 +3,7 @@ import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FolderImage from '../../../assets/images/icon/forder.png';
 import FileImage from '../../../assets/images/icon/file.png';
 import AddButton from '../../../assets/images/mark/addbutton.png';
-import FileAddModal from '../sidebar/modal/FileAddModal';
+import FileAddModal from './modal/FileAddModal';
 import NameEditor from './NameEditor';
 import { createDirectory } from '../../../api/service/directory';
 import { useFileContext } from '../../../contexts/FileContext';
@@ -32,6 +32,8 @@ interface ItemProps {
     addingFolderId: number | null;
     saveNewFolder: (objectId: number, newName: string) => void;
     saveNewFile: (objectId: number, newName: string) => void;
+    isFolderOpen: boolean;
+    toggleFolder: () => void;
 }
 
 const Item: React.FC<ItemProps> = ({ 
@@ -51,8 +53,10 @@ const Item: React.FC<ItemProps> = ({
     addingFolderId,
     saveNewFolder,
     saveNewFile,
+    isFolderOpen,
+    toggleFolder,
  }) => {
-    const [isFolderOpen, setIsFolderOpen] = useState(false);            // add-button 여닫는 여부
+    // const [isFolderOpen, setIsFolderOpen] = useState(false);            // add-button 여닫는 여부
     const [isDragOver, setIsDragOver] = useState(false);                // 드래그
     const [isAddingSubFolder, setIsAddingSubFolder] = useState(false);  // 폴더 추가 상태
     const [newFolderName, setNewFolderName] = useState('');             // 폴더 이름 상태
@@ -60,16 +64,11 @@ const Item: React.FC<ItemProps> = ({
 
     const { addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile } = useFileContext();
 
-    useEffect(() => {
-        console.log("addingFileId in FolderItem:", addingFileId);
-        console.log("isAddingSubFile in FolderItem:", isAddingSubFile);
-    }, [addingFileId, isAddingSubFile]);
-
     // 폴더 하위 요소 여닫는 함수
-    const toggleFolder = () => {
-        setIsFolderOpen(!isFolderOpen);
-        handleItemClick(item.id)
-    }
+    // const toggleFolder = () => {
+    //     setIsFolderOpen(!isFolderOpen);
+    //     handleItemClick(item.id)
+    // }
 
     // 폴더명 / 파일명 수정 함수
     const renderContentNameField = (): JSX.Element | null => {
@@ -204,7 +203,6 @@ const Item: React.FC<ItemProps> = ({
                     </div>
                 )}
             </div>
-            {/* {item.type === 'FOLDER' && isFolderOpen && renderContents(item.contents as IContentItem[])} */}
             {addingFolderId === item.id && isAddingSubFolder && (
                 <div>
                     <NameEditor

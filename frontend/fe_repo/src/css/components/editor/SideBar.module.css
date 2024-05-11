@@ -321,7 +321,8 @@
     text-align: center;
     height: 30px;
     font-size: medium;
-    background-color: rgb(250, 242, 242);
+    /* background-color: rgb(250, 242, 242); */
+    justify-content: center;
 }
 
 .item {

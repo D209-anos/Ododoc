@@ -10,7 +10,7 @@ import SettingModal from './modal/SettingModal'
 import ContextMenu from './ContextMenu';
 import useHandleClickOutside from '../../../hooks/useHandleClickOutside';
 import useContextMenu from '../../../hooks/useContextMenu';
-import Item from '../sidebar/FolderItem';
+import Item from './Item';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +58,7 @@ const SideBar: React.FC = () => {
     const [addingFolderId, setAddingFolderId] = useState<number | null>(null);          // 추가한 폴더 ID
     const [addingFileId, setAddingFileId] = useState<number | null>(null);
     const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
+    const [openFolders, setOpenFolders] = useState<Record<number, boolean>>({});        // 폴더 열림 닫힘 상태
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -112,6 +113,11 @@ const SideBar: React.FC = () => {
     // folder 클릭
     const folderItemClick = (id: number): void => {
         setSelectedId(id);
+    }
+
+    // 폴더 열기/닫기 상태 관리
+    const toggleFolder = (id: number) => {
+        setOpenFolders(prev => ({ ...prev, [id]: !prev[id] }))
     }
 
     // 폴더명 및 파일명 수정
@@ -175,12 +181,6 @@ const SideBar: React.FC = () => {
         );
     };
 
-    // 파일 클릭 시 router 이동
-    const handleItemClick = (id: number): void => {
-        navigate(`/editor/${id}`)
-        setSelectedId(id);
-    }
-
     // 폴더 및 파일 하위 구조
     const renderContents = (
         children: MyDirectoryItem[] | undefined,
@@ -212,8 +212,10 @@ const SideBar: React.FC = () => {
                             setAddingFolderId={setAddingFolderId}
                             addingFolderId={addingFolderId}
                             saveNewFile={saveNewFile}
+                            isFolderOpen={openFolders[item.id] || false}    // 폴더 열림 상태 전달
+                            toggleFolder={() => toggleFolder(item.id)}  // 폴더 열고 닫기 함수 전달
                         />
-                        {item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
+                        {item.type === 'FOLDER' && openFolders[item.id] && item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
                 );
             })
@@ -372,8 +374,7 @@ const SideBar: React.FC = () => {
                 {renderNameField()}
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
-            {renderContents(contents, null)}
-            {/* {isCreatingFolder && (
+            {isCreatingFolder && (
                 <div className={Sidebar.folderSpace}>
                     <div>
                         <NameEditor 
@@ -386,21 +387,8 @@ const SideBar: React.FC = () => {
                         />
                     </div>
                 </div>
-            )} */}
-            {/* {isCreatingFile && (
-                <div className={Sidebar.fileSpace}>
-                    <div>
-                        <NameEditor 
-                            objectId={rootId || 0}
-                            name={newFileName}
-                            setName={setNewFileName}
-                            saveName={saveNewFile}
-                            createDirectory={createDirectory}
-                            type='FILE'
-                        />
-                    </div>
-                </div>
-            )} */}
+            )}
+            {renderContents(contents, null)}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 

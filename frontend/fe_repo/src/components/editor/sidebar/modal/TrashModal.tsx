@@ -19,7 +19,7 @@ interface IContentItem {
     id: number;
     type: 'FOLDER' | 'FILE';
     name: string;
-    deletedate: string;
+    trashbinTime: string;
     contents?: string | IContentItem[];
 }
 
@@ -104,7 +104,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     />
                     <p className={Trash.contentName}>{content.name}</p>
                 </div>
-                <p>{content.deletedate}</p>
+                <p>{content.trashbinTime}</p>
                 <p>{content.type}</p>
             </div>
         ));
