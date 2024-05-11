@@ -27,7 +27,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 19%;
+    /* width: 19%; */
     height: 98vh;
     background-color: rgb(197, 192, 192);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -332,3 +332,20 @@
     margin-left: 3vh;
 }
 
+.handle {
+    width: 6px;
+    cursor: ew-resize;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: gray;
+}
+
+.handle:hover {
+    background-color: ff914d;
+}

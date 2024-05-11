@@ -59,6 +59,7 @@ const SideBar: React.FC = () => {
     const [addingFileId, setAddingFileId] = useState<number | null>(null);
     const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
     const [openFolders, setOpenFolders] = useState<Record<number, boolean>>({});        // 폴더 열림 닫힘 상태
+    const [sidebarWidth, setSidebarWidth] = useState<number>(250);                      // 초기 사이드바 너비 설정
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -367,9 +368,24 @@ const SideBar: React.FC = () => {
         setCreateFileParentId(null);
     }
 
+    const handleMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+        setSidebarWidth(e.clientX);
+    }
+
+    const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp)
+    }
+
     return (
         // 사이드바
-        <div className={Sidebar.sidebar}>
+        <div className={Sidebar.sidebar} style={{ width: sidebarWidth }}>
             <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
                 {renderNameField()}
             </div>
@@ -408,6 +424,7 @@ const SideBar: React.FC = () => {
                 <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} onClick={() => setSettingModalOpen(true)}/>
                 <SettingModal isOpen={isSettingModalOpen} onClose={() => setSettingModalOpen(false)}/>
             </div>
+            <div className={Sidebar.handle} onMouseDown={handleMouseDown}/>
         </div>
     )
 }

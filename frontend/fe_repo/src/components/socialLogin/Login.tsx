@@ -17,6 +17,7 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();          // 리다이렉트
     const [animation, setAnimation] = useState('animate__backInDown');
     const loginBackground = useRef<HTMLDivElement>(null);
+    const [hasNavigated, setHasNavigated] = useState(false); 
 
     // 인가 코드 추출하는 함수
     const getAuthorizationCode = (): string | null => {
@@ -51,10 +52,11 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
     // 로그인 성공 시 editor 화면으로 이동
     useEffect(() => {
         console.log(accessToken)
-        if (accessToken) {
+        if (accessToken && !hasNavigated) {
             navigate('/editor'); 
+            setHasNavigated(true);
         }
-    }, [accessToken, navigate]);
+    }, [accessToken, navigate, hasNavigated]);
 
     const handleSocialLogin = (provider: 'kakao' | 'google' | 'naver') => {
         const clientId = {
