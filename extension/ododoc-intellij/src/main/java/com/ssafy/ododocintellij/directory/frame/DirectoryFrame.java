@@ -1,11 +1,13 @@
 package com.ssafy.ododocintellij.directory.frame;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododocintellij.directory.dto.request.CreateRequestDto;
 import com.ssafy.ododocintellij.directory.dto.response.DirectoryDto;
 import com.ssafy.ododocintellij.directory.dto.response.ResultDto;
 import com.ssafy.ododocintellij.directory.entity.FileInfo;
 import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
+import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,12 +15,17 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DirectoryFrame extends Application {
 
@@ -80,7 +87,19 @@ public class DirectoryFrame extends Application {
             }
         });
 
-        Scene scene = new Scene(treeView, 300, 500);
+        Button refreshButton = new Button();
+        ImageView refreshIcon = new ImageView(new Image(getClass().getResourceAsStream("/image/button/refresh.png")));
+        refreshButton.setGraphic(refreshIcon);
+        refreshButton.setTooltip(new Tooltip("새로고침"));
+        refreshButton.setOnAction(e -> refreshDirectoryView());
+
+        ToolBar toolBar = new ToolBar(refreshButton);
+        BorderPane root = new BorderPane();
+        root.setBottom(toolBar);
+        root.setCenter(treeView);
+
+
+        Scene scene = new Scene(root, 300, 500);
         stage.setScene(scene);
         stage.show();
     }
@@ -92,10 +111,27 @@ public class DirectoryFrame extends Application {
                 .defaultHeader("Authorization", TokenManager.getInstance().getAccessToken())
                 .build();
 
-        return webClient.get()
+        Map<String, Object> resultMap = webClient.get()
                 .uri("/" + rootId)
                 .retrieve()
-                .bodyToMono(ResultDto.class);
+                .bodyToMono(Map.class)
+                .block();
+
+        ResultDto resultDto = new ResultDto();
+
+        if((Integer) resultMap.get("status") == 200){
+            ObjectMapper objectMapper = new ObjectMapper();
+            resultDto = objectMapper.convertValue(resultMap, ResultDto.class);
+            return Mono.just(resultDto);
+        }
+        else{
+            showAlert();
+            DirectoryDto dto = new DirectoryDto();
+            resultDto.setStatus(400);
+            resultDto.setData(dto);
+            return Mono.just(resultDto);
+        }
+
     }
 
     private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
@@ -179,6 +215,18 @@ public class DirectoryFrame extends Application {
         });
     }
 
+    private void showAlert(){
+        Platform.runLater(() ->{
+            Alert alert = AlertHelper.makeAlert(
+                    Alert.AlertType.WARNING,
+                    "디렉토리",
+                    "조회 실패",
+                    "디렉토리 조회에 실패했습니다.",
+                    "/image/button/icon.png"
+            );
+            alert.showAndWait();
+        });
+    }
 
     class FileListener implements ChangeListener<TreeItem<FileInfo>> {
         @Override

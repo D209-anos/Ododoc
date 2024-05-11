@@ -9,16 +9,15 @@ public class ResultDto {
         return status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public DirectoryDto getData() {
         return data;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public void setData(DirectoryDto data) {
         this.data = data;
     }
-
 }
