@@ -8,6 +8,7 @@ import com.ssafy.ododocintellij.directory.entity.FileInfo;
 import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
+import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -34,12 +35,12 @@ public class DirectoryFrame extends Application {
     private TreeView<FileInfo> treeView;
     private ContextMenu folderContextMenu = new ContextMenu();
     private ContextMenu fileContextMenu = new ContextMenu();
-
+    private Stage stage;
     @Override
-    public void start(Stage stage) {
+    public void start(Stage initStage) {
         DirectoryInfoManager directoryInfoManager = DirectoryInfoManager.getInstance();
         ResultDto resultDto = retrieveDirectory(directoryInfoManager.getRootId()).block();
-
+        this.stage = initStage;
         // 제목 설정
         stage.setTitle(" " + directoryInfoManager.getTitle());
         currentDirectoryId = directoryInfoManager.getRootId();
@@ -49,13 +50,12 @@ public class DirectoryFrame extends Application {
 
         // 디렉토리 UI 생성
         TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
-        invisibleRoot = LoadDirectory(resultDto.getData().getChildren(), invisibleRoot);
+        invisibleRoot = LoadDirectory(((DirectoryDto)resultDto.getData()).getChildren(), invisibleRoot);
 
         treeView = new TreeView<>(invisibleRoot);
         treeView.setShowRoot(false);
         treeView.setEditable(true);
-        treeView.getSelectionModel().selectedItemProperty().addListener(new FileListener());
-        treeView.setCellFactory(tv -> new FileAndFolderTreeCell(folderContextMenu, fileContextMenu, this::refreshDirectoryView));
+        treeView.setCellFactory(tv -> new FileAndFolderTreeCell(folderContextMenu, fileContextMenu, stage, this::refreshDirectoryView));
         treeView.setOnMouseClicked(event -> {
             // 오른쪽 마우스 클릭 시 빈 공간 일 경우 파일 및 폴더 생성
             if (event.getButton() == MouseButton.SECONDARY) {
@@ -111,27 +111,28 @@ public class DirectoryFrame extends Application {
                 .defaultHeader("Authorization", TokenManager.getInstance().getAccessToken())
                 .build();
 
-        Map<String, Object> resultMap = webClient.get()
+        return webClient.get()
                 .uri("/" + rootId)
                 .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        ResultDto resultDto = new ResultDto();
-
-        if((Integer) resultMap.get("status") == 200){
-            ObjectMapper objectMapper = new ObjectMapper();
-            resultDto = objectMapper.convertValue(resultMap, ResultDto.class);
-            return Mono.just(resultDto);
-        }
-        else{
-            showAlert();
-            DirectoryDto dto = new DirectoryDto();
-            resultDto.setStatus(400);
-            resultDto.setData(dto);
-            return Mono.just(resultDto);
-        }
-
+                .bodyToMono(ResultDto.class)
+                .doOnSuccess(result -> {
+                    // 성공했을 경우
+                    if(result.getStatus() == 200){
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        result.setData(objectMapper.convertValue(result.getData(), DirectoryDto.class));
+                    }
+                    // 토큰이 만료되었을 경우
+                    else if(result.getStatus() == 401){
+                        result.setData(new DirectoryDto());
+                        refreshAccessToken();
+                        retrieveDirectory(DirectoryInfoManager.getInstance().getRootId());
+                    }
+                    else{
+                        result.setData(new DirectoryDto());
+                        showAlert("조회 실패", "디렉토리 조회에 실패했습니다./n 새로고침 버튼은 눌러 다시 시도해주세요.");
+                    }
+                })
+                .doOnError(error -> showAlert("조회 실패", "디렉토리 조회에 실패했습니다./n 새로고침 버튼은 눌러 다시 시도해주세요."));
     }
 
     private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
@@ -197,17 +198,27 @@ public class DirectoryFrame extends Application {
                 .subscribe(result -> {
                     if (result.getStatus() == 200) {
                         refreshDirectoryView();
-                    } else {
-                        System.out.println("생성 실패");
                     }
-                }, error -> System.out.println("API 호출 실패: " + error.getMessage()));
+                    else if (result.getStatus() == 401) {
+                        refreshAccessToken();
+                        showAlert("생성 실패", "다시 시도해주세요.");
+                        refreshDirectoryView();
+                    }
+                    else {
+                        showAlert("생성 실패", "다시 시도해주세요.");
+                        refreshDirectoryView();
+                    }
+                }, error -> {
+                    showAlert("생성 실패", "다시 시도해주세요.");
+                    refreshDirectoryView();
+                });
     }
 
     private void refreshDirectoryView() {
         retrieveDirectory(DirectoryInfoManager.getInstance().getRootId()).subscribe(resultDto -> {
             Platform.runLater(() -> {
                 TreeItem<FileInfo> invisibleRoot = new TreeItem<>();
-                invisibleRoot = LoadDirectory(resultDto.getData().getChildren(), invisibleRoot);
+                invisibleRoot = LoadDirectory(((DirectoryDto)resultDto.getData()).getChildren(), invisibleRoot);
                 treeView.setRoot(invisibleRoot);
                 treeView.setShowRoot(false);
                 treeView.refresh();
@@ -215,28 +226,50 @@ public class DirectoryFrame extends Application {
         });
     }
 
-    private void showAlert(){
+    private void showAlert(String header, String content){
         Platform.runLater(() ->{
             Alert alert = AlertHelper.makeAlert(
                     Alert.AlertType.WARNING,
                     "디렉토리",
-                    "조회 실패",
-                    "디렉토리 조회에 실패했습니다.",
+                    header,
+                    content,
                     "/image/button/icon.png"
             );
             alert.showAndWait();
         });
     }
 
-    class FileListener implements ChangeListener<TreeItem<FileInfo>> {
-        @Override
-        public void changed(ObservableValue<? extends TreeItem<FileInfo>> observableValue, TreeItem<FileInfo> oldValue, TreeItem<FileInfo> newValue) {
-            if (newValue != null) {
-                FileInfo fileInfo = newValue.getValue();
-                System.out.println("Selected: " + fileInfo.getName());
-                System.out.println("ID: " + fileInfo.getId() + ", Type: " + fileInfo.getType());
-            }
-        }
+    private void refreshAccessToken() {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://k10d209.p.ssafy.io/api")
+                .defaultCookie("refreshToken", TokenManager.getInstance().getRefreshToken())
+                .build();
+
+        webClient.post()
+                .uri("/oauth2/issue/access-token")
+                .retrieve()
+                .bodyToMono(ResultDto.class)
+                .subscribe(result -> {
+                    if (result.getStatus() == 200) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        Map<String, String> data = objectMapper.convertValue(result.getData(), Map.class);
+                        TokenManager.getInstance().setAccessToken(data.get("accessToken"));
+                    } else {
+                        reLogin();
+                    }
+                }, error -> reLogin());
+
+    }
+
+    private void reLogin() {
+        Platform.runLater(() -> {
+            TokenManager.getInstance().setAccessToken(null);
+            TokenManager.getInstance().setRefreshToken(null);
+
+            stage.close();
+            MainLoginFrame mainLoginFrame = new MainLoginFrame();
+            mainLoginFrame.show();
+        });
     }
 
 }

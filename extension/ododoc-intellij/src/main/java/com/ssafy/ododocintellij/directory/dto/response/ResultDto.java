@@ -3,13 +3,13 @@ package com.ssafy.ododocintellij.directory.dto.response;
 public class ResultDto {
 
     private int status;
-    private DirectoryDto data;
+    private Object data;
 
     public int getStatus() {
         return status;
     }
 
-    public DirectoryDto getData() {
+    public Object getData() {
         return data;
     }
 
@@ -17,7 +17,7 @@ public class ResultDto {
         this.status = status;
     }
 
-    public void setData(DirectoryDto data) {
+    public void setData(Object data) {
         this.data = data;
     }
 }

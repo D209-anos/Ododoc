@@ -1,7 +1,9 @@
 package com.ssafy.ododocintellij.login.frame;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.openapi.project.Project;
+import com.ssafy.ododocintellij.directory.dto.response.ResultDto;
 import com.ssafy.ododocintellij.directory.frame.DirectoryFrame;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
@@ -23,12 +25,14 @@ import javafx.stage.Stage;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -251,4 +255,5 @@ public class OauthLoginFrame extends Stage {
     private void connectWebSocket() {
         BuildResultSender.getINSTANCE(WEBSOCKET_URI);
     }
+
 }
