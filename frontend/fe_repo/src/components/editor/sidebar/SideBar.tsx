@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useDrop } from 'react-dnd';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../../assets/images/icon/pencil.png'
 import Line from '../../../assets/images/mark/line.png'
@@ -60,6 +61,7 @@ const SideBar: React.FC = () => {
     const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
     const [openFolders, setOpenFolders] = useState<Record<number, boolean>>({});        // 폴더 열림 닫힘 상태
     const [sidebarWidth, setSidebarWidth] = useState<number>(250);                      // 초기 사이드바 너비 설정
+    const [dragOverFolder, setDragOverFolder] = useState<number | null>(null);  
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -215,6 +217,7 @@ const SideBar: React.FC = () => {
                             saveNewFile={saveNewFile}
                             isFolderOpen={openFolders[item.id] || false}    // 폴더 열림 상태 전달
                             toggleFolder={() => toggleFolder(item.id)}  // 폴더 열고 닫기 함수 전달
+                            moveItem={moveItem}
                         />
                         {item.type === 'FOLDER' && openFolders[item.id] && item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
@@ -372,6 +375,130 @@ const SideBar: React.FC = () => {
         setCreateFileParentId(null);
     }
 
+    // 부모를 찾는 함수
+    const findParent = (
+        items: MyDirectoryItem[], 
+        childId: number
+    ): MyDirectoryItem | null => {
+        for (let item of items) {
+            if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                if (item.children.some(child => child.id === childId)) {
+                    return item;
+                }
+                const foundParent = findParent(item.children as MyDirectoryItem[], childId);
+                if (foundParent) {
+                    return foundParent;
+                }
+            }
+        }
+        return null;
+    };
+
+    const [{ isOver: isOverTop }, dropTop] = useDrop({
+        accept: 'ITEM',
+        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+            moveItem(draggedItem.id, null, null);  // 최상위로 이동
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+    const [{ isOver: isOverBottom }, dropBottom] = useDrop({
+        accept: 'ITEM',
+        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+            moveItem(draggedItem.id, null, null);  // 최상위로 이동
+        },
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+    // 폴더 및 파일 이동
+    const moveItem = (draggedId: number, targetId: number | null, parentId: number | null) => {
+        const findAndRemoveItem = (items: MyDirectoryItem[], id: number): { item: MyDirectoryItem | null, items: MyDirectoryItem[] } => {
+            let foundItem: MyDirectoryItem | null = null;
+            const updatedItems = items.filter(item => {
+                if (item.id === id) {
+                    foundItem = item;
+                    return false;
+                }
+                if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                    const result = findAndRemoveItem(item.children as MyDirectoryItem[], id);
+                    if (result.item) {
+                        foundItem = result.item;
+                        item.children = result.items;
+                    }
+                }
+                return true;
+            });
+            return { item: foundItem, items: updatedItems };
+        };
+
+        const insertItem = (items: MyDirectoryItem[], newItem: MyDirectoryItem, targetId: number | null, parentId: number | null): MyDirectoryItem[] => {
+            if (parentId === null) {
+                // 최상위 레벨에 삽입
+                if (targetId === null) {
+                    items.push(newItem);
+                } else {
+                    const targetIndex = items.findIndex(item => item.id === targetId);
+                    items.splice(targetIndex + 1, 0, newItem);
+                }
+            } else {
+                for (let item of items) {
+                    if (item.id === parentId) {
+                        if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                            if (targetId === null) {
+                                item.children.push(newItem);
+                            } else {
+                                const targetIndex = item.children.findIndex(child => child.id === targetId);
+                                item.children.splice(targetIndex + 1, 0, newItem);
+                            }
+                        }
+                    } else if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                        item.children = insertItem(item.children as MyDirectoryItem[], newItem, targetId, parentId);
+                    }
+                }
+            }
+            return items;
+        };
+
+        const isValidMove = (draggedItem: MyDirectoryItem, targetId: number | null): boolean => {
+            if (draggedItem.id === targetId) return false;
+
+            const findItemById = (items: MyDirectoryItem[], id: number): MyDirectoryItem | undefined => {
+                for (let item of items) {
+                    if (item.id === id) return item;
+                    if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                        const found = findItemById(item.children as MyDirectoryItem[], id);
+                        if (found) return found;
+                    }
+                }
+                return undefined;
+            };
+
+            const targetItem = findItemById(contents, targetId!);
+            if (!targetItem) return true;
+
+            let currentParent: MyDirectoryItem | null = targetItem;
+            while (currentParent) {
+                if (currentParent.id === draggedItem.id) return false;
+                currentParent = findParent(contents, currentParent.id) as MyDirectoryItem | null;
+            }
+
+            return true;
+        };
+
+        setContents(prevContents => {
+            const { item: draggedItem, items: itemsWithoutDragged } = findAndRemoveItem(prevContents, draggedId);
+            if (!draggedItem || !isValidMove(draggedItem, targetId)) return prevContents;
+
+            return insertItem(itemsWithoutDragged, draggedItem, targetId, parentId);
+        });
+    };
+
+
+
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
         document.addEventListener('mousemove', handleMouseMove);
@@ -390,6 +517,7 @@ const SideBar: React.FC = () => {
     return (
         // 사이드바
         <div className={Sidebar.sidebar} style={{ width: sidebarWidth }}>
+            <div ref={dropTop} className={`${Sidebar.topDropZone} ${isOverTop ? Sidebar.dragOver : ''}`} />
             <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
                 {renderNameField()}
             </div>
@@ -420,6 +548,7 @@ const SideBar: React.FC = () => {
                     onDelete={handleDelete}
                 />
             )}
+            <div ref={dropBottom} className={`${Sidebar.bottomDropZone} ${isOverBottom ? Sidebar.dragOver : ''}`} />
             <div className={Sidebar.sideButtonWrapper}>
                 <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton} onClick={handleCreateFolder}/>

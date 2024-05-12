@@ -349,3 +349,19 @@
 .handle:hover {
     background-color: ff914d;
 }
+
+.dragOver {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dropAfter {
+    height: 4px;
+    background-color: transparent;
+}
+
+.topDropZone,
+.bottomDropZone {
+    height: 20px;
+    /* 필요에 따라 조절하세요 */
+    background-color: transparent;
+}

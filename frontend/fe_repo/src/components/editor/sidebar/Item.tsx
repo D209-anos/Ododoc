@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import Sidebar from '../../../css/components/editor/SideBar.module.css';
 import FolderImage from '../../../assets/images/icon/forder.png';
 import FileImage from '../../../assets/images/icon/file.png';
@@ -7,6 +8,7 @@ import FileAddModal from './modal/FileAddModal';
 import NameEditor from './NameEditor';
 import { createDirectory } from '../../../api/service/directory';
 import { useFileContext } from '../../../contexts/FileContext';
+
 
 interface IContentItem {
     id: number;
@@ -34,6 +36,10 @@ interface ItemProps {
     saveNewFile: (objectId: number, newName: string) => void;
     isFolderOpen: boolean;
     toggleFolder: () => void;
+    moveItem: (draggedId: number, targetId: number | null, parentId: number | null) => void;
+    onDragOver?: () => void;
+    onDragLeave?: () => void;
+    dragOver?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({ 
@@ -55,8 +61,11 @@ const Item: React.FC<ItemProps> = ({
     saveNewFile,
     isFolderOpen,
     toggleFolder,
+    moveItem,
+    onDragOver,
+    onDragLeave,
+    dragOver
  }) => {
-    // const [isFolderOpen, setIsFolderOpen] = useState(false);            // add-button 여닫는 여부
     const [isDragOver, setIsDragOver] = useState(false);                // 드래그
     const [isAddingSubFolder, setIsAddingSubFolder] = useState(false);  // 폴더 추가 상태
     const [newFolderName, setNewFolderName] = useState('');             // 폴더 이름 상태
@@ -64,11 +73,48 @@ const Item: React.FC<ItemProps> = ({
 
     const { addingFileId, isAddingSubFile, setAddingFileId, setIsAddingSubFile } = useFileContext();
 
-    // 폴더 하위 요소 여닫는 함수
-    // const toggleFolder = () => {
-    //     setIsFolderOpen(!isFolderOpen);
-    //     handleItemClick(item.id)
-    // }
+    const ref = useRef<HTMLDivElement>(null);
+
+    const [{ isDragging }, drag] = useDrag({
+        type: 'ITEM',
+        item: { id: item.id, type: item.type, parentId },
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
+
+    const [, drop] = useDrop({
+        accept: 'ITEM',
+        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+            moveItem(draggedItem.id, item.id, item.type === 'FOLDER' ? item.id : parentId);
+            setIsDragOver(false);
+        },
+        hover: () => setIsDragOver(true),
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+    const [, dropAfter] = useDrop({
+        accept: 'ITEM',
+        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+            moveItem(draggedItem.id, null, null);  // newParentId를 null로 설정하여 최상위로 이동
+            setIsDragOver(false);
+        },
+        hover: () => setIsDragOver(true),
+        collect: (monitor) => ({
+            isOver: monitor.isOver(),
+        }),
+    });
+
+
+    drag(drop(ref));
+
+    const opacity = isDragging ? 0.5 : 1;
+
+    const handleItemClickWrapper = () => {
+        handleItemClick(item.id);
+    };
 
     // 폴더명 / 파일명 수정 함수
     const renderContentNameField = (): JSX.Element | null => {
@@ -112,56 +158,15 @@ const Item: React.FC<ItemProps> = ({
         return undefined;
     }
 
-    // 드래그 시작하는 함수
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        e.dataTransfer.setData(
-            "application/reactflow", 
-            JSON.stringify({ id: item.id, parentId: parentId })
-        );
-        e.dataTransfer.effectAllowed = "move";
-        console.log("드래그 시작했다 ~~~")
-        console.log(item.id, parentId)
-    }
-
-    // 드래그 하고 있는 함수
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragOver(true);
-        e.dataTransfer.dropEffect = 'move';
-        console.log("드래그 하고 있다!!!")
-    }
-
-    const handleDragLeave = () => {
-        setIsDragOver(false);
-    }
-
-    // 드래그 후 항목 내려놓을 때 함수
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setIsDragOver(false);
-
-        // 폴더의 ID
-        const draggedData: { id: number; parentId: number | null } = JSON.parse(
-            e.dataTransfer.getData("application/reactflow")
-        );
-
-        // 드랍된 곳의 부모 폴더 ID
-        if (Array.isArray(item.contents)) {
-            const currentParentId = findParentId(item.contents as IContentItem[], draggedData.id);
-            console.log("내려놨다 ~~~~", draggedData, currentParentId)
-        }
-    }
-
     return (
         <div 
-            key={item.id} 
-            className={Sidebar.folderSpace}
-            draggable
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            ref={ref}
+            key={item.id}
+            className={`${Sidebar.folderSpace} ${isDragOver ? Sidebar.dragOver : ''}`}
+            style={{ opacity }}
             onContextMenu={(e) => handleContextMenu(e, item.id)}
+            onDragLeave={() => setIsDragOver(false)}
+            draggable
         >
             <div className={Sidebar.folderWrapper} onClick={item.type === 'FOLDER' ? toggleFolder : () => handleItemClick(item.id)}>
                 <img src={item.type === 'FOLDER' ? FolderImage : FileImage} alt={`${item.type.toLowerCase()}-image`} className={Sidebar.forderImage} />
@@ -203,6 +208,7 @@ const Item: React.FC<ItemProps> = ({
                     </div>
                 )}
             </div>
+            <div ref={dropAfter} className={Sidebar.dropAfter} />
             {addingFolderId === item.id && isAddingSubFolder && (
                 <div>
                     <NameEditor
