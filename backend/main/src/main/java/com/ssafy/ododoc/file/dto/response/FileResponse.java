@@ -11,5 +11,6 @@ import java.util.List;
 public class FileResponse {
 
     private Long directoryId;
+    private String title;
     private List<Block> content;
 }

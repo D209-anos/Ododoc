@@ -9,13 +9,11 @@ import java.util.List;
 
 @Builder
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Block {
 
     @Field("id")
     private String id;
+    private List<Value> value;
     private String type;
-    private Props props;
-    private List<Content> content;
-    private List<Block> children;
+    private Meta meta;
 }
