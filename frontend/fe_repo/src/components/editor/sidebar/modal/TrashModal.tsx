@@ -7,9 +7,10 @@ import FileImage from '../../../../assets/images/icon/file.png'
 import FolderImage from '../../../../assets/images/icon/forder.png'
 import Swal from 'sweetalert2';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { fetchTrashbin, restoreDirectoryItem  } from '../../../../api/service/directory';
+import { fetchTrashbin, restoreDirectoryItem, deleteDirectoryItem  } from '../../../../api/service/directory';
 import Restore from '../../../../assets/images/icon/restore.png';
 import ForeverDelete from '../../../../assets/images/icon/foreverDelete.png';
+import { useTrash } from '../../../../contexts/TrashContext';
 
 interface ModalProps {
     isOpen: boolean;
@@ -29,7 +30,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const { state, dispatch } = useAuth();
     const { accessToken } = state;
-    const [trashbinData, setTrashbinData] = useState<IContentItem[]>([]);
+    const { trashbinData, loadTrashbin } = useTrash();
     useHandleClickOutside(modalRef, onClose);
 
     const clickExitButton = () => {
@@ -40,22 +41,48 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         handleRestore(item);
     }
 
-    //휴지통 조회
-    useEffect(() => {
-        const loadTrashbin = async () => {
-            if (accessToken) {
+    const handleForeverDelete = async (item: IContentItem) => {
+        Swal.fire({
+            html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제하시겠습니까?</h2>',
+            icon: 'warning',
+            showCancelButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
                 try {
-                    console.log("휴지통에 데이터 잘 들어옴")
-                    console.log(trashbinData)
-                    const data = await fetchTrashbin();
-                    setTrashbinData(data);
+                    await deleteDirectoryItem('delete', item.id);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제되었습니다.</h2>',
+                        icon: 'success',
+                    });
+
+                    loadTrashbin();
                 } catch (error) {
-                    console.error('휴지통 조회 에러:', error)
+                    console.error('영구 삭제 에러:', error);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제에 실패했습니다.</h2>',
+                        icon: 'error',
+                    });
                 }
-            } 
-        };
-        loadTrashbin();
-    }, [])
+            }
+        });
+    };
+
+    //휴지통 조회
+    // useEffect(() => {
+    //     const loadTrashbin = async () => {
+    //         if (accessToken) {
+    //             try {
+    //                 console.log("휴지통에 데이터 잘 들어옴")
+    //                 console.log(trashbinData)
+    //                 const data = await fetchTrashbin();
+    //                 setTrashbinData(data);
+    //             } catch (error) {
+    //                 console.error('휴지통 조회 에러:', error)
+    //             }
+    //         } 
+    //     };
+    //     loadTrashbin();
+    // }, [accessToken])
 
     // 휴지통 복원 모달
     const handleRestore = async (item: IContentItem) => {
@@ -71,10 +98,9 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     Swal.fire({
                         html: '<h2 style="font-family: hanbitFont, sans-serif;">복원되었습니다.</h2>',
                         icon: 'success'
-                    })
+                    });
 
-                    const updatedData = await fetchTrashbin();
-                    setTrashbinData(updatedData);
+                    loadTrashbin();
                 } catch (error) {
                     console.error('휴지통 복원 에러:', error);
                     Swal.fire({
@@ -84,8 +110,8 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                 }
                 onClose();
             }
-        })
-    }
+        });
+    };
 
     if (!isOpen) return null;
 
@@ -108,7 +134,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                         <img src={Restore} alt="restore-image" className={Trash.Restore} onClick={() => handleItemClick(content)}/>
                     </div>
                     <div>
-                        <img src={ForeverDelete} alt="forever-Delete-image" className={Trash.ForeverDelete} />
+                        <img src={ForeverDelete} alt="forever-Delete-image" className={Trash.ForeverDelete} onClick={() => handleForeverDelete(content)}/>
                     </div>
                 </p>
             </div>

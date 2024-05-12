@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem, moveDirectoryItem  } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useFileContext } from '../../../contexts/FileContext';
+import { useTrash } from '../../../contexts/TrashContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -40,6 +41,7 @@ const SideBar: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch } = useAuth();
     const { accessToken, rootId, title } = state;
+    const { loadTrashbin } = useTrash();
 
     const [contents, setContents] = useState<MyDirectoryItem[]>([]);                       // 디렉토리 내용 (id, name, type, children)
     const [folderAddModal, setFolderAddModal] = useState<Record<number, boolean>>({});  // 폴더 추가, 파일 추가 모달창 열림 여부 (true / false)
@@ -80,9 +82,6 @@ const SideBar: React.FC = () => {
     useEffect(() => {
         loadDirectory();
     }, [accessToken, rootId]);
-
-
-    
 
     // 디렉토리 조회 (디렉토리 생성 후 조회)
     useEffect(() => {
@@ -264,12 +263,13 @@ const SideBar: React.FC = () => {
             console.log('삭제 성공:', data)
 
             // 삭제로 디렉토리 목록 갱신
-            // const updatedContents = contents.filter(item => item.id !== id);
             const updatedContents = removeItemFromDirectory(contents, id);
             setContents(updatedContents)
 
             const updatedDirectoryData = await fetchDirectory(rootId);
             setDirectoryData(updatedDirectoryData);
+
+            loadTrashbin();
         } catch (error) {
             console.log('directory delete error:', error)
         }
