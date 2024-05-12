@@ -70,16 +70,17 @@ const SideBar: React.FC = () => {
     const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
     // 디렉토리 조회 (로그인 시 title 매핑)
+    const loadDirectory = async () => {
+        if (accessToken && rootId) {
+            const data = await fetchDirectory(rootId);
+            setDirectoryData(data);
+        }
+    };
+
     useEffect(() => {
-        const loadDirectory = async () => {
-            if (accessToken && rootId) {
-                const data = await fetchDirectory(rootId);
-                setDirectoryData(data)
-            }
-        };
-        
         loadDirectory();
-    }, [accessToken, rootId])
+    }, [accessToken, rootId]);
+
 
     
 
@@ -541,7 +542,13 @@ const SideBar: React.FC = () => {
                 <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton} onClick={handleCreateFolder}/>
                 <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} onClick={() => setTrashModalOpen(true)}/>
-                <TrashModal isOpen={isTrashModalOpen} onClose={() => setTrashModalOpen(false)} />
+                <TrashModal 
+                    isOpen={isTrashModalOpen} 
+                    onClose={() => {
+                        setTrashModalOpen(false);
+                        loadDirectory();
+                    }}
+                />
                 <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} onClick={() => setSettingModalOpen(true)}/>
                 <SettingModal isOpen={isSettingModalOpen} onClose={() => setSettingModalOpen(false)}/>
             </div>

@@ -7,7 +7,7 @@ import FileImage from '../../../../assets/images/icon/file.png'
 import FolderImage from '../../../../assets/images/icon/forder.png'
 import Swal from 'sweetalert2';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { fetchTrashbin } from '../../../../api/service/directory';
+import { fetchTrashbin, restoreDirectoryItem  } from '../../../../api/service/directory';
 import Restore from '../../../../assets/images/icon/restore.png';
 import ForeverDelete from '../../../../assets/images/icon/foreverDelete.png';
 
@@ -58,19 +58,31 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     }, [])
 
     // 휴지통 복원 모달
-    const handleRestore = (item: IContentItem) => {
+    const handleRestore = async (item: IContentItem) => {
         Swal.fire({
             html: '<h2 style="font-family: hanbitFont, sans-serif;">복원하시겠습니까??</h2>',
             icon: 'warning',
             showCancelButton: true
-        }).then((result) => {
+        }).then(async (result) => {
             onClose();
             if (result.isConfirmed) {
-                //  이 안에 복원시킬 때 사용할 api 들어가야 함
-                Swal.fire({
-                    html: '<h2 style="font-family: hanbitFont, sans-serif;">복원되었습니다.</h2>',
-                    icon: 'success'
-                })
+                try {
+                    await restoreDirectoryItem(item.id);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">복원되었습니다.</h2>',
+                        icon: 'success'
+                    })
+
+                    const updatedData = await fetchTrashbin();
+                    setTrashbinData(updatedData);
+                } catch (error) {
+                    console.error('휴지통 복원 에러:', error);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">복원에 실패했습니다.</h2>',
+                        icon: 'error',
+                    });
+                }
+                onClose();
             }
         })
     }
@@ -134,3 +146,4 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
 
 export default TrashModal
+

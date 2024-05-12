@@ -94,3 +94,16 @@ export const fetchTrashbin = async () => {
         throw error;
     }
 }
+
+// 휴지통 복원
+export const restoreDirectoryItem = async (directoryId: number): Promise<IContentItem | null> => {
+    try {
+        const response = await api.put<Response>(`/directory/restore/${directoryId}`);
+        const data = response.data.data;
+
+        return data;
+    } catch (error: any) {
+        console.error('휴지통 복원 에러:', error);
+        throw error;
+    }
+}
