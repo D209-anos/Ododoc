@@ -58,4 +58,12 @@ public class BuildResultSender {
         }
     }
 
+    public static boolean isConnected() {
+        if(!INSTANCE.isOpen()){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 }

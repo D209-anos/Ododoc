@@ -129,10 +129,10 @@ public class DirectoryFrame extends Application {
                     }
                     else{
                         result.setData(new DirectoryDto());
-                        showAlert("조회 실패", "디렉토리 조회에 실패했습니다./n 새로고침 버튼은 눌러 다시 시도해주세요.");
+                        showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요.");
                     }
                 })
-                .doOnError(error -> showAlert("조회 실패", "디렉토리 조회에 실패했습니다./n 새로고침 버튼은 눌러 다시 시도해주세요."));
+                .doOnError(error -> showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요."));
     }
 
     private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {

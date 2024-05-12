@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
@@ -33,6 +34,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -225,7 +228,9 @@ public class OauthLoginFrame extends Stage {
                     connectWebSocket();
 
                     try {
-                        new DirectoryFrame().start(mainLoginFrame);
+                        if(BuildResultSender.isConnected()){
+                            new DirectoryFrame().start(mainLoginFrame);
+                        }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -253,7 +258,31 @@ public class OauthLoginFrame extends Stage {
 
     // 처리 서버와 webSocket 연결해주기
     private void connectWebSocket() {
+
         BuildResultSender.getINSTANCE(WEBSOCKET_URI);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(!BuildResultSender.isConnected()){
+            Alert alert = AlertHelper.makeAlert(
+                    Alert.AlertType.CONFIRMATION,
+                    " Ododoc",
+                    "서버 연결 실패",
+                    "Ododoc 서비스를 이용하려면 서버와의 연결이 필요합니다.\n 다시 시도하시겠습니까?",
+                    "/image/button/icon.png"
+            );
+            Optional<ButtonType> result = alert.showAndWait();
+            if(result.isPresent() && result.get() == ButtonType.OK) {
+                connectWebSocket();
+            }
+            else if(result.isPresent() && result.get() != ButtonType.OK){
+                this.close();
+            }
+        };
     }
 
 }
