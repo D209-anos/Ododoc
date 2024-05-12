@@ -2,9 +2,11 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 export default class DirectoryItem extends vscode.TreeItem {
+  private selected: boolean = false;
+
   constructor(
     public readonly id: string, // vscode.TreeItem의 id는 string이어야 함.
-    public readonly label: string,
+    public label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly type: "FOLDER" | "FILE" | "NONE",
     private readonly context: vscode.ExtensionContext,
@@ -14,6 +16,16 @@ export default class DirectoryItem extends vscode.TreeItem {
     this.type = type;
     this.contextValue = type.toLowerCase();
 
+    this.updateIcon();
+  }
+
+  private getIconPath(fileName: string): vscode.Uri {
+    return vscode.Uri.file(
+      path.join(this.context.extensionPath, "images", fileName)
+    );
+  }
+
+  private updateIcon() {
     if (this.type === "FOLDER") {
       this.iconPath = {
         light: this.getIconPath("folderIcon.svg"),
@@ -21,15 +33,18 @@ export default class DirectoryItem extends vscode.TreeItem {
       };
     } else if (this.type === "FILE") {
       this.iconPath = {
-        light: this.getIconPath("fileIcon.svg"),
-        dark: this.getIconPath("fileIcon.svg"),
+        light: this.getIconPath(
+          this.selected ? "selectedFileIcon.svg" : "fileIcon.svg"
+        ),
+        dark: this.getIconPath(
+          this.selected ? "selectedFileIcon.svg" : "fileIcon.svg"
+        ),
       };
     }
   }
 
-  private getIconPath(fileName: string): vscode.Uri {
-    return vscode.Uri.file(
-      path.join(this.context.extensionPath, "images", fileName)
-    );
+  public setSelected(selected: boolean) {
+    this.selected = selected;
+    this.updateIcon();
   }
 }

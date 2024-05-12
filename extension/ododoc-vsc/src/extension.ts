@@ -21,11 +21,11 @@ export function activate(context: vscode.ExtensionContext) {
   new OdodocTreeProvider(context);
 
   if (getLoggedInSession() !== undefined) {
-    WebSocketClient.getInstance().connect();
+    WebSocketClient.getInstance(context).connect();
   }
 
   // 터미널 생성
-  const terminalManager = new TerminalManager();
+  const terminalManager = new TerminalManager(context);
   let ododocTerminal = terminalManager.createTerminal();
   ododocTerminal.show();
 }

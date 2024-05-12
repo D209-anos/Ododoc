@@ -81,7 +81,7 @@ export default class JwtAuthenticationProvider
         changed: [],
       });
 
-      WebSocketClient.getInstance().connect();
+      WebSocketClient.getInstance(this.context).connect();
 
       return session;
     } catch (error) {
@@ -119,7 +119,7 @@ export default class JwtAuthenticationProvider
           changed: [],
         });
 
-        WebSocketClient.getInstance().disconnect();
+        WebSocketClient.getInstance(this.context).disconnect();
       }
     }
   }

@@ -4,10 +4,15 @@ import { OdodocTerminal } from "./OdodocTerminal";
 export class TerminalManager {
   private terminals: Map<number, vscode.Terminal> = new Map();
   private nextTerminalId: number = 0;
+  private context: vscode.ExtensionContext;
+
+  constructor(context: vscode.ExtensionContext) {
+    this.context = context;
+  }
 
   public createTerminal(): vscode.Terminal {
     const terminalId = this.nextTerminalId++;
-    const ododocTerminal = new OdodocTerminal();
+    const ododocTerminal = new OdodocTerminal(this.context);
     const terminal = vscode.window.createTerminal({
       name: `ododoc Terminal`,
       pty: ododocTerminal,

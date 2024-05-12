@@ -18,14 +18,22 @@ export default class OdodocTreeProvider
 
   private context: vscode.ExtensionContext;
   private directoryCache: Directory | null = null; // 전체 디렉토리 구조를 저장하는 캐시
+  private connectedFileItem: DirectoryItem | null = null; // 연결할 파일
 
   constructor(context: vscode.ExtensionContext) {
     this.context = context;
     // TreeView를 생성하고 확장 기능에 등록
-    vscode.window.createTreeView("ododoc.main", {
+    const treeView = vscode.window.createTreeView("ododoc.main", {
       treeDataProvider: this,
       showCollapseAll: true,
     });
+    context.subscriptions.push(treeView);
+
+    context.subscriptions.push(
+      // 트리 아이템이 선택될 때 이벤트 처리
+      treeView.onDidChangeSelection((e) => this.onDidChangeSelection(e))
+    );
+
     context.subscriptions.push(
       // 인증 세션이 변경될 때 TreeView를 새로 고침
       vscode.authentication.onDidChangeSessions(() => {
@@ -34,7 +42,6 @@ export default class OdodocTreeProvider
     );
 
     // 새로고침 커맨드 등록
-
     context.subscriptions.push(
       vscode.commands.registerCommand("ododoc.refreshTreeView", () => {
         this.refresh();
@@ -149,6 +156,35 @@ export default class OdodocTreeProvider
     } catch (error) {
       console.error("Failed to load directory:", error);
       return null;
+    }
+  }
+
+  private async onDidChangeSelection(
+    event: vscode.TreeViewSelectionChangeEvent<vscode.TreeItem>
+  ) {
+    const selectedItem = event.selection[0];
+    if (selectedItem instanceof DirectoryItem && selectedItem.type === "FILE") {
+      const confirm = await vscode.window.showInformationMessage(
+        `연동하시겠습니까?`,
+        { modal: false },
+        "확인",
+        "취소"
+      );
+
+      if (confirm === "확인") {
+        if (this.connectedFileItem) {
+          this.connectedFileItem.setSelected(false);
+          this._onDidChangeTreeData.fire(this.connectedFileItem);
+        }
+        selectedItem.setSelected(true);
+        this.connectedFileItem = selectedItem;
+        this._onDidChangeTreeData.fire(selectedItem);
+
+        this.context.secrets.store(
+          "connectedFileId",
+          selectedItem.id.toString()
+        );
+      }
     }
   }
 }
