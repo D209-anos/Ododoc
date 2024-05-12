@@ -30,7 +30,10 @@ public class FileService {
     private final S3Util s3Util;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
-        checkDirectory(directoryId, member);
+        Directory directory = directoryRepository.findById(directoryId)
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        checkDirectory(directory, member);
 
         return ImageResponse.builder()
                 .id(directoryId)
@@ -39,7 +42,10 @@ public class FileService {
     }
 
     public FileResponse getFile(Long directoryId, Member member) {
-        checkDirectory(directoryId, member);
+        Directory directory = directoryRepository.findById(directoryId)
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        checkDirectory(directory, member);
 
         File file = fileRepository.findByDirectoryId(directoryId)
                 .orElseGet(() -> fileRepository.save(File.builder()
@@ -49,12 +55,16 @@ public class FileService {
 
         return FileResponse.builder()
                 .directoryId(file.getDirectoryId())
+                .title(directory.getName())
                 .content(file.getContent())
                 .build();
     }
 
-    public FileResponse saveFile(String actionType, FileRequest fileRequest, Member member) {
-        checkDirectory(fileRequest.getDirectoryId(), member);
+    public FileResponse saveFile(FileRequest fileRequest, Member member) {
+        Directory directory = directoryRepository.findById(fileRequest.getDirectoryId())
+                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+
+        checkDirectory(directory, member);
 
         File file = fileRepository.findByDirectoryId(fileRequest.getDirectoryId())
                 .orElseGet(() -> fileRepository.save(File.builder()
@@ -62,26 +72,18 @@ public class FileService {
                         .content(new ArrayList<>())
                         .build()));
 
-        if(actionType.toUpperCase().equals("ADD")) {
-            for(Block block : fileRequest.getContent()) {
-                file.getContent().add(block);
-            }
-        } else {
-            file.setContent(fileRequest.getContent());
-        }
+        file.setContent(fileRequest.getContent());
 
         fileRepository.save(file);
 
         return FileResponse.builder()
                 .directoryId(file.getDirectoryId())
+                .title(directory.getName())
                 .content(file.getContent())
                 .build();
     }
 
-    private void checkDirectory(Long directoryId, Member member) {
-        Directory directory = directoryRepository.findById(directoryId)
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
-
+    private void checkDirectory(Directory directory, Member member) {
         if(directory.getType().equals(DirectoryType.FOLDER)) {
             throw new FileBadRequestException("잘못된 요청입니다.");
         }

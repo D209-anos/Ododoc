@@ -267,7 +267,7 @@ public class FileApiTest extends ApiTest {
         Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         mockMvc.perform(
-                post("/file/{actionType}", "save")
+                put("/file")
                         .header(AUTH_HEADER, token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
@@ -276,10 +276,8 @@ public class FileApiTest extends ApiTest {
                 .andExpect(jsonPath("$.status").value(200))
                 .andDo(this::print)
                 .andDo(document(DEFAULT_RESTDOC_PATH, "파일을 수정/저장하는 API 입니다." +
-                        "<br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>post 요청</b> 해주세요." +
+                        "<br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>put 요청</b> 해주세요." +
                         "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 저장된 파일 내용</b>이 반환됩니다." +
-                        "<br> - actionType은 <b>save 또는 add</b>만 가능합니다. <b>클라이언트에서는 save를, 플러그인에서는 add</b>를 입력해 주세요." +
-                        "<br>   그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - <b>content는 null일 수 없습니다. 비어있다면 빈 배열</b>을 보내주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
@@ -288,43 +286,24 @@ public class FileApiTest extends ApiTest {
                         "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
                         "파일 수정/저장", CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields, FileDocument.fileResponseFields));
-    }
-
-    @Test
-    void 파일_저장_잘못된actionType_400() throws Exception {
-        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
-        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
-        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
-
-        mockMvc.perform(
-                        post("/file/{actionType}", "저장")
-                                .header(AUTH_HEADER, token)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                        FileDocument.fileResponseFields));
     }
 
     @Test
     void 파일_저장_잘못된아이디_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
 
-        Long wrongDirectoryId = -1L;
+        Long directoryId = -1L;
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(wrongDirectoryId)))
+                                .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
@@ -334,15 +313,14 @@ public class FileApiTest extends ApiTest {
         Long directoryId = directoryTestUtil.폴더_생성(token, rootId, mockMvc);
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
@@ -352,16 +330,14 @@ public class FileApiTest extends ApiTest {
         Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_Null_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(this::print)
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
@@ -371,13 +347,13 @@ public class FileApiTest extends ApiTest {
         Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(401))
-                .andDo(document(DEFAULT_RESTDOC_PATH, FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH));
     }
 
     @Test
@@ -389,15 +365,14 @@ public class FileApiTest extends ApiTest {
         String otherToken = memberTestUtil.회원가입_다른유저_토큰반환(mockMvc);
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, otherToken)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(403))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
@@ -406,15 +381,14 @@ public class FileApiTest extends ApiTest {
         Long directoryId = 99999L;
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(404))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
@@ -426,15 +400,14 @@ public class FileApiTest extends ApiTest {
         directoryTestUtil.디렉토리_삭제_휴지통(token, directoryId, mockMvc);
 
         mockMvc.perform(
-                        post("/file/{actionType}", "save")
+                        put("/file")
                                 .header(AUTH_HEADER, token)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(fileSteps.저장파일_생성(directoryId)))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(404))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
-                        FileDocument.filePathFields));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
     }
 
     @Test
