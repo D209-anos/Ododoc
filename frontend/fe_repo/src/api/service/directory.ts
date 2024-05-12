@@ -68,6 +68,21 @@ export const editDirectoryItem = async (id: number, name: string) => {
     }
 }
 
+// directory 이동
+export const moveDirectoryItem = async (id: number, parentId: number) => {
+    try {
+        const response = await api.put('/directory/move', {
+            id: id,
+            parentId: parentId
+        });
+        const data = response.data.data;
+        return data;
+    } catch (error) {
+        console.error('디렉토리 이동 에러:', error);
+        throw error;
+    }
+};
+
 // 휴지통 조회
 export const fetchTrashbin = async () => {
     try {

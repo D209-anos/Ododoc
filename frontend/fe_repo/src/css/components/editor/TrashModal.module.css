@@ -70,7 +70,7 @@
 
 .deleteFileTitle {
     display: grid;
-    grid-template-columns: 3fr 2fr 1fr;
+    grid-template-columns: 3fr 2.3fr 1.5fr 1.2fr;
     justify-items: start;
     padding: 0px 8px 0px 8px;
     background-color: #fd9c5f;
@@ -85,7 +85,7 @@
 
 .fileItem {
     display: grid;
-    grid-template-columns: 3fr 2fr 1fr;
+    grid-template-columns: 3fr 2.3fr 1.5fr 1.2fr;
     padding: 0px 8px 0px 8px;
     margin-bottom: 5px;
     margin-top: 5px;
@@ -124,4 +124,36 @@
 
 .fileName {
     margin-left: 5vh;
+}
+.DeleteWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* justify-content: center; */
+    padding: 0;
+}
+
+.RestoreWrapper {
+    margin: 0;
+}
+
+
+.Restore {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 3px;
+}
+
+.Restore:hover {
+    transform: scale(1.2);
+}
+
+.ForeverDelete {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin-left: 3px;
+}
+
+.ForeverDelete:hover {
+    transform: scale(1.2);
 }

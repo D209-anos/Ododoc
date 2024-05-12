@@ -8,6 +8,8 @@ import FolderImage from '../../../../assets/images/icon/forder.png'
 import Swal from 'sweetalert2';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { fetchTrashbin } from '../../../../api/service/directory';
+import Restore from '../../../../assets/images/icon/restore.png';
+import ForeverDelete from '../../../../assets/images/icon/foreverDelete.png';
 
 interface ModalProps {
     isOpen: boolean;
@@ -22,23 +24,6 @@ interface IContentItem {
     trashbinTime: string;
     contents?: string | IContentItem[];
 }
-
-// 임시 데이터
-// const dummyData: IContentItem = {
-//     "id": 1,
-//     "type": "FOLDER",
-//     "name": "sub-folder1",
-//     "deletedate": "2024-04-30",
-//     "contents": [
-//         {
-//             "id": 3,
-//             "type": "FILE",
-//             "name": "file3",
-//             "deletedate": "2024-05-02",
-//             "contents": "파일 3번입니다."
-//         }
-//     ],
-// }
 
 const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
@@ -95,7 +80,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     // 삭제된 폴더 및 파일 리스트
     const renderTopLevelContent = (data: IContentItem[]) => {
         return data.map((content) => (
-            <div className={Trash.fileItem} key={content.id} onClick={() => handleItemClick(content)}>
+            <div className={Trash.fileItem} key={content.id} >
                 <div className={Trash.nameWrapper}>
                     <img 
                         src={content.type === 'FILE' ? FileImage : FolderImage} 
@@ -106,6 +91,14 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                 </div>
                 <p>{content.trashbinTime}</p>
                 <p>{content.type}</p>
+                <p className={Trash.DeleteWrapper}>
+                    <div className={Trash.RestoreWrapper}>
+                        <img src={Restore} alt="restore-image" className={Trash.Restore} onClick={() => handleItemClick(content)}/>
+                    </div>
+                    <div>
+                        <img src={ForeverDelete} alt="forever-Delete-image" className={Trash.ForeverDelete} />
+                    </div>
+                </p>
             </div>
         ));
     };
@@ -127,6 +120,7 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                         <p className={Trash.fileName}>파일명</p>
                         <p>삭제된 날짜</p>
                         <p>항목 유형</p>
+                        <p>복원/삭제</p>
                     </div>
                     {/* 휴지통에 버린 폴더 및 파일 리스트 */}
                     {trashbinData && renderTopLevelContent(trashbinData)}

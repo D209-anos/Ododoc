@@ -15,7 +15,7 @@ import Item from './Item';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
-import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem } from '../../../api/service/directory';
+import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem, moveDirectoryItem  } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useFileContext } from '../../../contexts/FileContext';
 
@@ -195,7 +195,7 @@ const SideBar: React.FC = () => {
         return children
             .map((item: MyDirectoryItem) => {
                 const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`;
-                console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
+                // console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
                 return (
                     <div key={item.id} className={className}>
                         <Item
@@ -394,28 +394,8 @@ const SideBar: React.FC = () => {
         return null;
     };
 
-    const [{ isOver: isOverTop }, dropTop] = useDrop({
-        accept: 'ITEM',
-        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
-            moveItem(draggedItem.id, null, null);  // 최상위로 이동
-        },
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-        }),
-    });
-
-    const [{ isOver: isOverBottom }, dropBottom] = useDrop({
-        accept: 'ITEM',
-        drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
-            moveItem(draggedItem.id, null, null);  // 최상위로 이동
-        },
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-        }),
-    });
-
     // 폴더 및 파일 이동
-    const moveItem = (draggedId: number, targetId: number | null, parentId: number | null) => {
+    const moveItem = async (draggedId: number, targetId: number | null, parentId: number | null) => {
         const findAndRemoveItem = (items: MyDirectoryItem[], id: number): { item: MyDirectoryItem | null, items: MyDirectoryItem[] } => {
             let foundItem: MyDirectoryItem | null = null;
             const updatedItems = items.filter(item => {
@@ -495,6 +475,16 @@ const SideBar: React.FC = () => {
 
             return insertItem(itemsWithoutDragged, draggedItem, targetId, parentId);
         });
+
+        // 디렉토리 이동 API 호출
+        try {
+            console.log(`ID: ${draggedId} parent ID: ${parentId}`);
+            await moveDirectoryItem(draggedId, parentId!);
+            const updatedDirectoryData = await fetchDirectory(rootId);
+            setDirectoryData(updatedDirectoryData)
+        } catch (error) {
+            console.error('디렉토리 이동 에러:', error)
+        }
     };
 
 
@@ -517,7 +507,6 @@ const SideBar: React.FC = () => {
     return (
         // 사이드바
         <div className={Sidebar.sidebar} style={{ width: sidebarWidth }}>
-            <div ref={dropTop} className={`${Sidebar.topDropZone} ${isOverTop ? Sidebar.dragOver : ''}`} />
             <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
                 {renderNameField()}
             </div>
@@ -548,7 +537,6 @@ const SideBar: React.FC = () => {
                     onDelete={handleDelete}
                 />
             )}
-            <div ref={dropBottom} className={`${Sidebar.bottomDropZone} ${isOverBottom ? Sidebar.dragOver : ''}`} />
             <div className={Sidebar.sideButtonWrapper}>
                 <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton} onClick={handleCreateFolder}/>
