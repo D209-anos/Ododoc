@@ -16,6 +16,6 @@ public class FileRequest {
     @Min(value = 1, message = "directory 아이디는 1 이상이어야 합니다.")
     private Long directoryId;
 
-    @NotNull(message = "content는 null일 수 없습니다. 비어있다면 빈 배열을 보내주세요.")
+    @NotNull(message = "content는 null일 수 없습니다. 비어있다면 빈 객체를 보내주세요.")
     private LinkedHashMap<String, Block> content;
 }
