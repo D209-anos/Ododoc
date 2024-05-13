@@ -14,18 +14,21 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
   private cursorPosition = 0;
   private subprocesses: ChildProcessWithoutNullStreams[] = [];
   private webSocketClient: WebSocketClient;
+  private context: vscode.ExtensionContext;
 
-  constructor() {
+  constructor(context: vscode.ExtensionContext) {
+    this.context = context;
     this.ptyProcess = null as any;
     this.folderPath = vscode.workspace.workspaceFolders
       ? vscode.workspace.workspaceFolders[0].uri.fsPath
       : null;
-    this.webSocketClient = WebSocketClient.getInstance();
+    this.webSocketClient = WebSocketClient.getInstance(context);
     this.initializeTerminal();
   }
 
   initializeTerminal() {
-    this.ptyProcess = spawn("cmd", [], { shell: true }); // Or 'bash.exe' on Mac
+    const shell = process.platform === "win32" ? "cmd" : "bash";
+    this.ptyProcess = spawn(shell, [], { shell: true });
 
     // handle output
     this.ptyProcess.stdout.on("data", (data: Buffer) => {

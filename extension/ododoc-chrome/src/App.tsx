@@ -1,41 +1,47 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { sendCodeToBackend } from './service/user';
 import './css/login/login.css';
-import { sendChromeMessage, setupWebSocket } from './components/textCollect/chromeMessage';
 import Sidebar from './components/sidebar/Sidebar';
 import './css/directory/directory.css'
 import { logout } from './service/user';
 
 const App = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null); 
-  
-  // const [collectStart, setCollectStart] = useState<boolean>(false); 
-
-  // 웹소켓 설정
-  // useEffect(() => {
-  //   const socket = setupWebSocket();
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   sendChromeMessage('collectStatus', { collectStart });
-  // }, [collectStart]);
+  const [folderTitle, setFolderTitle] = useState<string | null>(null); 
+  const [rootId, setRootId] = useState<string | null>(null);
 
   useEffect(() => {
     // 페이지 로드 시 실행되는 로직
-    const token = localStorage.getItem('accessToken');
     const urlParams = new URLSearchParams(window.location.search);
     const accessToken = urlParams.get('token');
     const provider = urlParams.get('provider');
+    const rootId = urlParams.get('rootId');
+    const title = urlParams.get("title");
 
-    if (accessToken && provider) {
+    const token = localStorage.getItem('accessToken');
+    const root = localStorage.getItem('rootId');
+    const storeName = localStorage.getItem('title');
+
+    console.log("타이틀 디코딩 직전", title)
+    if (title) {
+      const decodedTitle = decodeURIComponent(title);
+      setFolderTitle(decodedTitle)
+      console.log('Decoded Title:', folderTitle);
+    }
+
+    console.log("타이틀 디코딩 끝?")
+    if (accessToken && provider && rootId && title) {
       setAccessToken(accessToken); // 상태 업데이트
+      setRootId(rootId);
       localStorage.setItem('accessToken', accessToken); // 로컬 스토리지 저장
+      localStorage.setItem('provider', provider);
+      localStorage.setItem('rootId', rootId);
+      localStorage.setItem('title', title);
+      chrome.storage.local.set({accessToken: accessToken, rootId: rootId, title: title})
       window.close(); // 로그인 창 닫기
     } else if (token) { // 로컬 스토리지에 토큰이 있을 경우 (팝업 창)
       setAccessToken(token);
+      setFolderTitle(storeName)
+      setRootId(root)
     }
   }, []);
 
@@ -69,6 +75,9 @@ const App = () => {
     await logout()
     setAccessToken(null);
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('provider')
+    localStorage.removeItem('rootId')
+    localStorage.removeItem('title')
 
   }
 
@@ -87,16 +96,10 @@ const App = () => {
         </div>
       ) : (
         <div>
-          <Sidebar />
-          <div className="buttons-container">
-            <button>Start</button>
-            <button>Stop</button>
-            <div className="menu.loginOpenBtn" onClick={handleLogout}>Logout</div>
-          </div>
-          {/* <button onClick={() => setCollectStart(true)}>Start</button>
-          <button onClick={() => setCollectStart(false)}>Stop</button> */}
-          {/* 로그인 후 보여줄 컨텐츠 */}
+          <Sidebar accessToken={accessToken} rootId={rootId} title={folderTitle} />
+          <div className="buttons-container" onClick={handleLogout}>Logout</div>
         </div>
+        
       )}
     </div>
   );

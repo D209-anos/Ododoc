@@ -27,7 +27,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 19%;
+    /* width: 19%; */
     height: 98vh;
     background-color: rgb(197, 192, 192);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -321,7 +321,8 @@
     text-align: center;
     height: 30px;
     font-size: medium;
-    background-color: rgb(250, 242, 242);
+    /* background-color: rgb(250, 242, 242); */
+    justify-content: center;
 }
 
 .item {
@@ -331,3 +332,36 @@
     margin-left: 3vh;
 }
 
+.handle {
+    width: 6px;
+    cursor: ew-resize;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: gray;
+}
+
+.handle:hover {
+    background-color: ff914d;
+}
+
+.dragOver {
+    /* background-color: rgba(0, 0, 0, 0.1); */
+}
+
+.dropAfter {
+    height: 4px;
+    background-color: transparent;
+}
+
+.topDropZone,
+.bottomDropZone {
+    height: 20px;
+    /* 필요에 따라 조절하세요 */
+    background-color: transparent;
+}

@@ -18,6 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @DynamicInsert
 public class Member extends BaseTime implements UserDetails {
 

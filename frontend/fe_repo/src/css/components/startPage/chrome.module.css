@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;500&family=Pacifico&display=swap");
+
+.container {
+    height: 1000vh;
+    overflow-y: auto;
+}
+
+.header {
+    padding-top: 110px;
+    background-color: #fdedd5;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.path {
+    fill: none;
+    stroke: black;
+    stroke-width: 3px;
+    stroke-dasharray: 100%;
+    stroke-dashoffset: 100%;
+    animation: draw 10s ease forwards;
+}
+
+.path1,
+.path2,
+.path3,
+.path4 {
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
+}
+
+.draw {
+    animation: drawPath 4s forwards;
+}
+
+@keyframes drawPath {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw1 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw2 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw3 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw4 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw5 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes floating {
+    50% {
+        transform: translate3d(0, 40px, 0);
+    }
+}
+
+.path1 {
+    animation: draw1 4s ease forwards;
+    animation: drawPath1 1s linear, floating 2.2s linear infinite;
+}
+
+.content1,
+.content2,
+.content3,
+.content4 {
+    background-color: #fdedd5;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content1,
+.content2 {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.content1 {
+    min-height: 500px;
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.path2 {
+    stroke: black;
+    z-index: 2000;
+    animation: draw2 40s ease forwards;
+}
+
+.footer {
+    height: 30vh;
+    background-color: #fdedd5;
+}
+
+.vscodeGuide {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.guideTitle {
+    background-color: #fdedd5;
+    margin: 130px 0px 0px 150px;
+}
+
+.guide {
+    color: black;
+    font-family: 'hanbitFont';
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.Explain1,
+.Explain2,
+.Explain3,
+.Explain4 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.path3 {
+    animation: draw3 10s ease forwards;
+    /* Explain3 애니메이션 10초 */
+}
+
+.path4 {
+    animation: draw4 12s ease forwards;
+    /* Explain4 애니메이션 12초 */
+}
+
+.path5 {
+    animation: draw5 14s ease forwards;
+    /* Explain5 애니메이션 14초 */
+}

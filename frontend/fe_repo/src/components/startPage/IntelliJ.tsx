@@ -1,45 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import Intellij from '../../css/components/startPage/intellij.module.css';
+import { ReactComponent as Explain1 } from '../../assets/svg/Explain1.svg';
+import { ReactComponent as Explain2 } from '../../assets/svg/Explain2.svg';
+import { ReactComponent as Explain3 } from '../../assets/svg/Explain3.svg';
+import { ReactComponent as Explain4 } from '../../assets/svg/Explain4.svg';
+import { ReactComponent as Explain5 } from '../../assets/svg/Explain5.svg';
 
-function IntelliJ() {
-    const [activeSection, setActiveSection] = useState<number>(0);
+const IntelliJ: React.FC = () => {
+    const pathRefs = useRef<(SVGPathElement | null)[]>([]);
 
     useEffect(() => {
-        const positions = [600, 1200, 1800, 2400];
-        const handleScroll = () => {
-            const scrollPosition = window.pageYOffset;
-            const newActiveSection = positions.findIndex(pos => scrollPosition < pos) - 1;
-            if (newActiveSection !== activeSection && newActiveSection >= 0) {
-                setActiveSection(newActiveSection);
-            }
+        const initializePaths = () => {
+            pathRefs.current.forEach((path) => {
+                if (path) {
+                    path.style.strokeDasharray = `${path.getTotalLength()}`;
+                    path.style.strokeDashoffset = `${path.getTotalLength()}`;
+                    path.classList.remove(Intellij.draw);
+                }
+            });
         }
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [activeSection])
-    
+        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const pathElement = entry.target as SVGPathElement;
+                    pathElement.classList.add(Intellij.draw);
+                    pathElement.addEventListener('animationend', () => {
+                        pathElement.style.strokeDashoffset = '0';
+                        pathElement.classList.remove(Intellij.draw);
+                    }, { once: true });
+                }
+            });
+        };
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -400px 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        initializePaths();
+
+        pathRefs.current.forEach((path) => {
+            if (path) {
+                observer.observe(path);
+            }
+        });
+
+        return () => {
+            pathRefs.current.forEach((path) => {
+                if (path) {
+                    observer.unobserve(path);
+                }
+            });
+        };
+    }, []);
+
     return (
-        <div>
-            <div>
-                {activeSection >= 0 && <div>1</div>}
-                {activeSection >= 1 && (
-                <svg width="100" height="100">
-                    <circle cx="50" cy="50" r="40" stroke="black" strokeWidth="3" fill="red" />
-                </svg>
-                )}
-                {activeSection >= 2 && <div>2</div>}
-                {activeSection >= 3 && (
-                <svg width="100" height="100">
-                    <rect x="10" y="10" width="80" height="80" stroke="blue" strokeWidth="3" fill="green" />
-                </svg>
-                )}
-                {activeSection >= 4 && <div>3</div>}
-                {activeSection >= 5 && (
-                <svg width="100" height="100">
-                    <polygon points="50,5 95,99 5,39 95,39 5,99" stroke="orange" strokeWidth="3" fill="purple" />
-                </svg>
-                )}
-                {activeSection >= 6 && <div>4</div>}
-      </div>
+        <div className={Intellij.vscodeGuide}>
+            <div className={Intellij.guideTitle}>
+                <p className={Intellij.guide}>IntelliJ 확장 프로그램 설치 및 활용 가이드</p>
+            </div>
+            <div className={Intellij.header}>
+                <Explain1 ref={(el) => (pathRefs.current[0] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path1}`}/>
+            </div>
+            <div className={Intellij.content1}>
+                <Explain2 ref={(el) => (pathRefs.current[1] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path2}`}/>
+            </div>
+            <div className={Intellij.content2}>
+                <Explain3 ref={(el) => (pathRefs.current[2] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path3}`}/>
+            </div>
+            <div className={Intellij.content3}>
+                <Explain4 ref={(el) => (pathRefs.current[3] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path4}`}/>
+            </div>
+            <div className={Intellij.content4}>
+                <Explain5 ref={(el) => (pathRefs.current[4] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path5}`}/>
+            </div>
+            <div className={Intellij.footer}></div>
         </div>
     )
 }

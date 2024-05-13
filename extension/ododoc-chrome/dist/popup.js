@@ -25,34 +25,43 @@ __webpack_require__.r(__webpack_exports__);
 
 const App = () => {
   const [accessToken, setAccessToken] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-
-  // const [collectStart, setCollectStart] = useState<boolean>(false); 
-
-  // 웹소켓 설정
-  // useEffect(() => {
-  //   const socket = setupWebSocket();
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   sendChromeMessage('collectStatus', { collectStart });
-  // }, [collectStart]);
-
+  const [folderTitle, setFolderTitle] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [rootId, setRootId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     // 페이지 로드 시 실행되는 로직
-    const token = localStorage.getItem('accessToken');
     const urlParams = new URLSearchParams(window.location.search);
     const accessToken = urlParams.get('token');
     const provider = urlParams.get('provider');
-    if (accessToken && provider) {
+    const rootId = urlParams.get('rootId');
+    const title = urlParams.get("title");
+    const token = localStorage.getItem('accessToken');
+    const root = localStorage.getItem('rootId');
+    const storeName = localStorage.getItem('title');
+    console.log("타이틀 디코딩 직전", title);
+    if (title) {
+      const decodedTitle = decodeURIComponent(title);
+      setFolderTitle(decodedTitle);
+      console.log('Decoded Title:', folderTitle);
+    }
+    console.log("타이틀 디코딩 끝?");
+    if (accessToken && provider && rootId && title) {
       setAccessToken(accessToken); // 상태 업데이트
+      setRootId(rootId);
       localStorage.setItem('accessToken', accessToken); // 로컬 스토리지 저장
+      localStorage.setItem('provider', provider);
+      localStorage.setItem('rootId', rootId);
+      localStorage.setItem('title', title);
+      chrome.storage.local.set({
+        accessToken: accessToken,
+        rootId: rootId,
+        title: title
+      });
       window.close(); // 로그인 창 닫기
     } else if (token) {
       // 로컬 스토리지에 토큰이 있을 경우 (팝업 창)
       setAccessToken(token);
+      setFolderTitle(storeName);
+      setRootId(root);
     }
   }, []);
   const handleSocialLogin = provider => {
@@ -82,6 +91,9 @@ const App = () => {
     await (0,_service_user__WEBPACK_IMPORTED_MODULE_4__.logout)();
     setAccessToken(null);
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('provider');
+    localStorage.removeItem('rootId');
+    localStorage.removeItem('title');
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, !accessToken ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "loginContent"
@@ -100,12 +112,14 @@ const App = () => {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "kakaoBtn socialLoginBtn",
     onClick: () => handleSocialLogin('kakao')
-  }))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_sidebar_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "buttons-container"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", null, "Start"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", null, "Stop"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "menu.loginOpenBtn",
+  }))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_sidebar_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    accessToken: accessToken,
+    rootId: rootId,
+    title: folderTitle
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "buttons-container",
     onClick: handleLogout
-  }, "Logout"))));
+  }, "Logout")));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
@@ -131,6 +145,7 @@ __webpack_require__.r(__webpack_exports__);
 const FileItem = _ref => {
   let {
     item,
+    parentId,
     selected,
     handleItemClick,
     selectedItem,
@@ -198,6 +213,7 @@ __webpack_require__.r(__webpack_exports__);
 const FolderItem = _ref => {
   let {
     item,
+    parentId,
     toggleModal,
     modalActive,
     renderContents,
@@ -213,6 +229,20 @@ const FolderItem = _ref => {
   const toggleFolder = () => {
     setIsFolderOpen(!isFolderOpen);
     handleItemClick(item.id);
+  };
+  const findParentId = function (contents, id) {
+    let parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    if (!contents || typeof contents === 'string') return undefined;
+    for (let item of contents) {
+      if (item.id === id) {
+        return parentId;
+      }
+      if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
+        const foundParentId = findParentId(item.contents, id, item.id); // 재귀로 부모 찾기
+        if (foundParentId !== undefined) return foundParentId;
+      }
+    }
+    return undefined;
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: item.id,
@@ -251,93 +281,66 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _images_icon_line_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../images/icon/line.png */ "./src/images/icon/line.png");
 /* harmony import */ var _FolderItem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FolderItem */ "./src/components/sidebar/FolderItem.tsx");
 /* harmony import */ var _FileItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FileItem */ "./src/components/sidebar/FileItem.tsx");
+/* harmony import */ var _service_directory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../service/directory */ "./src/service/directory.ts");
 
 
 
 
 
-// 임시 데이터
-const dummyData = {
-  "id": 1,
-  "type": "FOLDER",
-  "name": "현재의 정리 공간",
-  "contents": [{
-    "id": 2,
-    "type": "FOLDER",
-    "name": "ododoc 프로젝트",
-    "contents": [{
-      "id": 7,
-      "type": "FOLDER",
-      "name": "프로젝트 이슈 모음집",
-      "contents": [{
-        "id": 13,
-        "type": "FILE",
-        "name": "2024-04-20",
-        "contents": "13번입니다."
-      }, {
-        "id": 144,
-        "type": "FILE",
-        "name": "2024-04-22",
-        "contents": "144번입니다."
-      }, {
-        "id": 155,
-        "type": "FILE",
-        "name": "2024-04-25",
-        "contents": "155번입니다."
-      }, {
-        "id": 166,
-        "type": "FILE",
-        "name": "2024-05-03",
-        "contents": "166번입니다."
-      }]
-    }]
-  }, {
-    "id": 4,
-    "type": "FOLDER",
-    "name": "밀정윷놀이 프로젝트",
-    "contents": [{
-      "id": 999,
-      "type": "FILE",
-      "name": "Project Description",
-      "contents": "안녕 글 내용이야 이렇고 저렇고"
-    }]
-  }, {
-    "id": 5,
-    "type": "FOLDER",
-    "name": "vodle 프로젝트",
-    "contents": []
-  }]
-};
-const SideBar = () => {
-  // const navigate = useNavigate();
-  // const [contents, setContents] = useState<IContentItem[]>([]);
+
+
+// Props 타입 정의
+
+// 디렉토리 타입
+
+const adress = "ws://localhost:18080/process/ws";
+const SideBar = _ref => {
+  let {
+    accessToken,
+    rootId,
+    title
+  } = _ref;
+  console.log(accessToken, rootId, title);
+  const [monitoring, setMonitoring] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [contents, setContents] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [modalActive, setModalActive] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}); // 파일, 폴더 생성 모달창 열림, 닫힘 여부
-  const [isTrashModalOpen, setTrashModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 휴지통 모달창 열림, 닫힘 여부
-  const [isSettingModalOpen, setSettingModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 설정 모달창 열림, 닫힘 여부
-  const [isEditing, setIsEditing] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 사용자 이름 수정 여부
   const [isContentEditing, setIsContentEditing] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
-  const [userName, setUserName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(dummyData.name); // 사용자 이름 수정
+  const [userName, setUserName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(title || ''); // 사용자 이름 수정
   const [selectedId, setSelectedId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // 선택된 id
   const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [directoryData, setDirectoryData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // directory data 저장
 
-  // 디렉토리 조회
-  // useEffect(() => {
-  //     const loadDirectory = async () => {
-  //         const rootId = 1;
-  //         const directoryData = await fetchDirectory(rootId);
-  //         const token = localStorage.getItem('accessToken')
-  //         if (directoryData && token) {
-  //             console.log('데이터 들어왔따 ~~~')
-  //             console.log(directoryData)
-  //             setContents(directoryData.contents as IContentItem[]);
-  //             setUserName(directoryData.name);
-  //         }
-  //     };
+  // 디렉토리 조회 (로그인 시 title 매핑)
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const loadDirectory = async () => {
+      if (accessToken && rootId) {
+        console.log(accessToken, rootId);
+        const rootIdNumber = Number(rootId);
+        const data = await (0,_service_directory__WEBPACK_IMPORTED_MODULE_5__.fetchDirectory)(rootIdNumber, accessToken);
+        setDirectoryData(data);
+      }
+    };
+    loadDirectory();
+  }, [accessToken, rootId]);
 
-  //     loadDirectory();
-  // }, [])
+  // 디렉토리 조회 (디렉토리 생성 후 조회)
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (directoryData) {
+      console.log(directoryData);
+      setContents(directoryData.children); // diretoryData 정보 넣음
+      setUserName(directoryData.name); // 사용자 이름 넣음
+    } else {
+      console.log("디렉토리 찾을 수 없음.");
+    }
+  }, [directoryData]);
 
+  // 닉넴
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (title) {
+      setUserName(title);
+    }
+  }, [title]);
   const toggleModal = id => {
     setModalActive(prev => ({
       ...prev,
@@ -348,8 +351,8 @@ const SideBar = () => {
   // file 클릭
   const fileItemClick = id => {
     // navigate(`/editor/${id}`, {state: id})
-    // setSelectedId(id);
-    // console.log(id)
+    setSelectedId(id);
+    console.log(selectedId);
   };
 
   // folder 클릭
@@ -358,25 +361,11 @@ const SideBar = () => {
     // console.log(id)
   };
 
-  // // 사용자 이름 저장 함수
-  // const saveUserName = (objectId: number) => {
-  //     setIsEditing(false);
-  //     // 사용자 이름 수정 API 호출 코드 작성
-  // };
-
-  // 사용자 이름 수정 함수
-  const renderNameField = () => {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      onClick: () => setIsEditing(true),
-      className: "nickname"
-    }, userName);
-  };
-
   // 폴더 및 파일 하위 구조
-  const renderContents = function (contents) {
-    let indentLevel = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    if (!contents) return [];
-    return contents.map(item => {
+  const renderContents = function (children, parentId) {
+    let indentLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    if (!children) return [];
+    return children.map(item => {
       const className = "item ".concat(indentLevel > 0 ? 'itemIndent' : ''); // 하위 요소 들여쓰기
       if (item.type === 'FOLDER') {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -384,9 +373,10 @@ const SideBar = () => {
           className: className
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_FolderItem__WEBPACK_IMPORTED_MODULE_3__["default"], {
           item: item,
+          parentId: parentId,
           toggleModal: toggleModal,
           modalActive: modalActive,
-          renderContents: () => renderContents(item.contents, indentLevel + 1),
+          renderContents: () => renderContents(item.children, item.id, indentLevel + 1),
           handleItemClick: folderItemClick,
           selectedItem: selectedItem,
           isContentEditing: isContentEditing,
@@ -399,6 +389,7 @@ const SideBar = () => {
           className: className
         }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_FileItem__WEBPACK_IMPORTED_MODULE_4__["default"], {
           item: item,
+          parentId: item.id,
           selected: item.id === selectedId,
           handleItemClick: fileItemClick,
           selectedItem: selectedItem,
@@ -411,14 +402,14 @@ const SideBar = () => {
   };
 
   // 선택된 항목 ID 찾기 함수
-  const findItemById = (contents, id) => {
-    if (!contents || typeof contents === 'string') return undefined;
-    for (let item of contents) {
+  const findItemById = (children, id) => {
+    if (!children || typeof children === 'string') return undefined;
+    for (let item of children) {
       if (item.id === id) {
         return item;
       }
-      if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
-        const found = findItemById(item.contents, id);
+      if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+        const found = findItemById(item.children, id);
         if (found) return found;
       }
     }
@@ -434,24 +425,246 @@ const SideBar = () => {
       console.error('No item selected.');
     }
   };
+
+  /**  웹소켓 코드 */
+  // const socket = useRef<WebSocket | null>(null);
+
+  // useEffect(() => {
+  //     console.log(monitoring);
+  //     socket.current = new WebSocket(adress);
+  //     console.log("WebSocketClient created");
+
+  //     socket.current.onopen = () => {
+  //         console.log("Connection established");
+  //         // socket.current?.send("Hello Server!");
+  //         const messageData = {
+  //             sourceApplication: "Chrome",
+  //             accessToken: accessToken,
+  //             connectedFileId: 1,
+  //             dataType: "SIGNAL",
+  //             content: "Test message from React",
+  //             timestamp: new Date()
+  //         };
+
+  //         const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+  //         if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+  //             socket.current.send(messageJson); // JSON 문자열을 보냄
+  //         } else {
+  //             console.error("WebSocket connection is not established.");
+  //         }
+
+  //     };
+
+  //     socket.current.onmessage = (event) => {
+  //         console.log("Message from server:", event.data);
+  //     };
+
+  //     socket.current.onerror = (error) => {
+  //         console.error("WebSocket 에러:", error);
+  //     };
+
+  //     socket.current.onclose = () => {
+  //         console.log("소켓 닫혔어요");
+  //     };
+
+  //     const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+  //         console.log(monitoring, ", 변화 :", changeInfo.status, ", url : ", tab.url)
+  //         if (monitoring && changeInfo.status === 'complete' && tab.url) {
+  //             chrome.scripting.executeScript({
+  //                 target: { tabId: tabId },
+  //                 func: getHtml
+  //             }, (results) => {
+  //                 if (results[0]) {
+  //                     const pageHtml = results[0].result;
+  //                     let message = '';
+
+  //                     if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
+  //                         const urlParams = new URLSearchParams(new URL(tab.url).search);
+  //                         const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
+  //                         message = JSON.stringify({
+  //                             type: 'search',
+  //                             query: searchQuery
+  //                         });
+  //                     } else {
+  //                         message = JSON.stringify({
+  //                             type: 'page',
+  //                             url: tab.url,
+  //                             html: pageHtml
+  //                         });
+  //                     }
+
+  //                     const messageData = {
+  //                         sourceApplication: "Chrome",
+  //                         accessToken: accessToken,
+  //                         connectedFileId: 1,
+  //                         dataType: "SIGNAL",
+  //                         content: message,
+  //                         timestamp: new Date()
+  //                     };
+  //                     const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+  //                     if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+  //                         socket.current.send(messageJson); // JSON 문자열을 보냄
+  //                     } else {
+  //                         console.error("WebSocket connection is not established.");
+  //                     }
+  //                 }
+  //             });
+  //         }
+  //     };
+
+  //     const getHtml = () => document.documentElement.outerHTML;
+
+  //     chrome.tabs.onUpdated.addListener(handleTabUpdate);
+
+  //     // Cleanup on component unmount
+  //     return () => {
+  //         socket.current?.close();
+  //         chrome.tabs.onUpdated.removeListener(handleTabUpdate);
+  //     };
+  // }, [monitoring]);
+
+  const handleStartMonitoring = () => {
+    console.log("기록 시작할게요");
+    setMonitoring(true);
+    chrome.runtime.sendMessage({
+      command: "start"
+    });
+  };
+  const handleStopMonitoring = () => {
+    console.log("기록 중지할게요");
+    setMonitoring(false);
+    chrome.runtime.sendMessage({
+      command: "stop"
+    });
+  };
+
+  // const sendMessage = (message: string) => {
+  //     const messageObject = { text: message };
+
+  //     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+  //         socket.current.send(messageObject);
+  //     } else {
+  //         console.log("Connection not ready.");
+  //     }
+  // };
+  /***********************  웹소켓 코드 *********************************/
+
   return (
     /*#__PURE__*/
     // 사이드바
-    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "sidebar"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "nicknameSpace",
       style: {
         fontFamily: 'hanbitFont'
       }
-    }, renderNameField()), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "nickname"
+    }, userName)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
       src: _images_icon_line_png__WEBPACK_IMPORTED_MODULE_2__,
       alt: "line",
       className: "line"
-    }), renderContents(dummyData.contents))
+    }), renderContents(contents, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "buttons-container"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+      onClick: handleStartMonitoring
+    }, "\uAE30\uB85D \uC2DC\uC791"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+      onClick: handleStopMonitoring
+    }, "\uAE30\uB85D \uC911\uC9C0")))
   );
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SideBar);
+
+/***/ }),
+
+/***/ "./src/contexts/AuthContext.tsx":
+/*!**************************************!*\
+  !*** ./src/contexts/AuthContext.tsx ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AuthProvider: () => (/* binding */ AuthProvider),
+/* harmony export */   useAuth: () => (/* binding */ useAuth)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+const initialState = {
+  accessToken: null,
+  isAuthenticated: false,
+  rootId: null,
+  title: null,
+  type: null
+};
+
+// 로컬 스토리지에서 상태를 불러오는 함수
+const loadStateFromLocalStorage = () => {
+  try {
+    const serializedState = localStorage.getItem('authDetails');
+    if (serializedState === null) {
+      return initialState;
+    }
+    return JSON.parse(serializedState);
+  } catch (error) {
+    console.error("로컬 스토리지에서 불러오는게 잘못됐다", error);
+    return initialState;
+  }
+};
+
+// 로컬 스토리지에서 상태를 저장하는 함수
+const saveStateToLocalStorage = state => {
+  try {
+    const serializedState = JSON.stringify(state);
+    localStorage.setItem('authDetails', serializedState);
+  } catch (error) {
+    console.log("로컬스토리지에 저장안됐어..", error);
+  }
+};
+const AuthContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(undefined);
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_AUTH_DETAILS':
+      const newState = {
+        ...state,
+        ...action.payload,
+        isAuthenticated: true
+      };
+      saveStateToLocalStorage(newState);
+      return newState;
+    case 'LOGOUT':
+      saveStateToLocalStorage(initialState);
+      return {
+        ...initialState
+      };
+    default:
+      return state;
+  }
+};
+const AuthProvider = _ref => {
+  let {
+    children
+  } = _ref;
+  const [state, dispatch] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useReducer)(authReducer, initialState, loadStateFromLocalStorage);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    saveStateToLocalStorage(state);
+  }, [state]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(AuthContext.Provider, {
+    value: {
+      state,
+      dispatch
+    }
+  }, children);
+};
+const useAuth = () => {
+  const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 /***/ }),
 
@@ -512,10 +725,16 @@ const api = axios__WEBPACK_IMPORTED_MODULE_0__["default"].create({
 api.interceptors.request.use(
 // 토큰 있을 때: 헤더에 토큰 싣기
 function (config) {
-  const accessToken = localStorage.getItem("accessToken");
-  if (accessToken) {
-    config.headers["Authorization"] = "Bearer ".concat(accessToken);
+  const authDetails = localStorage.getItem("authDetails");
+  if (authDetails) {
+    const {
+      accessToken
+    } = JSON.parse(authDetails);
+    if (accessToken) {
+      config.headers["Authorization"] = "".concat(accessToken);
+    }
   }
+  console.log(config.headers);
   return config;
 },
 // 토큰 없을 때: 에러 띄우기
@@ -523,6 +742,42 @@ function (error) {
   return Promise.reject(error);
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (api);
+
+/***/ }),
+
+/***/ "./src/service/directory.ts":
+/*!**********************************!*\
+  !*** ./src/service/directory.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   fetchDirectory: () => (/* binding */ fetchDirectory)
+/* harmony export */ });
+/* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/service/api.ts");
+
+// directory 조회
+const fetchDirectory = async (rootId, token) => {
+  try {
+    console.log(rootId);
+    const response = await _api__WEBPACK_IMPORTED_MODULE_0__["default"].get("/directory/".concat(rootId), {
+      headers: {
+        Authorization: token
+      }
+    });
+    console.log(response);
+    const data = response.data.data;
+    console.log(data);
+
+    // localStorage.setItem('directoryData', JSON.stringify(data));
+    return data;
+  } catch (error) {
+    var _error$response;
+    console.error('Failed to fetch directory:', ((_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data) || error.message);
+    return null;
+  }
+};
 
 /***/ }),
 
@@ -535,27 +790,55 @@ function (error) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   logout: () => (/* binding */ logout),
-/* harmony export */   sendCodeToBackend: () => (/* binding */ sendCodeToBackend)
+/* harmony export */   useSendCodeToBackend: () => (/* binding */ useSendCodeToBackend)
 /* harmony export */ });
 /* harmony import */ var _api__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./api */ "./src/service/api.ts");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _contexts_AuthContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../contexts/AuthContext */ "./src/contexts/AuthContext.tsx");
+
+
 
 
 // 인가 코드 백엔드로 전송
-const sendCodeToBackend = async (code, url, provider, setAccessToken) => {
-  try {
-    const response = await _api__WEBPACK_IMPORTED_MODULE_0__["default"].post("/oauth2/authorization/".concat(provider), {
-      code: code,
-      url: url
-    });
-    console.log('Access Token:', response.data);
-
-    // 엑세스 토큰 상태 관리
-    setAccessToken(response.data.data.accessToken);
-    // local storage에 토큰 저장
-    localStorage.setItem('accessToken', response.data.data.accessToken);
-  } catch (error) {
-    console.error('Error sending authorization code:', error);
-  }
+const useSendCodeToBackend = () => {
+  const {
+    dispatch
+  } = (0,_contexts_AuthContext__WEBPACK_IMPORTED_MODULE_2__.useAuth)();
+  const sendCodeToBackend = (0,react__WEBPACK_IMPORTED_MODULE_1__.useCallback)(async (code, url, provider) => {
+    try {
+      const response = await _api__WEBPACK_IMPORTED_MODULE_0__["default"].post("/oauth2/authorization/".concat(provider), {
+        code: code,
+        url: url
+      });
+      console.log('Login Info:', response.data);
+      const {
+        accessToken,
+        rootId,
+        title,
+        type
+      } = response.data.data;
+      // 상태 업데이트
+      dispatch({
+        type: 'SET_AUTH_DETAILS',
+        payload: {
+          accessToken,
+          rootId,
+          title,
+          type
+        }
+      });
+      localStorage.setItem('authDetails', JSON.stringify({
+        accessToken,
+        rootId,
+        title,
+        type
+      }));
+    } catch (error) {
+      console.error('Error sending authorization code:', error);
+    }
+  }, [dispatch]);
+  return sendCodeToBackend;
 };
 
 // 로그아웃
@@ -570,6 +853,7 @@ const logout = async () => {
 
     // 로그아웃 후 local storage 토큰 제거
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('provider');
   } catch (error) {
     console.error('로그아웃 도중 문제 발생!!!', error);
   }
