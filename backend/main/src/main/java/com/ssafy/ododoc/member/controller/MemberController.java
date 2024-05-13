@@ -59,7 +59,7 @@ public class MemberController {
                                @PathVariable String provider,
                                HttpServletResponse response) {
 
-        log.debug("[테스트 social login 호출] : {} {}", provider, code);
+        log.debug("[IntelliJ Plugin social login 호출] : {} {}", provider, code);
         Directory directory = memberService.getMemberInfo(provider, code, redirectUri);
 
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());
