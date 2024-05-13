@@ -16,6 +16,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -24,6 +26,10 @@ import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -100,8 +106,14 @@ public class DirectoryFrame extends Application {
         connectButton.setTooltip(new Tooltip("서버 연결"));
         connectButton.setOnAction(e -> connectWebSocket());
 
+        Button homeButton = new Button();
+        ImageView homeIcon = new ImageView(new Image(getClass().getResourceAsStream("/image/button/home.png")));
+        homeButton.setGraphic(homeIcon);
+        homeButton.setTooltip(new Tooltip("Ododoc 홈페이지로 이동"));
+        homeButton.setOnAction(e -> openWebPage());
+
         ToolBar toolBar = new ToolBar();
-        toolBar.getItems().addAll(refreshButton, connectButton);
+        toolBar.getItems().addAll(homeButton, connectButton, refreshButton);
         BorderPane root = new BorderPane();
         root.setBottom(toolBar);
         root.setCenter(treeView);
@@ -313,6 +325,19 @@ public class DirectoryFrame extends Application {
             });
         }
 
+    }
+
+    private void openWebPage(){
+        Platform.runLater(() -> {
+            try{
+                if(Desktop.isDesktopSupported()){
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.browse(new URI("https://k10d209.p.ssafy.io/"));
+                }
+            } catch (IOException | URISyntaxException e){
+                e.printStackTrace();
+            }
+        });
     }
 
 }
