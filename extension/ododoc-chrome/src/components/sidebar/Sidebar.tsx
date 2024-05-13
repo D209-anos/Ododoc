@@ -20,7 +20,7 @@ interface MyDirectoryItem {
     children?: MyDirectoryItem[] | string;
 }
 
-const adress = "ws://192.168.0.6:18080/process/ws";
+const adress = "ws://localhost:18080/process/ws";
 
 const SideBar: React.FC<SidebarProps> = ({ accessToken, rootId, title }) => {
     console.log(accessToken, rootId, title)
@@ -154,108 +154,112 @@ const SideBar: React.FC<SidebarProps> = ({ accessToken, rootId, title }) => {
     }    
 
     /**  웹소켓 코드 */
-    const socket = useRef<WebSocket | null>(null);
+    // const socket = useRef<WebSocket | null>(null);
 
-    useEffect(() => {
-        socket.current = new WebSocket(adress);
-        console.log("WebSocketClient created");
+    // useEffect(() => {
+    //     console.log(monitoring);
+    //     socket.current = new WebSocket(adress);
+    //     console.log("WebSocketClient created");
 
-        socket.current.onopen = () => {
-            console.log("Connection established");
-            // socket.current?.send("Hello Server!");
-            const messageData = {
-                sourceApplication: "Chrome",
-                accessToken: accessToken,
-                connectedFileId: 1,
-                dataType: "SIGNAL",
-                content: "Test message from React",
-                timestamp: new Date()
-            };
+    //     socket.current.onopen = () => {
+    //         console.log("Connection established");
+    //         // socket.current?.send("Hello Server!");
+    //         const messageData = {
+    //             sourceApplication: "Chrome",
+    //             accessToken: accessToken,
+    //             connectedFileId: 1,
+    //             dataType: "SIGNAL",
+    //             content: "Test message from React",
+    //             timestamp: new Date()
+    //         };
 
-            const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-            if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
-                socket.current.send(messageJson); // JSON 문자열을 보냄
-            } else {
-                console.error("WebSocket connection is not established.");
-            }
+    //         const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+    //         if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+    //             socket.current.send(messageJson); // JSON 문자열을 보냄
+    //         } else {
+    //             console.error("WebSocket connection is not established.");
+    //         }
 
-        };
+    //     };
 
-        socket.current.onmessage = (event) => {
-            console.log("Message from server:", event.data);
-        };
+    //     socket.current.onmessage = (event) => {
+    //         console.log("Message from server:", event.data);
+    //     };
 
-        socket.current.onerror = (error) => {
-            console.error("WebSocket 에러:", error);
-        };
+    //     socket.current.onerror = (error) => {
+    //         console.error("WebSocket 에러:", error);
+    //     };
 
-        socket.current.onclose = () => {
-            console.log("소켓 닫혔어요");
-        };
+    //     socket.current.onclose = () => {
+    //         console.log("소켓 닫혔어요");
+    //     };
 
-        const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-            if (monitoring && changeInfo.status === 'complete' && tab.url) {
-                chrome.scripting.executeScript({
-                    target: { tabId: tabId },
-                    func: getHtml
-                }, (results) => {
-                    if (results[0]) {
-                        const pageHtml = results[0].result;
-                        let message = '';
+    //     const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+    //         console.log(monitoring, ", 변화 :", changeInfo.status, ", url : ", tab.url)
+    //         if (monitoring && changeInfo.status === 'complete' && tab.url) {
+    //             chrome.scripting.executeScript({
+    //                 target: { tabId: tabId },
+    //                 func: getHtml
+    //             }, (results) => {
+    //                 if (results[0]) {
+    //                     const pageHtml = results[0].result;
+    //                     let message = '';
 
-                        if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
-                            const urlParams = new URLSearchParams(new URL(tab.url).search);
-                            const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
-                            message = JSON.stringify({
-                                type: 'search',
-                                query: searchQuery
-                            });
-                        } else {
-                            message = JSON.stringify({
-                                type: 'page',
-                                url: tab.url,
-                                html: pageHtml
-                            });
-                        }
+    //                     if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
+    //                         const urlParams = new URLSearchParams(new URL(tab.url).search);
+    //                         const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
+    //                         message = JSON.stringify({
+    //                             type: 'search',
+    //                             query: searchQuery
+    //                         });
+    //                     } else {
+    //                         message = JSON.stringify({
+    //                             type: 'page',
+    //                             url: tab.url,
+    //                             html: pageHtml
+    //                         });
+    //                     }
 
-                        const messageData = {
-                            sourceApplication: "Chrome",
-                            accessToken: accessToken,
-                            connectedFileId: 1,
-                            dataType: "SIGNAL",
-                            content: message,
-                            timestamp: new Date()
-                        };
-                        const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-                        if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
-                            socket.current.send(messageJson); // JSON 문자열을 보냄
-                        } else {
-                            console.error("WebSocket connection is not established.");
-                        }
-                    }
-                });
-            }
-        };
+    //                     const messageData = {
+    //                         sourceApplication: "Chrome",
+    //                         accessToken: accessToken,
+    //                         connectedFileId: 1,
+    //                         dataType: "SIGNAL",
+    //                         content: message,
+    //                         timestamp: new Date()
+    //                     };
+    //                     const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+    //                     if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+    //                         socket.current.send(messageJson); // JSON 문자열을 보냄
+    //                     } else {
+    //                         console.error("WebSocket connection is not established.");
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //     };
       
-        const getHtml = () => document.documentElement.outerHTML;
+    //     const getHtml = () => document.documentElement.outerHTML;
 
-        chrome.tabs.onUpdated.addListener(handleTabUpdate);
+    //     chrome.tabs.onUpdated.addListener(handleTabUpdate);
 
-        // Cleanup on component unmount
-        return () => {
-            socket.current?.close();
-            chrome.tabs.onUpdated.removeListener(handleTabUpdate);
-        };
-    }, [monitoring]);
+    //     // Cleanup on component unmount
+    //     return () => {
+    //         socket.current?.close();
+    //         chrome.tabs.onUpdated.removeListener(handleTabUpdate);
+    //     };
+    // }, [monitoring]);
 
     const handleStartMonitoring = () => {
         console.log("기록 시작할게요");
         setMonitoring(true);
+        chrome.runtime.sendMessage({ command: "start" });
     };
     
       const handleStopMonitoring = () => {
         console.log("기록 중지할게요");
         setMonitoring(false);
+        chrome.runtime.sendMessage({ command: "stop" });
     };
 
     
@@ -283,8 +287,8 @@ const SideBar: React.FC<SidebarProps> = ({ accessToken, rootId, title }) => {
                 {renderContents(contents, null)}
             </div>
             <div className="buttons-container">
-                <button onClick={handleStartMonitoring}>Start</button>
-                <button onClick={handleStopMonitoring}>Stop</button>
+                <button onClick={handleStartMonitoring}>기록 시작</button>
+                <button onClick={handleStopMonitoring}>기록 중지</button>
             </div>
         </div>
     )

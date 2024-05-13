@@ -1,152 +1,135 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./src/components/textCollect/chromeMessage.ts":
-/*!*****************************************************!*\
-  !*** ./src/components/textCollect/chromeMessage.ts ***!
-  \*****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   sendChromeMessage: () => (/* binding */ sendChromeMessage),
-/* harmony export */   sendWebSocketMessage: () => (/* binding */ sendWebSocketMessage),
-/* harmony export */   setupWebSocket: () => (/* binding */ setupWebSocket)
-/* harmony export */ });
-const sendChromeMessage = (action, data) => {
-  chrome.runtime.sendMessage({
-    action,
-    ...data
-  });
-};
-
-// 웹소켓
-let socket = null;
-const setupWebSocket = () => {
-  socket = new WebSocket('wss://localhost:18080/process');
-  socket.onopen = () => {
-    console.log('WebSocket connection established');
-  };
-  socket.onerror = error => {
-    console.error('WebSocket error:', error);
-  };
-  socket.onclose = () => {
-    console.log('WebSocket connection closed');
-  };
-  return socket;
-};
-const sendWebSocketMessage = data => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(data));
-  } else {
-    console.log('WebSocket is not connected, trying to reconnect...');
-    socket = setupWebSocket();
-  }
-};
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
 /*!***************************!*\
   !*** ./src/background.ts ***!
   \***************************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_textCollect_chromeMessage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/textCollect/chromeMessage */ "./src/components/textCollect/chromeMessage.ts");
-
+let socket = null;
+let start = false;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'sendPageData') {
-    (0,_components_textCollect_chromeMessage__WEBPACK_IMPORTED_MODULE_0__.sendWebSocketMessage)(message.data);
+  if (message.command === "start") {
+    console.log("start 명령 백그라운드에서 받음");
+    start = true;
+    if (!socket || socket.readyState === WebSocket.CLOSED) {
+      connectWebSocket();
+    }
+    chrome.tabs.onUpdated.addListener(handleTabUpdate);
+  } else if (message.command === "stop") {
+    console.log("stop 명령 백그라운드에서 받음");
+    start = false;
+
+    // 웹소켓 연결 종료
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+    chrome.tabs.onUpdated.removeListener(handleTabUpdate);
   }
 });
-
-// chrome.action.onClicked.addListener((tab: chrome.tabs.Tab) => {
-//     chrome.windows.create({
-//       url: chrome.runtime.getURL("window.html"),
-//       type: "popup",
-//       width: 400,
-//       height: 600
-//     });
-//   });
-
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   switch (message.action) {
-//     case 'startTracking':
-//       collectStart = true;
-//       break;
-//     case 'stopTracking':
-//       collectStart = false;
-//       break;
-//     case 'sendText':
-//       console.log('Received text:', message.html);
-//       break;
-//     case 'searchText':
-//       console.log('Search text:', message.text);
-//       break;
-//     default:
-//       console.error('Unknown action:', message.action);
-//   }
-// });
-})();
-
+function getAccessToken() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['accessToken'], result => {
+      console.log(result);
+      if (chrome.runtime.lastError) {
+        console.error('Failed to retrieve access token:', chrome.runtime.lastError.message);
+        resolve(null);
+      } else {
+        resolve(result.accessToken);
+      }
+    });
+  });
+}
+async function connectWebSocket() {
+  try {
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      console.error("Access token is not available.");
+      return;
+    }
+    if (socket !== null && socket.readyState !== WebSocket.CLOSED) {
+      return; // 이미 열려있거나 연결 중인 경우 재연결 시도를 방지
+    }
+    socket = new WebSocket('ws://localhost:18080/process/ws');
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+      const messageData = {
+        sourceApplication: "Chrome",
+        accessToken: accessToken,
+        connectedFileId: 1,
+        dataType: "SIGNAL",
+        content: "웹 소켓 onopen",
+        timestamp: new Date()
+      };
+      const messageJson = JSON.stringify(messageData);
+      if (socket) {
+        socket.send(messageJson);
+      } else {
+        console.error("WebSocket connection is not established.");
+      }
+    };
+    socket.onerror = error => {
+      console.error("WebSocket Error: ", error);
+    };
+    socket.onclose = async e => {
+      console.log("WebSocket 연결 끊김. 1초 후 재연결 합니다.", e);
+      setTimeout(function () {
+        connectWebSocket();
+      }, 1000);
+    };
+  } catch (e) {
+    console.error("WebSocket connection failed: ", e);
+  }
+}
+function handleTabUpdate(tabId, changeInfo, tab) {
+  const accessToken = getAccessToken();
+  console.log("tabId :", tabId, " , changeInfo :", changeInfo, " , tab : ", tab);
+  console.log(start);
+  if (start && changeInfo.url) {
+    chrome.scripting.executeScript({
+      target: {
+        tabId
+      },
+      func: getHtml
+    }, results => {
+      if (results[0]) {
+        const pageHtml = results[0].result;
+        console.log(pageHtml);
+        let message = '';
+        if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
+          const urlParams = new URLSearchParams(new URL(tab.url).search);
+          const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
+          message = JSON.stringify({
+            query: searchQuery
+          });
+        } else {
+          message = JSON.stringify({
+            url: tab.url,
+            html: pageHtml
+          });
+        }
+        const messageData = {
+          sourceApplication: "Chrome",
+          accessToken: accessToken,
+          connectedFileId: 1,
+          dataType: "SIGNAL",
+          content: message,
+          timestamp: new Date()
+        };
+        const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+        console.log("소켓이 열려있나?", socket);
+        if (socket) {
+          // socket.current가 null이 아닐 때만 send 호출
+          console.log("메세지 보냅니다~~");
+          socket.send(messageJson); // JSON 문자열을 보냄
+        } else {
+          console.error("WebSocket connection is not established.");
+        }
+      }
+    });
+  }
+}
+function getHtml() {
+  return document.documentElement.outerHTML;
+}
 /******/ })()
 ;
 //# sourceMappingURL=background.js.map

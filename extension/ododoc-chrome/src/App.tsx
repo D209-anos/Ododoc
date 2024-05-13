@@ -36,6 +36,7 @@ const App = () => {
       localStorage.setItem('provider', provider);
       localStorage.setItem('rootId', rootId);
       localStorage.setItem('title', title);
+      chrome.storage.local.set({accessToken: accessToken, rootId: rootId, title: title})
       window.close(); // 로그인 창 닫기
     } else if (token) { // 로컬 스토리지에 토큰이 있을 경우 (팝업 창)
       setAccessToken(token);
@@ -96,7 +97,7 @@ const App = () => {
       ) : (
         <div>
           <Sidebar accessToken={accessToken} rootId={rootId} title={folderTitle} />
-          <div className="menu.loginOpenBtn" onClick={handleLogout}>Logout</div>
+          <div className="buttons-container" onClick={handleLogout}>Logout</div>
         </div>
         
       )}

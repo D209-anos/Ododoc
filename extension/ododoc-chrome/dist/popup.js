@@ -51,6 +51,11 @@ const App = () => {
       localStorage.setItem('provider', provider);
       localStorage.setItem('rootId', rootId);
       localStorage.setItem('title', title);
+      chrome.storage.local.set({
+        accessToken: accessToken,
+        rootId: rootId,
+        title: title
+      });
       window.close(); // 로그인 창 닫기
     } else if (token) {
       // 로컬 스토리지에 토큰이 있을 경우 (팝업 창)
@@ -112,7 +117,7 @@ const App = () => {
     rootId: rootId,
     title: folderTitle
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "menu.loginOpenBtn",
+    className: "buttons-container",
     onClick: handleLogout
   }, "Logout")));
 };
@@ -288,7 +293,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // 디렉토리 타입
 
-const adress = "ws://192.168.0.6:18080/process/ws";
+const adress = "ws://localhost:18080/process/ws";
 const SideBar = _ref => {
   let {
     accessToken,
@@ -422,97 +427,115 @@ const SideBar = _ref => {
   };
 
   /**  웹소켓 코드 */
-  const socket = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    socket.current = new WebSocket(adress);
-    console.log("WebSocketClient created");
-    socket.current.onopen = () => {
-      console.log("Connection established");
-      // socket.current?.send("Hello Server!");
-      const messageData = {
-        sourceApplication: "Chrome",
-        accessToken: accessToken,
-        connectedFileId: 1,
-        dataType: "SIGNAL",
-        content: "Test message from React",
-        timestamp: new Date()
-      };
-      const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-      if (socket.current) {
-        // socket.current가 null이 아닐 때만 send 호출
-        socket.current.send(messageJson); // JSON 문자열을 보냄
-      } else {
-        console.error("WebSocket connection is not established.");
-      }
-    };
-    socket.current.onmessage = event => {
-      console.log("Message from server:", event.data);
-    };
-    socket.current.onerror = error => {
-      console.error("WebSocket 에러:", error);
-    };
-    socket.current.onclose = () => {
-      console.log("소켓 닫혔어요");
-    };
-    const handleTabUpdate = (tabId, changeInfo, tab) => {
-      if (monitoring && changeInfo.status === 'complete' && tab.url) {
-        chrome.scripting.executeScript({
-          target: {
-            tabId: tabId
-          },
-          func: getHtml
-        }, results => {
-          if (results[0]) {
-            const pageHtml = results[0].result;
-            let message = '';
-            if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
-              const urlParams = new URLSearchParams(new URL(tab.url).search);
-              const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
-              message = JSON.stringify({
-                type: 'search',
-                query: searchQuery
-              });
-            } else {
-              message = JSON.stringify({
-                type: 'page',
-                url: tab.url,
-                html: pageHtml
-              });
-            }
-            const messageData = {
-              sourceApplication: "Chrome",
-              accessToken: accessToken,
-              connectedFileId: 1,
-              dataType: "SIGNAL",
-              content: message,
-              timestamp: new Date()
-            };
-            const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-            if (socket.current) {
-              // socket.current가 null이 아닐 때만 send 호출
-              socket.current.send(messageJson); // JSON 문자열을 보냄
-            } else {
-              console.error("WebSocket connection is not established.");
-            }
-          }
-        });
-      }
-    };
-    const getHtml = () => document.documentElement.outerHTML;
-    chrome.tabs.onUpdated.addListener(handleTabUpdate);
+  // const socket = useRef<WebSocket | null>(null);
 
-    // Cleanup on component unmount
-    return () => {
-      var _socket$current;
-      (_socket$current = socket.current) === null || _socket$current === void 0 || _socket$current.close();
-      chrome.tabs.onUpdated.removeListener(handleTabUpdate);
-    };
-  }, [monitoring]);
+  // useEffect(() => {
+  //     console.log(monitoring);
+  //     socket.current = new WebSocket(adress);
+  //     console.log("WebSocketClient created");
+
+  //     socket.current.onopen = () => {
+  //         console.log("Connection established");
+  //         // socket.current?.send("Hello Server!");
+  //         const messageData = {
+  //             sourceApplication: "Chrome",
+  //             accessToken: accessToken,
+  //             connectedFileId: 1,
+  //             dataType: "SIGNAL",
+  //             content: "Test message from React",
+  //             timestamp: new Date()
+  //         };
+
+  //         const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+  //         if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+  //             socket.current.send(messageJson); // JSON 문자열을 보냄
+  //         } else {
+  //             console.error("WebSocket connection is not established.");
+  //         }
+
+  //     };
+
+  //     socket.current.onmessage = (event) => {
+  //         console.log("Message from server:", event.data);
+  //     };
+
+  //     socket.current.onerror = (error) => {
+  //         console.error("WebSocket 에러:", error);
+  //     };
+
+  //     socket.current.onclose = () => {
+  //         console.log("소켓 닫혔어요");
+  //     };
+
+  //     const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+  //         console.log(monitoring, ", 변화 :", changeInfo.status, ", url : ", tab.url)
+  //         if (monitoring && changeInfo.status === 'complete' && tab.url) {
+  //             chrome.scripting.executeScript({
+  //                 target: { tabId: tabId },
+  //                 func: getHtml
+  //             }, (results) => {
+  //                 if (results[0]) {
+  //                     const pageHtml = results[0].result;
+  //                     let message = '';
+
+  //                     if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
+  //                         const urlParams = new URLSearchParams(new URL(tab.url).search);
+  //                         const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
+  //                         message = JSON.stringify({
+  //                             type: 'search',
+  //                             query: searchQuery
+  //                         });
+  //                     } else {
+  //                         message = JSON.stringify({
+  //                             type: 'page',
+  //                             url: tab.url,
+  //                             html: pageHtml
+  //                         });
+  //                     }
+
+  //                     const messageData = {
+  //                         sourceApplication: "Chrome",
+  //                         accessToken: accessToken,
+  //                         connectedFileId: 1,
+  //                         dataType: "SIGNAL",
+  //                         content: message,
+  //                         timestamp: new Date()
+  //                     };
+  //                     const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+  //                     if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+  //                         socket.current.send(messageJson); // JSON 문자열을 보냄
+  //                     } else {
+  //                         console.error("WebSocket connection is not established.");
+  //                     }
+  //                 }
+  //             });
+  //         }
+  //     };
+
+  //     const getHtml = () => document.documentElement.outerHTML;
+
+  //     chrome.tabs.onUpdated.addListener(handleTabUpdate);
+
+  //     // Cleanup on component unmount
+  //     return () => {
+  //         socket.current?.close();
+  //         chrome.tabs.onUpdated.removeListener(handleTabUpdate);
+  //     };
+  // }, [monitoring]);
+
   const handleStartMonitoring = () => {
+    console.log("기록 시작할게요");
     setMonitoring(true);
+    chrome.runtime.sendMessage({
+      command: "start"
+    });
   };
   const handleStopMonitoring = () => {
+    console.log("기록 중지할게요");
     setMonitoring(false);
+    chrome.runtime.sendMessage({
+      command: "stop"
+    });
   };
 
   // const sendMessage = (message: string) => {
@@ -546,9 +569,9 @@ const SideBar = _ref => {
       className: "buttons-container"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
       onClick: handleStartMonitoring
-    }, "Start"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    }, "\uAE30\uB85D \uC2DC\uC791"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
       onClick: handleStopMonitoring
-    }, "Stop")))
+    }, "\uAE30\uB85D \uC911\uC9C0")))
   );
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SideBar);

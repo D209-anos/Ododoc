@@ -23,7 +23,7 @@
     }
   ],
   "permissions": [
-    "storage", "activeTab", "webNavigation", "scripting"
+    "storage", "activeTab", "webNavigation", "scripting", "tabs"
   ]
   
 }
