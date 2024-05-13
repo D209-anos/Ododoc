@@ -286,7 +286,7 @@ public class FileApiTest extends ApiTest {
                         "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
                         "파일 수정/저장", CommonDocument.AccessTokenHeader,
-                        FileDocument.fileResponseFields));
+                        FileDocument.fileRequestFields, FileDocument.fileResponseFields));
     }
 
     @Test
@@ -303,7 +303,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test
@@ -320,7 +321,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test
@@ -337,7 +339,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test
@@ -353,7 +356,7 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(401))
-                .andDo(document(DEFAULT_RESTDOC_PATH));
+                .andDo(document(DEFAULT_RESTDOC_PATH, FileDocument.fileRequestFields));
     }
 
     @Test
@@ -372,7 +375,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(403))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test
@@ -388,7 +392,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(404))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test
@@ -407,7 +412,8 @@ public class FileApiTest extends ApiTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(404))
-                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader));
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.fileRequestFields));
     }
 
     @Test

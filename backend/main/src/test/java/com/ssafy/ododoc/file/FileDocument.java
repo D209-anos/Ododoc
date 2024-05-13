@@ -24,6 +24,22 @@ public class FileDocument {
             parameterWithName("directoryId").attributes(required()).description("조회할 파일 아이디")
     );
 
+    public static final Snippet fileRequestFields = requestFields(
+            fieldWithPath("directoryId").type(JsonFieldType.NUMBER).attributes(required()).description("저장할 파일 아이디"),
+            fieldWithPath("content").optional().type(JsonFieldType.ARRAY).attributes(required()).description("저장할 파일 내용"),
+            fieldWithPath("content[].id").optional().type(JsonFieldType.STRING).attributes(required()).description("블럭 아이디"),
+            fieldWithPath("content[].value").optional().type(JsonFieldType.ARRAY).attributes(required()).description("블럭 value"),
+            fieldWithPath("content[].value[].id").optional().type(JsonFieldType.STRING).description("value id"),
+            fieldWithPath("content[].value[].type").optional().type(JsonFieldType.STRING).description("value type"),
+            fieldWithPath("content[].value[].children").optional().type(JsonFieldType.ARRAY).description("value children"),
+            fieldWithPath("content[].value[].children[].text").optional().type(JsonFieldType.STRING).description("text"),
+            fieldWithPath("content[].value[].props.nodeType").optional().type(JsonFieldType.STRING).description("value props nodeType"),
+            fieldWithPath("content[].value[].props.checked").optional().type(JsonFieldType.BOOLEAN).description("value props checked"),
+            fieldWithPath("content[].type").optional().type(JsonFieldType.STRING).description("블럭 타입"),
+            fieldWithPath("content[].meta.order").optional().type(JsonFieldType.NUMBER).description("블럭 순서"),
+            fieldWithPath("content[].meta.depth").optional().type(JsonFieldType.NUMBER).description("블럭 depth")
+    );
+
     public static final Snippet fileResponseFields = responseFields(
             fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드"),
             fieldWithPath("data.directoryId").type(JsonFieldType.NUMBER).description("파일 아이디"),
