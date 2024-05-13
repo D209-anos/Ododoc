@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Props {
 
     private String nodeType;
@@ -22,4 +22,7 @@ public class Props {
     private String rel;
     private String url;
     private String title;
+    private int size;
+    private String name;
+    private String format;
 }

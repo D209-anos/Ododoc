@@ -1,16 +1,16 @@
 package com.ssafy.ododoc.file.dto.validator;
 
-import com.ssafy.ododoc.file.dto.annotation.CheckActionType;
+import com.ssafy.ododoc.file.dto.annotation.CheckFileType;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class CheckActionTypevalidator implements ConstraintValidator<CheckActionType, String> {
+public class CheckFileTypevalidator implements ConstraintValidator<CheckFileType, String> {
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        String actionType = value.toUpperCase();
+        String type = value.toUpperCase();
 
-        if(!actionType.equals("SAVE") && !actionType.equals("ADD")) {
+        if(!type.equals("SUCCESS") && !type.equals("FAIL") && !type.equals("SEARCH")) {
             return false;
         }
 
