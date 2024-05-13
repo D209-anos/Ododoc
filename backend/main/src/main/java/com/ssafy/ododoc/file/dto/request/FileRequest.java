@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 @Builder
 @Getter
@@ -17,5 +17,5 @@ public class FileRequest {
     private Long directoryId;
 
     @NotNull(message = "content는 null일 수 없습니다. 비어있다면 빈 배열을 보내주세요.")
-    private List<Block> content;
+    private LinkedHashMap<String, Block> content;
 }
