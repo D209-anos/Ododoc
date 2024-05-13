@@ -1,6 +1,7 @@
 package com.ssafy.ododoc.file;
 
 import com.ssafy.ododoc.file.dto.*;
+import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +60,22 @@ public class FileSteps {
         return FileRequest.builder()
                 .directoryId(directoryId)
                 .content(null)
+                .build();
+    }
+
+    public AddRequest 플러그인_저장파일_생성(Long directoryId) {
+        return AddRequest.builder()
+                .connectedFileId(directoryId)
+                .type("fail")
+                .fileBlock(contentList)
+                .build();
+    }
+
+    public AddRequest 플러그인_저장파일_잘못된type_생성(Long directoryId) {
+        return AddRequest.builder()
+                .connectedFileId(directoryId)
+                .type("인텔리제이")
+                .fileBlock(contentList)
                 .build();
     }
 }
