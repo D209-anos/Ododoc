@@ -23,7 +23,7 @@
     }
   ],
   "permissions": [
-    "storage", "activeTab", "webNavigation", "https://*/*", "chrome-extension://*/*"
+    "storage", "activeTab", "webNavigation", "scripting"
   ]
   
 }
