@@ -8,7 +8,7 @@
   <name>Ododoc</name>
 
   <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-  <vendor email="non_duality@naver.com" url="https://www.yourcompany.com">Ododoc</vendor>
+  <vendor email="non_duality@naver.com" url="https://k10d209.p.ssafy.io/">Ododoc</vendor>
 
   <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
        Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
@@ -28,4 +28,11 @@
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="com.ssafy.ododocintellij.StartUpActivity"/>
   </extensions>
+  <actions>
+    <action id="OpenOdodocPlugin" class="com.ssafy.ododocintellij.OpenOdodocPlugin" text="Ododoc"
+            description="Open Ododoc" icon="/image/button/ododoc.png">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="alt C"/>
+    </action>
+  </actions>
 </idea-plugin>
