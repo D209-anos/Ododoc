@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +77,12 @@ public class FileService {
                         .content(new ArrayList<>())
                         .build()));
 
-        file.setContent(fileRequest.getContent());
+
+        List<Block> content = fileRequest.getContent().stream()
+                .sorted(Comparator.comparing(block -> block.getMeta().getOrder()))
+                .toList();
+
+        file.setContent(content);
 
         fileRepository.save(file);
 
@@ -114,12 +121,7 @@ public class FileService {
             }
         }
 
-        int lastOrder = 0;
-        for(Block block : file.getContent()) {
-            if(lastOrder < block.getMeta().getOrder()) {
-                lastOrder = block.getMeta().getOrder();
-            }
-        }
+        int lastOrder = file.getContent().getLast().getMeta().getOrder();
 
         lastOrder++;
 
