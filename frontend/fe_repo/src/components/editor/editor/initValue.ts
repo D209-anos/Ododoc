@@ -1,26 +1,4 @@
 export const WITH_BASIC_INIT_VALUE = {
-  '1': {
-    id: '1',
-    value: [
-      {
-        id: '0508777e-52a4-4168-87a0-bc7661e57aab',
-        type: 'heading-one',
-        children: [
-          {
-            text: 'Example with full setup of Yoopta-Editor',
-          },
-        ],
-        props: {
-          nodeType: 'block',
-        },
-      },
-    ],
-    type: 'HeadingOne',
-    meta: {
-      order: 0,
-      depth: 0,
-    },
-  },
   'f99045cc-2391-4917-949d-ee3d2f6754b4': {
     id: 'f99045cc-2391-4917-949d-ee3d2f6754b4',
     value: [
