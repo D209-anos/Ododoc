@@ -1,3 +1,4 @@
+import * as vscode from "vscode";
 import WebSocket from "ws";
 import { MessageData } from "./MessageData";
 import { getLoggedInSession } from "../authentication/AuthService";
@@ -7,15 +8,18 @@ const URL = "ws://localhost:18080/process/ws";
 export default class WebSocketClient {
   private socket: WebSocket | null = null;
   private static instance: WebSocketClient;
+  private context: vscode.ExtensionContext;
 
-  public static getInstance(): WebSocketClient {
+  public static getInstance(context: vscode.ExtensionContext): WebSocketClient {
     if (!WebSocketClient.instance) {
-      WebSocketClient.instance = new WebSocketClient();
+      WebSocketClient.instance = new WebSocketClient(context);
     }
     return WebSocketClient.instance;
   }
 
-  private constructor() {}
+  private constructor(context: vscode.ExtensionContext) {
+    this.context = context;
+  }
 
   public async connect() {
     const socket = new WebSocket(URL);
@@ -65,10 +69,17 @@ export default class WebSocketClient {
         return;
       }
 
+      const connectedFileId = await this.context.secrets.get("connectedFileId");
+      if (connectedFileId === undefined) {
+        console.log("Root ID not found.");
+        return;
+      }
+
+      this.context.secrets.get("rootId");
       const messageData: MessageData = {
         sourceApplication: "VSCODE",
         accessToken: session.accessToken,
-        connectedFileId: 1,
+        connectedFileId: parseInt(connectedFileId),
         dataType: dataType,
         content: message,
         timestamp: new Date().toISOString(),

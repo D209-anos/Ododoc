@@ -101,8 +101,8 @@ public class MemberController {
      */
     @GetMapping("/authorization/chrome/{provider}")
     public void chromeLogin(@RequestParam String code,
-                         @PathVariable String provider,
-                         HttpServletResponse response) throws IOException {
+                            @PathVariable String provider,
+                            HttpServletResponse response) throws IOException {
 
         log.debug("[chrome extension login 호출] : {} {}", provider, code);
         Directory directory = memberService.getMemberInfo(provider, code, "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/" + provider);
