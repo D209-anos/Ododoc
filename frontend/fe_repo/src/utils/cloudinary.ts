@@ -1,7 +1,7 @@
 export const CLOUDINARY = {
-  PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_PRESET!,
-  API: process.env.NEXT_PUBLIC_CLOUDINARY_API!,
-  CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!,
+  PRESET: process.env.REACT_APP_CLOUDINARY_CLOUD_PRESET!,
+  API: process.env.REACT_APP_CLOUDINARY_CLOUD_API!,
+  CLOUD_NAME: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME!,
 };
 
 export type MediaObject = {
@@ -26,6 +26,9 @@ export const uploadToCloudinary = async (file: File, type = 'image'): Promise<Me
   formData.append('upload_preset', CLOUDINARY.PRESET);
 
   try {
+    console.log("file : " + {file})
+    console.log("type : " + {type})
+    console.log("api: " + {CLOUDINARY})
     const call = await fetch(`${CLOUDINARY.API}/${type}/upload`, { method: 'POST', body: formData });
     const response = await call.json();
 

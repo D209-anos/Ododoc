@@ -12,8 +12,7 @@ function Editor() {
             </div>
             <div className={EditorStyle.editorWrapper}>
                 <Routes>
-                    {/* <Route index element={<Mypage/>} /> */}
-                    <Route index element={<Editor1 />} />
+                    <Route index element={<Mypage/>} />
                     <Route path=":id" element={<Editor1 />} />
                     <Route path='profile' element={<Mypage />} />
                 </Routes>

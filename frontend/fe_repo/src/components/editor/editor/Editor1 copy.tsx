@@ -19,7 +19,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { TerminalBlock, insertTerminal } from "../editor/TerminalBlock";
 import _, { isNull } from 'lodash';
 import axios from 'axios';
-import useImageUpload from "../../../hooks/editor/useImageUpload";
 import { BoldButton } from "./CustomTextBoldButton";
 import { CodeButton } from "./CustomTextCodeButton";
 import { ItalicButton } from "./CustomTextItalicButton";
@@ -146,7 +145,7 @@ const Editor1 = () => {
   // }, [fileId, navigate]);
 
   // 이미지 업로드 훅
-  const { ImageUpload } = useImageUpload();
+  // const { ImageUpload } = useImageUpload();
 
 
   //기본 에디터 + 코드블록 + 터미널블록 사용가능 스키마 설정

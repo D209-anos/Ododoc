@@ -18,9 +18,14 @@ import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
 import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css'
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { WITH_BASIC_INIT_VALUE } from './initValue';
 import { uploadToCloudinary } from '../../..//utils/cloudinary';
 
+import { editDirectoryItem, fetchDirectory } from '../../../api/service/directory';
+import { fetchFile, saveFile } from '../../../api/service/editor'
+import { useLocation, useParams } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
+
+import {WITH_BASIC_INIT_VALUE} from "./initValue"
 
 const plugins = [
   Paragraph,
@@ -51,21 +56,21 @@ const plugins = [
       },
     },
   }),
-  Video.extend({
-    options: {
-      onUpload: async (file) => {
-        const data = await uploadToCloudinary(file, 'video');
-        return {
-          src: data.secure_url,
-          alt: 'cloudinary',
-          sizes: {
-            width: data.width,
-            height: data.height,
-          },
-        };
-      },
-    },
-  }),
+  // Video.extend({
+  //   options: {
+  //     onUpload: async (file) => {
+  //       const data = await uploadToCloudinary(file, 'video');
+  //       return {
+  //         src: data.secure_url,
+  //         alt: 'cloudinary',
+  //         sizes: {
+  //           width: data.width,
+  //           height: data.height,
+  //         },
+  //       };
+  //     },
+  //   },
+  // }),
   File.extend({
     options: {
       onUpload: async (file) => {
@@ -91,23 +96,19 @@ const TOOLS = {
   },
 };
 
-
 const MARKS = [Bold, Italic, CodeMark, Underline, Strike, Highlight];
 
-function WithBaseFullSetup() {
+function Edito1() {
+  const { state, dispatch } = useAuth();
+  const { accessToken, rootId } = state;
+  const location = useLocation();
+  const directoryId = location.state;
   const editor = useMemo(() => createYooptaEditor(), []);
   const selectionRef = useRef(null);
+
+  const [title, setTitle] = useState();
+  const [documentData, setDocumentData] = useState();
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
-  const [title, setTitle] = useState('제목입니다');
-  useEffect(() => {
-    function handleChange(value: any) {
-      console.log('value', value);
-    }
-    editor.on('change', handleChange);
-    return () => {
-      editor.off('change', handleChange);
-    };
-  }, [editor]);
 
   useEffect(() => {
     function handleEditorChange() {
@@ -126,9 +127,94 @@ function WithBaseFullSetup() {
     };
   }, [editor]); // 의존성 배열에 editor 추가
 
-  const handleTitleChange = (event : any) => {
-    setTitle(event.target.innerText);
+
+  //제목 조회하기
+  useEffect(() => {
+    // 디렉토리 정보를 로드하고, 해당하는 파일의 이름을 제목으로 설정
+    const loadDirectoryAndSetTitle = async () => {
+      if (directoryId) {
+        try {
+          const directoryData = await fetchDirectory(rootId); // API 호출
+          const file = findFileById(directoryData, directoryId);
+          if (file && file.type === "FILE") {
+            setTitle(file.name); // 파일 이름을 제목으로 설정
+          }
+        } catch (error) {
+          console.error('Error fetching directory:', error);
+        }
+      }
+    };
+
+    loadDirectoryAndSetTitle();
+  }, [directoryId]);
+
+  // ID를 사용하여 데이터 내에서 파일 객체를 찾는 함수
+  //@ts-ignore
+  function findFileById(data, id) {
+    if (data.id === id && data.type === 'FILE') {
+      return data; // 일치하는 파일 찾기
+    }
+    if (data.children) {
+      for (const child of data.children) {
+        //@ts-ignore
+        const found = findFileById(child, id);
+        if (found) return found; // 재귀적으로 찾기
+      }
+    }
+    return null;
+  }
+  console.log('fetchDirectory : ' + fetchDirectory(rootId))
+  //파일 내용 조회하기
+
+  // 제목 변경 이벤트 핸들러
+  const handleTitleChange = async (event: any) => {
+    const newTitle = event.target.innerText;
+    setTitle(newTitle); // 상태 업데이트
+
+    // 제목이 변경되었으면 서버에 저장
+    if (directoryId && newTitle !== title) { // 현재 제목과 새 제목이 다를 경우에만 요청
+      try {
+        const response = await editDirectoryItem(directoryId, newTitle);
+        console.log('Title updated successfully:', response);
+        // 여기에 추가적인 성공 처리 로직을 추가할 수 있습니다.
+      } catch (error) {
+        console.error('Failed to update title:', error);
+        // 에러 처리 로직
+      }
+    }
   };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 기본 Enter 키 동작 방지
+      event.target.blur(); // 포커스 해제
+    }
+  };
+
+  // 파일 변경시 저장하기
+  useEffect(() => {
+    const handleEditorChange = async () => {
+      if (directoryId) {
+        // 에디터에서 현재 콘텐츠 값 가져오기
+        const content = editor.getEditorValue();
+        try {
+          await saveFile('save', directoryId, content);
+        } catch (error) {
+          console.error('Failed to save File:');
+        }
+      }
+    };
+
+    // editor의 change 이벤트에 handleEditorChange 함수를 등록
+    editor.on('change', handleEditorChange);
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거
+    return () => {
+      editor.off('change', handleEditorChange);
+    };
+  }, [editor, directoryId]);  // 의존성 배열에 editor와 directoryId를 포함
+
+  console.log("directoryId : " + directoryId)
 
   return (
     <>
@@ -137,7 +223,7 @@ function WithBaseFullSetup() {
         ref={selectionRef}
       >
         <p>
-          <h1 contentEditable="true" onBlur={handleTitleChange} className={EditorDetailStyle.editableTitle}>
+          <h1 contentEditable="true" onBlur={handleTitleChange} suppressContentEditableWarning={true} onKeyDown={handleKeyDown}>
             {title}
           </h1>
         </p>
@@ -149,6 +235,7 @@ function WithBaseFullSetup() {
           tools={TOOLS}
           marks={MARKS}
           selectionBoxRoot={selectionRef}
+          // readOnly = {true}
           //@ts-ignore
           value={WITH_BASIC_INIT_VALUE}
           autoFocus
@@ -164,8 +251,11 @@ function WithBaseFullSetup() {
         </div>
       </div>
     </>
-
   );
 }
 
-export default WithBaseFullSetup;
+export default Edito1;
+
+
+
+
