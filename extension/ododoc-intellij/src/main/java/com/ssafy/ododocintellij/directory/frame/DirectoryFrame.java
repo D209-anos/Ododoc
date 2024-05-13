@@ -38,12 +38,6 @@ public class DirectoryFrame extends Application {
     private Stage stage;
 
     @Override
-    public void init() throws Exception {
-        super.init();
-        Platform.setImplicitExit(false);
-    }
-
-    @Override
     public void start(Stage initStage) {
         DirectoryInfoManager directoryInfoManager = DirectoryInfoManager.getInstance();
         ResultDto resultDto = retrieveDirectory(directoryInfoManager.getRootId()).block();

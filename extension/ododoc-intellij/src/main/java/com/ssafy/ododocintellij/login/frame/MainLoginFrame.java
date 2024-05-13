@@ -16,7 +16,10 @@ import java.util.Optional;
 
 public class MainLoginFrame extends Stage {
 
+    private static boolean isFrameVisible = false;
+
     public MainLoginFrame() {
+        isFrameVisible = true;
         setTitle(" Ododoc");
         VBox layout = new VBox(10);
         layout.setAlignment(Pos.CENTER);
@@ -38,6 +41,9 @@ public class MainLoginFrame extends Stage {
                 Optional<ButtonType> result = alert.showAndWait();
                 if(result.isPresent() && result.get() != ButtonType.OK) {
                     event.consume();
+                }
+                else{
+                    isFrameVisible = false;
                 }
             }
         });
@@ -71,5 +77,9 @@ public class MainLoginFrame extends Stage {
         });
 
         return loginBtn;
+    }
+
+    public static boolean isFrameVisible() {
+        return isFrameVisible;
     }
 }
