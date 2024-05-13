@@ -22,9 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +54,7 @@ public class FileService {
         File file = fileRepository.findByDirectoryId(directoryId)
                 .orElseGet(() -> fileRepository.save(File.builder()
                         .directoryId(directoryId)
-                        .content(new ArrayList<>())
+                        .content(new LinkedHashMap<>())
                         .build()));
 
         return FileResponse.builder()
@@ -74,13 +73,16 @@ public class FileService {
         File file = fileRepository.findByDirectoryId(fileRequest.getDirectoryId())
                 .orElseGet(() -> fileRepository.save(File.builder()
                         .directoryId(fileRequest.getDirectoryId())
-                        .content(new ArrayList<>())
+                        .content(new LinkedHashMap<>())
                         .build()));
 
-
-        List<Block> content = fileRequest.getContent().stream()
-                .sorted(Comparator.comparing(block -> block.getMeta().getOrder()))
-                .toList();
+        LinkedHashMap<String, Block> content = fileRequest.getContent().entrySet().stream()
+                        .sorted(Comparator.comparingInt(e -> e.getValue().getMeta().getOrder()))
+                                .collect(Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                                ));
 
         file.setContent(content);
 
@@ -103,7 +105,7 @@ public class FileService {
         File file = fileRepository.findByDirectoryId(addRequest.getConnectedFileId())
                 .orElseGet(() -> fileRepository.save(File.builder()
                         .directoryId(addRequest.getConnectedFileId())
-                        .content(new ArrayList<>())
+                        .content(new LinkedHashMap<>())
                         .build()));
 
         AddType type = AddType.valueOf(addRequest.getType().toUpperCase());
@@ -121,13 +123,21 @@ public class FileService {
             }
         }
 
-        int lastOrder = file.getContent().getLast().getMeta().getOrder();
+        int lastOrder = 0;
 
-        lastOrder++;
+        for(Map.Entry<String, Block> entry : file.getContent().entrySet()) {
+            if(lastOrder < entry.getValue().getMeta().getOrder()) {
+                lastOrder = entry.getValue().getMeta().getOrder();
+            }
+        }
 
-        for(Block block : addRequest.getFileBlock()) {
-            block.getMeta().setOrder(lastOrder++);
-            file.getContent().add(block);
+        if(lastOrder != 0) {
+            lastOrder++;
+        }
+
+        for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
+            entry.getValue().getMeta().setOrder(lastOrder++);
+            file.getContent().put(entry.getKey(), entry.getValue());
         }
 
         fileRepository.save(file);
