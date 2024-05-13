@@ -10,10 +10,10 @@ import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
+import com.ssafy.ododocintellij.sender.BuildResultSender;
+import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -24,9 +24,9 @@ import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class DirectoryFrame extends Application {
 
@@ -36,6 +36,13 @@ public class DirectoryFrame extends Application {
     private ContextMenu folderContextMenu = new ContextMenu();
     private ContextMenu fileContextMenu = new ContextMenu();
     private Stage stage;
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        Platform.setImplicitExit(false);
+    }
+
     @Override
     public void start(Stage initStage) {
         DirectoryInfoManager directoryInfoManager = DirectoryInfoManager.getInstance();
@@ -93,7 +100,14 @@ public class DirectoryFrame extends Application {
         refreshButton.setTooltip(new Tooltip("새로고침"));
         refreshButton.setOnAction(e -> refreshDirectoryView());
 
-        ToolBar toolBar = new ToolBar(refreshButton);
+        Button connectButton = new Button();
+        ImageView connectIcon = new ImageView(new Image(getClass().getResourceAsStream("/image/button/connect.png")));
+        connectButton.setGraphic(connectIcon);
+        connectButton.setTooltip(new Tooltip("서버 연결"));
+        connectButton.setOnAction(e -> connectWebSocket());
+
+        ToolBar toolBar = new ToolBar();
+        toolBar.getItems().addAll(refreshButton, connectButton);
         BorderPane root = new BorderPane();
         root.setBottom(toolBar);
         root.setCenter(treeView);
@@ -230,7 +244,7 @@ public class DirectoryFrame extends Application {
         Platform.runLater(() ->{
             Alert alert = AlertHelper.makeAlert(
                     Alert.AlertType.WARNING,
-                    "디렉토리",
+                    " Ododoc",
                     header,
                     content,
                     "/image/button/icon.png"
@@ -270,6 +284,34 @@ public class DirectoryFrame extends Application {
             MainLoginFrame mainLoginFrame = new MainLoginFrame();
             mainLoginFrame.show();
         });
+    }
+
+    private void connectWebSocket(){
+        if(BuildResultSender.isConnected()){
+            Platform.runLater(() -> {
+                Alert alert = AlertHelper.makeAlert(
+                        Alert.AlertType.INFORMATION,
+                        " Ododoc",
+                        "서버 연결 확인",
+                        "이미 서버와 연결이 되어 있습니다.",
+                        "/image/button/icon.png"
+                );
+                alert.showAndWait();
+            });
+        }
+
+        else {
+            Platform.runLater(() -> {
+                Alert alert = WebSocketReConnectAlert.makeAlert();
+                Optional<ButtonType> result = alert.showAndWait();
+                if(result.isPresent() && result.get() == ButtonType.OK) {
+                    BuildResultSender.setEnableWhenPushBtn(true);
+                    BuildResultSender.setINSTANCE(null);
+                    BuildResultSender.getINSTANCE();
+                }
+            });
+        }
+
     }
 
 }

@@ -1,14 +1,13 @@
 package com.ssafy.ododocintellij.login.frame;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.execution.ExecutionManager;
 import com.intellij.openapi.project.Project;
-import com.ssafy.ododocintellij.directory.dto.response.ResultDto;
 import com.ssafy.ododocintellij.directory.frame.DirectoryFrame;
 import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
+import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import com.ssafy.ododocintellij.tracker.CodeListener;
 import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
@@ -19,23 +18,19 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.java_websocket.client.WebSocketClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +44,6 @@ public class OauthLoginFrame extends Stage {
     private String firstLocation;
     private String lastLocation;
     private String loginUri;
-    private final String WEBSOCKET_URI = "ws://localhost:18080/process/ws";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;
@@ -225,12 +219,10 @@ public class OauthLoginFrame extends Stage {
 
                     // 지금 현재 등록되어 있는 모든 프로젝트들에게 codeListener 추가하기
                     addCodeListener(ProjectProvider.getInstance());
-                    connectWebSocket();
 
                     try {
-                        if(BuildResultSender.isConnected()){
-                            new DirectoryFrame().start(mainLoginFrame);
-                        }
+                        new DirectoryFrame().start(mainLoginFrame);
+                        connectWebSocket();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -258,8 +250,8 @@ public class OauthLoginFrame extends Stage {
 
     // 처리 서버와 webSocket 연결해주기
     private void connectWebSocket() {
-
-        BuildResultSender.getINSTANCE(WEBSOCKET_URI);
+        BuildResultSender.setINSTANCE(null);
+        BuildResultSender.getINSTANCE();
 
         try {
             Thread.sleep(1000);
@@ -268,21 +260,18 @@ public class OauthLoginFrame extends Stage {
         }
 
         if(!BuildResultSender.isConnected()){
-            Alert alert = AlertHelper.makeAlert(
-                    Alert.AlertType.CONFIRMATION,
-                    " Ododoc",
-                    "서버 연결 실패",
-                    "Ododoc 서비스를 이용하려면 서버와의 연결이 필요합니다.\n 다시 시도하시겠습니까?",
-                    "/image/button/icon.png"
-            );
-            Optional<ButtonType> result = alert.showAndWait();
-            if(result.isPresent() && result.get() == ButtonType.OK) {
-                connectWebSocket();
-            }
-            else if(result.isPresent() && result.get() != ButtonType.OK){
-                this.close();
-            }
-        };
+            Platform.runLater(() -> {
+                Alert alert = WebSocketReConnectAlert.makeAlert();
+                Optional<ButtonType> result = alert.showAndWait();
+                if(result.isPresent() && result.get() == ButtonType.OK) {
+                    System.out.println("연결 시도");
+                    connectWebSocket();
+                }
+                else {
+                    this.close();
+                }
+            });
+        }
     }
 
 }
