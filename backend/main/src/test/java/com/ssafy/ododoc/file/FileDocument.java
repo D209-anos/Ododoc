@@ -4,8 +4,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Snippet;
 
 import static com.ssafy.ododoc.common.DocumentFormatProvider.required;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
@@ -36,9 +35,28 @@ public class FileDocument {
             fieldWithPath("data.content[].value[].type").type(JsonFieldType.STRING).description("value type"),
             fieldWithPath("data.content[].value[].children").type(JsonFieldType.ARRAY).description("value children"),
             fieldWithPath("data.content[].value[].children[].text").type(JsonFieldType.STRING).description("text"),
-            fieldWithPath("data.content[].value[].props.nodeType").type(JsonFieldType.STRING).description("value props"),
+            fieldWithPath("data.content[].value[].props.nodeType").type(JsonFieldType.STRING).description("value props nodeType"),
+            fieldWithPath("data.content[].value[].props.checked").type(JsonFieldType.BOOLEAN).description("value props checked"),
             fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("블럭 타입"),
             fieldWithPath("data.content[].meta.order").type(JsonFieldType.NUMBER).description("블럭 순서"),
             fieldWithPath("data.content[].meta.depth").type(JsonFieldType.NUMBER).description("블럭 depth")
+    );
+
+    public static final Snippet addRequestFields = requestFields(
+            fieldWithPath("connectedFileId").type(JsonFieldType.NUMBER).attributes(required()).description("저장할 파일 아이디"),
+            fieldWithPath("type").type(JsonFieldType.STRING).attributes(required()).description("success, fail, search"),
+            fieldWithPath("visitedCount").optional().type(JsonFieldType.NUMBER).attributes(required()).description("type이 search일 경우, 방문 횟수 (null 가능)"),
+            fieldWithPath("fileBlock").type(JsonFieldType.ARRAY).attributes(required()).description("저장할 파일 내용"),
+            fieldWithPath("fileBlock[].id").type(JsonFieldType.STRING).attributes(required()).description("블럭 아이디"),
+            fieldWithPath("fileBlock[].value").type(JsonFieldType.ARRAY).attributes(required()).description("블럭 value"),
+            fieldWithPath("fileBlock[].value[].id").type(JsonFieldType.STRING).description("value id"),
+            fieldWithPath("fileBlock[].value[].type").type(JsonFieldType.STRING).description("value type"),
+            fieldWithPath("fileBlock[].value[].children").type(JsonFieldType.ARRAY).description("value children"),
+            fieldWithPath("fileBlock[].value[].children[].text").type(JsonFieldType.STRING).description("text"),
+            fieldWithPath("fileBlock[].value[].props.nodeType").type(JsonFieldType.STRING).description("value props nodeType"),
+            fieldWithPath("fileBlock[].value[].props.checked").type(JsonFieldType.BOOLEAN).description("value props checked"),
+            fieldWithPath("fileBlock[].type").type(JsonFieldType.STRING).description("블럭 타입"),
+            fieldWithPath("fileBlock[].meta.order").type(JsonFieldType.NUMBER).description("블럭 순서"),
+            fieldWithPath("fileBlock[].meta.depth").type(JsonFieldType.NUMBER).description("블럭 depth")
     );
 }
