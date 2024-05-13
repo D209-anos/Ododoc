@@ -1,12 +1,17 @@
 import React, { useRef, useEffect } from 'react';
-import Intellij from '../../css/components/startPage/intellij.module.css';
+import Vscode from '../../css/components/startPage/vscode.module.css';
 import { ReactComponent as Explain1 } from '../../assets/svg/Explain1.svg';
 import { ReactComponent as Explain2 } from '../../assets/svg/Explain2.svg';
 import { ReactComponent as Explain3 } from '../../assets/svg/Explain3.svg';
 import { ReactComponent as Explain4 } from '../../assets/svg/Explain4.svg';
 import { ReactComponent as Explain5 } from '../../assets/svg/Explain5.svg';
+import VscodeExplain0 from '../../assets/images/startPageImage/vscodeExplain0.png';
+import VscodeExplain1 from '../../assets/images/startPageImage/vscodeExplain1.png';
+import VscodeExplain2 from '../../assets/images/startPageImage/vscodeExplain2.png';
+import VscodeExplain3 from '../../assets/images/startPageImage/vscodeExplain3.png';
+import VscodeExplain4 from '../../assets/images/startPageImage/vscodeExplain4.png';
 
-const IntelliJ: React.FC = () => {
+const VSCode: React.FC = () => {
     const pathRefs = useRef<(SVGPathElement | null)[]>([]);
 
     useEffect(() => {
@@ -15,7 +20,7 @@ const IntelliJ: React.FC = () => {
                 if (path) {
                     path.style.strokeDasharray = `${path.getTotalLength()}`;
                     path.style.strokeDashoffset = `${path.getTotalLength()}`;
-                    path.classList.remove(Intellij.draw);
+                    path.classList.remove(Vscode.draw);
                 }
             });
         }
@@ -24,10 +29,10 @@ const IntelliJ: React.FC = () => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     const pathElement = entry.target as SVGPathElement;
-                    pathElement.classList.add(Intellij.draw);
+                    pathElement.classList.add(Vscode.draw);
                     pathElement.addEventListener('animationend', () => {
                         pathElement.style.strokeDashoffset = '0';
-                        pathElement.classList.remove(Intellij.draw);
+                        pathElement.classList.remove(Vscode.draw);
                     }, { once: true });
                 }
             });
@@ -59,28 +64,63 @@ const IntelliJ: React.FC = () => {
     }, []);
 
     return (
-        <div className={Intellij.vscodeGuide}>
-            <div className={Intellij.guideTitle}>
-                <p className={Intellij.guide}>VSCode 확장 프로그램 설치 및 활용 가이드</p>
+        <div className={Vscode.vscodeGuide}>
+            <div className={Vscode.guideTitle}>
+                <p className={Vscode.guide}>VSCode 확장 프로그램 설치 및 활용 가이드</p>
             </div>
-            <div className={Intellij.header}>
-                <Explain1 ref={(el) => (pathRefs.current[0] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path1}`}/>
+
+            {/* HEADER */}
+            <div className={Vscode.header}>
+                <Explain1 ref={(el) => (pathRefs.current[0] = el?.querySelector('path') || null)} className={`${Vscode.path} ${Vscode.path1}`}/>
+                <div className={Vscode.imageContainer0}>
+                    <p className={Vscode.ExplainContent0}>1. VSCode Extentions Marketplace에서 "ododoc"을 검색하세요.</p>
+                    <img src={VscodeExplain0} alt="vscode-explain-0" className={Vscode.VscodeExplainImage0}/>
+                </div>
             </div>
-            <div className={Intellij.content1}>
-                <Explain2 ref={(el) => (pathRefs.current[1] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path2}`}/>
+            
+            {/* CONTENT 1 */}
+            <div className={Vscode.content1}>
+                <Explain2 ref={(el) => (pathRefs.current[1] = el?.querySelector('path') || null)} className={`${Vscode.path} ${Vscode.path2}`}/>
+                <div className={Vscode.imageContainer1}>
+                    <p className={Vscode.ExplainContent1}>2. "ododoc" 익스텐션을 install 하세요.</p>
+                    <img src={VscodeExplain1} alt="vscode-explain-1" className={Vscode.VscodeExplainImage1}/>
+                </div>
             </div>
-            <div className={Intellij.content2}>
-                <Explain3 ref={(el) => (pathRefs.current[2] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path3}`}/>
+
+            {/* CONTENT 2 */}
+            <div className={Vscode.content2}>
+                <Explain3 ref={(el) => (pathRefs.current[2] = el?.querySelector('path') || null)} className={`${Vscode.path} ${Vscode.path3}`}/>
+                <div className={Vscode.imageContainer2}>
+                    <p className={Vscode.ExplainContent2}>3. Activity Bar에서 "ododoc"을 클릭해 로그인하세요.</p>
+                    <img src={VscodeExplain2} alt="vscode-explain-2" className={Vscode.VscodeExplainImage2} />
+                </div>
+                <div className={Vscode.imageContainer3}>
+                    <p className={Vscode.ExplainContent3}>4. ododoc에 대한 권한을 주세요.</p>
+                    <img src={VscodeExplain3} alt="vscode-explain-3" className={Vscode.VscodeExplainImage3}/>
+                </div>
             </div>
-            <div className={Intellij.content3}>
-                <Explain4 ref={(el) => (pathRefs.current[3] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path4}`}/>
+
+            {/* CONTENT 3 */}
+            <div className={Vscode.content3}>
+                <Explain4 ref={(el) => (pathRefs.current[3] = el?.querySelector('path') || null)} className={`${Vscode.path} ${Vscode.path4}`}/>
+                <div className={Vscode.imageContainer4}>
+                    <p className={Vscode.ExplainContent4}>5. 연동할 파일을 클릭하고 알림창에서 확인 버튼을 누르세요.</p>
+                    <img src={VscodeExplain4} alt="vscode-explain-4" className={Vscode.VscodeExplainImage4} />
+                </div>
             </div>
-            <div className={Intellij.content4}>
-                <Explain5 ref={(el) => (pathRefs.current[4] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path5}`}/>
+
+            {/* CONTENT 4 */}
+            <div className={Vscode.content4}>
+                <Explain5 ref={(el) => (pathRefs.current[4] = el?.querySelector('path') || null)} className={`${Vscode.path} ${Vscode.path5}`}/>
+                <div className={Vscode.imageContainer5}>
+                    <p className={Vscode.ExplainContent5}>6. 이제 마음껏 ododoc을 즐겨보세요.</p>
+                </div>
             </div>
-            <div className={Intellij.footer}></div>
+
+            {/* FOOTER */}
+            <div className={Vscode.footer}></div>
         </div>
     )
 }
 
-export default IntelliJ;
+export default VSCode;
