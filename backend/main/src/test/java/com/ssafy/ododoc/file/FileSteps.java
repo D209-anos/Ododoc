@@ -5,7 +5,7 @@ import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Component
@@ -35,24 +35,26 @@ public class FileSteps {
             .depth(0)
             .build();
 
-    private List<Block> contentList = List.of(Block.builder()
-            .id(blockId)
-            .value(value)
-            .type(type)
-            .meta(meta)
-            .build());
 
     public FileRequest 저장파일_생성(Long directoryId) {
+        LinkedHashMap<String, Block> contentMap = new LinkedHashMap<>();
+        contentMap.put(blockId, Block.builder()
+                .id(blockId)
+                .value(value)
+                .type(type)
+                .meta(meta)
+                .build());
+
         return FileRequest.builder()
                 .directoryId(directoryId)
-                .content(contentList)
+                .content(contentMap)
                 .build();
     }
 
     public FileRequest 저장파일_비어있음_생성(Long directoryId) {
         return FileRequest.builder()
                 .directoryId(directoryId)
-                .content(new ArrayList<>())
+                .content(new LinkedHashMap<>())
                 .build();
     }
 
@@ -64,18 +66,34 @@ public class FileSteps {
     }
 
     public AddRequest 플러그인_저장파일_생성(Long directoryId) {
+        LinkedHashMap<String, Block> contentMap = new LinkedHashMap<>();
+        contentMap.put(blockId, Block.builder()
+                .id(blockId)
+                .value(value)
+                .type(type)
+                .meta(meta)
+                .build());
+
         return AddRequest.builder()
                 .connectedFileId(directoryId)
                 .type("fail")
-                .fileBlock(contentList)
+                .fileBlock(contentMap)
                 .build();
     }
 
     public AddRequest 플러그인_저장파일_잘못된type_생성(Long directoryId) {
+        LinkedHashMap<String, Block> contentMap = new LinkedHashMap<>();
+        contentMap.put(blockId, Block.builder()
+                .id(blockId)
+                .value(value)
+                .type(type)
+                .meta(meta)
+                .build());
+
         return AddRequest.builder()
                 .connectedFileId(directoryId)
                 .type("인텔리제이")
-                .fileBlock(contentList)
+                .fileBlock(contentMap)
                 .build();
     }
 }
