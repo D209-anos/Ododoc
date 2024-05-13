@@ -13,11 +13,11 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
+import com.ssafy.ododocintellij.tracker.dto.BuildResultInfo;
+import com.ssafy.ododocintellij.tracker.dto.ModifiedFileInfo;
 import com.ssafy.ododocintellij.tracker.dto.RequestDto;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
-import com.ssafy.ododocintellij.tracker.dto.BuildResultInfo;
-import com.ssafy.ododocintellij.tracker.dto.ModifiedFileInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -33,6 +33,7 @@ public class CodeListener implements ExecutionListener {
     public CodeListener(Project project) {
         this.project = project;
     }
+
 
     @Override
     public void processStarted(@NotNull String executorId, @NotNull ExecutionEnvironment env, @NotNull ProcessHandler handler) {
