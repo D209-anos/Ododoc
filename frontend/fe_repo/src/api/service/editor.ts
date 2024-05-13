@@ -28,9 +28,11 @@ export const editorUploadImage = async (file: File, directoryId: string): Promis
 };
 
 export const fetchFile = async (directoryId: string): Promise<any> => {
+  console.log('fetchFile 시작')
   try {
     const response = await api.get<Response>(`/file/${directoryId}`);
     const data = response.data.data;
+    console.log('fetch file 성공 : ' + JSON.stringify(data, null, 2))
     return data
   } catch (error: any) {
     console.error('Failed to fetch File:', error.response?.data || error.message);
@@ -38,12 +40,14 @@ export const fetchFile = async (directoryId: string): Promise<any> => {
   }
 }
 
-export const saveFile = async (actionType: string, directoryId: string, content: any): Promise<any> => {
+export const saveFile = async (directoryId: string, content: any): Promise<any> => {
+  console.log('saveFile 시작')
   try {
-    const response = await api.post<Response>(`/file/${actionType}`, {
+    const response = await api.put<Response>(`/file`, {
       directoryId: directoryId,
       content: content
     })
+    console.log('save 성공 : ' + JSON.stringify(response, null, 2))
     return response.data;
   } catch (error: any) {
     console.error('Failed to save File:', error.response?.data || error.message);

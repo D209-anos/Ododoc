@@ -6,7 +6,6 @@ import Embed from '@yoopta/embed';
 import Image from '@yoopta/image';
 import Link from '@yoopta/link';
 import Callout from '@yoopta/callout';
-import Video from '@yoopta/video';
 import File from '@yoopta/file';
 import { NumberedList, BulletedList, TodoList } from '@yoopta/lists';
 import { Bold, Italic, CodeMark, Underline, Strike, Highlight } from '@yoopta/marks';
@@ -17,7 +16,7 @@ import Toolbar, { DefaultToolbarRender } from '@yoopta/toolbar';
 import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
 import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css'
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { uploadToCloudinary } from '../../..//utils/cloudinary';
 
 import { editDirectoryItem, fetchDirectory } from '../../../api/service/directory';
@@ -25,7 +24,6 @@ import { fetchFile, saveFile } from '../../../api/service/editor'
 import { useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 
-import {WITH_BASIC_INIT_VALUE} from "./initValue"
 
 const plugins = [
   Paragraph,
@@ -110,79 +108,40 @@ function Edito1() {
   const [documentData, setDocumentData] = useState();
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
 
-  useEffect(() => {
-    function handleEditorChange() {
-      // 에디터 전체의 현재 상태를 가져오는 로직 (예시)
-      // 에디터의 선택 영역이 있을 때만 getBlock을 호출
-      if (editor.selection) {
-        const block = editor.getEditorValue(); // 올바른 매개변수 형식을 전달
-        setBlocks(block);
-      }
-    }
 
-    editor.on('change', handleEditorChange); // 에디터의 변경사항 감지
-
-    return () => {
-      editor.off('change', handleEditorChange); // 클린업 함수에서 이벤트 리스너 제거
-    };
-  }, [editor]); // 의존성 배열에 editor 추가
-
+  console.log('fetchDirectory : ' + fetchDirectory(rootId))
 
   //제목 조회하기
+  //파일 내용 조회하기
   useEffect(() => {
-    // 디렉토리 정보를 로드하고, 해당하는 파일의 이름을 제목으로 설정
-    const loadDirectoryAndSetTitle = async () => {
-      if (directoryId) {
-        try {
-          const directoryData = await fetchDirectory(rootId); // API 호출
-          const file = findFileById(directoryData, directoryId);
-          if (file && file.type === "FILE") {
-            setTitle(file.name); // 파일 이름을 제목으로 설정
-          }
-        } catch (error) {
-          console.error('Error fetching directory:', error);
-        }
+    const loadData = async () => {
+      try {
+        const fileData = await fetchFile(directoryId);
+        setDocumentData(fileData.contnet);
+        setTitle(fileData.title)
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
     };
 
-    loadDirectoryAndSetTitle();
+    if (directoryId) {
+      loadData();
+    }
   }, [directoryId]);
 
-  // ID를 사용하여 데이터 내에서 파일 객체를 찾는 함수
-  //@ts-ignore
-  function findFileById(data, id) {
-    if (data.id === id && data.type === 'FILE') {
-      return data; // 일치하는 파일 찾기
-    }
-    if (data.children) {
-      for (const child of data.children) {
-        //@ts-ignore
-        const found = findFileById(child, id);
-        if (found) return found; // 재귀적으로 찾기
-      }
-    }
-    return null;
-  }
-  console.log('fetchDirectory : ' + fetchDirectory(rootId))
-  //파일 내용 조회하기
-
   // 제목 변경 이벤트 핸들러
-  const handleTitleChange = async (event: any) => {
+  const handleTitleChange = useCallback(async (event: any) => {
     const newTitle = event.target.innerText;
-    setTitle(newTitle); // 상태 업데이트
-
-    // 제목이 변경되었으면 서버에 저장
-    if (directoryId && newTitle !== title) { // 현재 제목과 새 제목이 다를 경우에만 요청
+    setTitle(newTitle);
+    if (directoryId && newTitle !== title) {
       try {
-        const response = await editDirectoryItem(directoryId, newTitle);
-        console.log('Title updated successfully:', response);
-        // 여기에 추가적인 성공 처리 로직을 추가할 수 있습니다.
+        await editDirectoryItem(directoryId, newTitle);
+        console.log('Title updated successfully');
       } catch (error) {
         console.error('Failed to update title:', error);
-        // 에러 처리 로직
       }
     }
-  };
+  }, [directoryId, title]);
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
@@ -192,27 +151,25 @@ function Edito1() {
   };
 
   // 파일 변경시 저장하기
-  useEffect(() => {
-    const handleEditorChange = async () => {
-      if (directoryId) {
-        // 에디터에서 현재 콘텐츠 값 가져오기
-        const content = editor.getEditorValue();
-        try {
-          await saveFile('save', directoryId, content);
-        } catch (error) {
-          console.error('Failed to save File:');
-        }
+  const handleEditorChange = useCallback(async () => {
+    if (editor.selection) {
+      const block = editor.getEditorValue(); // 에디터의 현재 값 가져오기
+      setBlocks(block)
+      // API 호출을 통해 서버에 저장
+      try {
+        console.log('저장 할 내용:', JSON.stringify(block, null, 2));
+        await saveFile(directoryId, block);
+      } catch (error) {
+        console.error('파일 저장 실패', error);
       }
-    };
+    }
+  }, [editor, directoryId]);
 
-    // editor의 change 이벤트에 handleEditorChange 함수를 등록
+  useEffect(() => {
     editor.on('change', handleEditorChange);
+    return () => editor.off('change', handleEditorChange);
+  }, [editor, handleEditorChange]);
 
-    // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거
-    return () => {
-      editor.off('change', handleEditorChange);
-    };
-  }, [editor, directoryId]);  // 의존성 배열에 editor와 directoryId를 포함
 
   console.log("directoryId : " + directoryId)
 
@@ -237,7 +194,7 @@ function Edito1() {
           selectionBoxRoot={selectionRef}
           // readOnly = {true}
           //@ts-ignore
-          value={WITH_BASIC_INIT_VALUE}
+          value={documentData}
           autoFocus
           style={{ zIndex: 0, important: 'true' }}
         />
@@ -255,7 +212,3 @@ function Edito1() {
 }
 
 export default Edito1;
-
-
-
-
