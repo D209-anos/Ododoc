@@ -173,6 +173,23 @@ export default class OdodocTreeProvider
   ) {
     const selectedItem = event.selection[0];
     if (selectedItem instanceof DirectoryItem && selectedItem.type === "FILE") {
+      if (this.connectedFileItem === selectedItem) {
+        const confirm = await vscode.window.showInformationMessage(
+          `연동을 해제하시겠습니까?`,
+          { modal: false },
+          "확인",
+          "취소"
+        );
+
+        if (confirm === "확인") {
+          this.connectedFileItem.setSelected(false);
+          this.connectedFileItem = null;
+          this._onDidChangeTreeData.fire(selectedItem);
+          this.context.secrets.store("connectedFileId", "");
+        }
+
+        return;
+      }
       const confirm = await vscode.window.showInformationMessage(
         `연동하시겠습니까?`,
         { modal: false },
