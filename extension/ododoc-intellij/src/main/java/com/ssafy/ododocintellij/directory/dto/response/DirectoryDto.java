@@ -1,13 +1,14 @@
 package com.ssafy.ododocintellij.directory.dto.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DirectoryDto {
 
-    private Long id;
-    private String name;
-    private String type;
-    private List<DirectoryDto> children;
+    private Long id = -1L;
+    private String name = "";
+    private String type = "";
+    private List<DirectoryDto> children = new ArrayList<>();
 
     public Long getId() {
         return id;

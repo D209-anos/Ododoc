@@ -1,14 +1,22 @@
 package com.ssafy.ododocintellij.directory.frame;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododocintellij.directory.dto.request.ModifyRequestDto;
 import com.ssafy.ododocintellij.directory.dto.response.ResultDto;
 import com.ssafy.ododocintellij.directory.entity.FileInfo;
+import com.ssafy.ododocintellij.login.alert.AlertHelper;
+import com.ssafy.ododocintellij.login.frame.MainLoginFrame;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Map;
 
 public class FileAndFolderTreeCell extends TreeCell<FileInfo> {
 
@@ -16,11 +24,13 @@ public class FileAndFolderTreeCell extends TreeCell<FileInfo> {
     private Runnable refreshCallback;
     private ContextMenu folderContextMenu;
     private ContextMenu fileContextMenu;
+    private Stage stage;
     private final String baseUrl = "https://k10d209.p.ssafy.io/api/directory";
 
-    public FileAndFolderTreeCell(ContextMenu folderContextMenu, ContextMenu fileContextMenu, Runnable refreshCallback) {
+    public FileAndFolderTreeCell(ContextMenu folderContextMenu, ContextMenu fileContextMenu, Stage stage,Runnable refreshCallback) {
         this.fileContextMenu = fileContextMenu;
         this.folderContextMenu = folderContextMenu;
+        this.stage = stage;
         this.refreshCallback = refreshCallback;
     }
 
@@ -108,11 +118,67 @@ public class FileAndFolderTreeCell extends TreeCell<FileInfo> {
                         if (refreshCallback != null) {
                             refreshCallback.run();
                         }
-                    } else {
-                        System.out.println("수정 실패");
                     }
-                }, error -> System.out.println("API 호출 실패: " + error.getMessage()));
+                    else if (result.getStatus() == 401){
+                        refreshAccessToken();
+                        showAlert("수정 실패", "다시 시도해주세요.");
+                        refreshCallback.run();
+                    }
+                    else {
+                        showAlert("수정 실패", "다시 시도해주세요.");
+                        refreshCallback.run();
+                    }
+                }, error ->{
+                    showAlert("수정 실패", "다시 시도해주세요.");
+                    refreshCallback.run();
+                });
     }
+    private void showAlert(String header, String content){
+        Platform.runLater(() ->{
+            Alert alert = AlertHelper.makeAlert(
+                    Alert.AlertType.WARNING,
+                    "디렉토리",
+                    header,
+                    content,
+                    "/image/button/icon.png"
+            );
+            alert.showAndWait();
+        });
+    }
+
+    private void refreshAccessToken() {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://k10d209.p.ssafy.io/api")
+                .defaultCookie("refreshToken", TokenManager.getInstance().getRefreshToken())
+                .build();
+
+        webClient.post()
+                .uri("/oauth2/issue/access-token")
+                .retrieve()
+                .bodyToMono(ResultDto.class)
+                .subscribe(result -> {
+                    if (result.getStatus() == 200) {
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        Map<String, String> data = objectMapper.convertValue(result.getData(), Map.class);
+                        TokenManager.getInstance().setAccessToken(data.get("accessToken"));
+                    } else {
+                        reLogin();
+                    }
+                }, error -> reLogin());
+
+    }
+
+    private void reLogin() {
+        Platform.runLater(() -> {
+            TokenManager.getInstance().setAccessToken(null);
+            TokenManager.getInstance().setRefreshToken(null);
+
+            stage.close();
+            MainLoginFrame mainLoginFrame = new MainLoginFrame();
+            mainLoginFrame.show();
+        });
+    }
+
     private String getString() {
         return getItem() == null ? "" : getItem().toString();
     }
