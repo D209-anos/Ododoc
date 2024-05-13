@@ -1,5 +1,6 @@
 package com.ssafy.ododoc.file.controller;
 
+import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
 import com.ssafy.ododoc.file.dto.response.FileResponse;
 import com.ssafy.ododoc.file.dto.response.ImageResponse;
@@ -63,8 +64,9 @@ public class FileController {
         return fileService.saveFile(saveRequest, member);
     }
 
-//    @PutMapping("/add")
-//    public FileResponse addFile(@RequestBody ) {
-//        return fileService.addFile();
-//    }
+    @PutMapping("/add")
+    public FileResponse addFile(@RequestBody @Valid AddRequest addRequest,
+                                @AuthenticationPrincipal Member member) {
+        return fileService.addFile(addRequest, member);
+    }
 }
