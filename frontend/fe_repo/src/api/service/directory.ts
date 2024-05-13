@@ -68,6 +68,21 @@ export const editDirectoryItem = async (id: number, name: string) => {
     }
 }
 
+// directory 이동
+export const moveDirectoryItem = async (id: number, parentId: number) => {
+    try {
+        const response = await api.put('/directory/move', {
+            id: id,
+            parentId: parentId
+        });
+        const data = response.data.data;
+        return data;
+    } catch (error) {
+        console.error('디렉토리 이동 에러:', error);
+        throw error;
+    }
+};
+
 // 휴지통 조회
 export const fetchTrashbin = async () => {
     try {
@@ -76,6 +91,19 @@ export const fetchTrashbin = async () => {
         return data
     } catch (error) {
         console.error('휴지통 조회 에러:', error)
+        throw error;
+    }
+}
+
+// 휴지통 복원
+export const restoreDirectoryItem = async (directoryId: number): Promise<IContentItem | null> => {
+    try {
+        const response = await api.put<Response>(`/directory/restore/${directoryId}`);
+        const data = response.data.data;
+
+        return data;
+    } catch (error: any) {
+        console.error('휴지통 복원 에러:', error);
         throw error;
     }
 }

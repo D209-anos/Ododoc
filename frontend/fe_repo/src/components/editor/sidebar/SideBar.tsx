@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useDrop } from 'react-dnd';
 import Sidebar from '../../../css/components/editor/SideBar.module.css'
 import PencilImage from '../../../assets/images/icon/pencil.png'
 import Line from '../../../assets/images/mark/line.png'
@@ -10,13 +11,14 @@ import SettingModal from './modal/SettingModal'
 import ContextMenu from './ContextMenu';
 import useHandleClickOutside from '../../../hooks/useHandleClickOutside';
 import useContextMenu from '../../../hooks/useContextMenu';
-import FolderItem from './FolderItem';
-import FileItem from './FileItem';
+import Item from './Item';
 import NameEditor from './NameEditor';
 import ProfileIcon from '../../../assets/images/icon/profileIcon.png'
 import { useNavigate } from 'react-router-dom';
-import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem } from '../../../api/service/directory';
+import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem, moveDirectoryItem  } from '../../../api/service/directory';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useFileContext } from '../../../contexts/FileContext';
+import { useTrash } from '../../../contexts/TrashContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -39,6 +41,7 @@ const SideBar: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch } = useAuth();
     const { accessToken, rootId, title } = state;
+    const { loadTrashbin } = useTrash();
 
     const [contents, setContents] = useState<MyDirectoryItem[]>([]);                       // 디렉토리 내용 (id, name, type, children)
     const [folderAddModal, setFolderAddModal] = useState<Record<number, boolean>>({});  // 폴더 추가, 파일 추가 모달창 열림 여부 (true / false)
@@ -51,8 +54,16 @@ const SideBar: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<MyDirectoryItem | null>(null);     // 선택된 파일 또는 폴더의 구조
     const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);           // 폴더 생성 여부 (true / false)
     const [newFolderName, setNewFolderName] = useState<string>('');                     // 새로 바꾼 폴더 이름
+    const [isCreatingFile, setIsCreatingFile] = useState<boolean>(false);               // 파일 생성 여부 (true / false)
+    const [newFileName, setNewFileName] = useState<string>('');                         // 새로 바꾼 파일 이름
     const [createFolderParentId, setCreateFolderParentId] = useState<number | null>(null);  // 생성한 폴더 부모 id (부모 id 넘겨줘야하니깐)
-    const [addingFolderId, setAddingFolderId] = useState<number | null>(null);
+    const [createFileParentId, setCreateFileParentId] = useState<number | null>(null);      // 생성한 파일 부모 id
+    const [addingFolderId, setAddingFolderId] = useState<number | null>(null);          // 추가한 폴더 ID
+    const [addingFileId, setAddingFileId] = useState<number | null>(null);
+    const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
+    const [openFolders, setOpenFolders] = useState<Record<number, boolean>>({});        // 폴더 열림 닫힘 상태
+    const [sidebarWidth, setSidebarWidth] = useState<number>(250);                      // 초기 사이드바 너비 설정
+    const [dragOverFolder, setDragOverFolder] = useState<number | null>(null);  
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -61,16 +72,16 @@ const SideBar: React.FC = () => {
     const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
     // 디렉토리 조회 (로그인 시 title 매핑)
+    const loadDirectory = async () => {
+        if (accessToken && rootId) {
+            const data = await fetchDirectory(rootId);
+            setDirectoryData(data);
+        }
+    };
+
     useEffect(() => {
-        const loadDirectory = async () => {
-            if (accessToken && rootId) {
-                const data = await fetchDirectory(rootId);
-                setDirectoryData(data)
-            }
-        };
-        
         loadDirectory();
-    }, [accessToken, rootId])
+    }, [accessToken, rootId]);
 
     // 디렉토리 조회 (디렉토리 생성 후 조회)
     useEffect(() => {
@@ -94,6 +105,7 @@ const SideBar: React.FC = () => {
     const toggleModal = (id: number): void => {
         setFolderAddModal(prev => ({ ...prev, [id]: !prev[id] }));
         setCreateFolderParentId(id);        // add-button 모달을 열 때 폴더의 부모 ID 설정
+        setCreateFileParentId(id);
     };
 
     // file 클릭    
@@ -106,11 +118,16 @@ const SideBar: React.FC = () => {
         setSelectedId(id);
     }
 
+    // 폴더 열기/닫기 상태 관리
+    const toggleFolder = (id: number) => {
+        setOpenFolders(prev => ({ ...prev, [id]: !prev[id] }))
+    }
+
     // 폴더명 및 파일명 수정
     const saveName = async (id: number, newName: string) => {
         try {
             const data = await editDirectoryItem(id, newName);
-            console.log('폴더명 수정 완료:', data);
+            console.log('폴더명/파일명 수정 완료:', data);
 
             setContents((prevContents) => {
                 const updatedContents = [...prevContents];
@@ -123,7 +140,7 @@ const SideBar: React.FC = () => {
 
             setIsContentEditing(false);
         } catch (error) {
-            console.error('폴더명 수정 실패:', error);
+            console.error('폴더명/파일명 수정 실패:', error);
         }
     };
 
@@ -167,85 +184,46 @@ const SideBar: React.FC = () => {
         );
     };
 
-    // 파일 클릭 시 router 이동
-    const handleItemClick = (id: number): void => {
-        navigate(`/editor/${id}`)
-        setSelectedId(id);
-    }
-
-    // // 부모 ID를 찾는 함수
-    // const findParentId = (children: MyDirectoryItem[] | undefined, id: number, parentId: number | null = null): number | null | undefined => {
-    //     if (!children || typeof children === 'string') return undefined;            // 폴더가 아니라 파일
-
-    //     for (let item of children) {
-    //         if (item.id === id) {
-    //             return parentId;
-    //         }
-    //         if (item.type === 'FOLDER' && Array.isArray(item.children)) {
-    //             const foundParentId = findParentId(item.children as MyDirectoryItem[], id, item.id);   // 재귀로 부모 찾기
-    //             if (foundParentId !== undefined) return foundParentId;
-    //         }
-    //     }
-    //     return undefined;
-    // }
-
-    // // parentId
-    // const parentId = (id: number): void => {
-    //     const foundParentId = findParentId(contents, id);
-    //     console.log("Select ID:", id)
-    //     console.log("Parent ID:", parentId)
-    // }
-
     // 폴더 및 파일 하위 구조
     const renderContents = (
-        children: MyDirectoryItem[] | undefined, 
-        parentId: number | null, 
+        children: MyDirectoryItem[] | undefined,
+        parentId: number | null,
         indentLevel: number = 0
     ): JSX.Element[] => {
         if (!children) return [];
 
-        return children.map((item: MyDirectoryItem) => {
-            const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`; // 하위 요소 들여쓰기
-            if (item.type === 'FOLDER') {
+        return children
+            .map((item: MyDirectoryItem) => {
+                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`;
+                // console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
                 return (
                     <div key={item.id} className={className}>
-                        <FolderItem 
+                        <Item
                             item={item}
                             parentId={parentId}
-                            toggleModal={toggleModal} 
-                            folderAddModal={folderAddModal} 
-                            renderContents={() => renderContents(item.children as MyDirectoryItem[], item.id, indentLevel + 1)} 
-                            handleContextMenu={handleContextMenu} 
-                            handleItemClick={folderItemClick} 
-                            selectedItem={selectedItem} 
-                            isContentEditing={isContentEditing} 
-                            setIsContentEditing={setIsContentEditing} 
+                            toggleModal={toggleModal}
+                            folderAddModal={folderAddModal}
+                            renderContents={(contents) => renderContents(contents, item.id, indentLevel + 1)}
+                            handleContextMenu={handleContextMenu}
+                            handleItemClick={item.type === 'FOLDER' ? folderItemClick : fileItemClick}
+                            selectedItem={selectedItem}
+                            isContentEditing={isContentEditing}
+                            setIsContentEditing={setIsContentEditing}
                             saveName={saveName}
                             setCreateFolderParentId={setCreateFolderParentId}
+                            saveNewFolder={saveNewFolder}
                             setAddingFolderId={setAddingFolderId}
                             addingFolderId={addingFolderId}
-                            saveNewFolder={saveNewFolder}
+                            saveNewFile={saveNewFile}
+                            isFolderOpen={openFolders[item.id] || false}    // 폴더 열림 상태 전달
+                            toggleFolder={() => toggleFolder(item.id)}  // 폴더 열고 닫기 함수 전달
+                            moveItem={moveItem}
                         />
+                        {item.type === 'FOLDER' && openFolders[item.id] && item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1)}
                     </div>
                 );
-            } else {
-                return (
-                    <div key={item.id} className={className}>
-                        <FileItem 
-                            item={item} 
-                            parentId={item.id}
-                            selected={item.id === selectedId} 
-                            handleContextMenu={handleContextMenu} 
-                            handleItemClick={fileItemClick} 
-                            selectedItem={selectedItem} 
-                            isContentEditing={isContentEditing} 
-                            setIsContentEditing={setIsContentEditing} 
-                            saveName={saveName}
-                        />
-                    </div>
-                );
-            }
-        });
+            })
+            .filter(Boolean) as JSX.Element[];
     };
 
     // 선택된 항목 ID 찾기 함수
@@ -285,13 +263,35 @@ const SideBar: React.FC = () => {
             console.log('삭제 성공:', data)
 
             // 삭제로 디렉토리 목록 갱신
-            const updatedContents = contents.filter(item => item.id !== id);
+            const updatedContents = removeItemFromDirectory(contents, id);
             setContents(updatedContents)
+
+            const updatedDirectoryData = await fetchDirectory(rootId);
+            setDirectoryData(updatedDirectoryData);
+
+            loadTrashbin();
         } catch (error) {
             console.log('directory delete error:', error)
         }
 
         hideMenu();
+    }
+
+    // directory에서 아이템 제거
+    const removeItemFromDirectory = (directory: MyDirectoryItem[], id: number): MyDirectoryItem[] => {
+        return directory.reduce((acc: MyDirectoryItem[], item: MyDirectoryItem) => {
+            if (item.id === id) {
+                return acc;
+            }
+
+            if (item.children && Array.isArray(item.children)) {
+                const updatedChildren = removeItemFromDirectory(item.children, id);
+                if (updatedChildren.length !== item.children.length) {
+                    return [...acc, { ...item, children: updatedChildren }];
+                }
+            }
+            return [...acc, item];
+        }, []);
     }
 
     // make-file-button 클릭 시 폴더 생성되는 함수
@@ -329,19 +329,189 @@ const SideBar: React.FC = () => {
         const updatedDirectoryData = await fetchDirectory(rootId);
         setDirectoryData(updatedDirectoryData);
 
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+
+        setOpenFolders(prev => ({ ...prev, [createFolderParentId!]: true }));
+
         setIsCreatingFolder(false);
         setNewFolderName('');
         setCreateFolderParentId(null);
     }
 
+    // 새로운 파일 저장
+    const saveNewFile = async (objectId: number, newName: string) => {
+        const newFile: IContentItemCreate = {
+            id: Date.now(),
+            parentId: createFileParentId,
+            type: 'FILE',
+            name: newFileName,
+            children: ''
+        };
+
+        await createDirectory(objectId, newName, 'FILE')
+
+        setContents((prevContents) => {
+            const updateContents = [...prevContents];
+            const parentIndex = updateContents.findIndex(item => item.id === createFileParentId);
+
+            if (parentIndex !== -1 && Array.isArray(updateContents[parentIndex].children)) {
+                (updateContents[parentIndex].children as MyDirectoryItem[]).push(newFile);
+            } else {
+                newFile.name = newFileName;
+                updateContents.push(newFile);
+            }
+            return updateContents;
+        })
+
+        // directoryData 갱신
+        const updatedDirectoryData = await fetchDirectory(rootId);
+        setDirectoryData(updatedDirectoryData);
+
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+
+        setOpenFolders(prev => ({ ...prev, [createFileParentId!]: true }));
+
+        setIsCreatingFile(false);
+        setNewFileName('');
+        setCreateFileParentId(null);
+    }
+
+    // 부모를 찾는 함수
+    const findParent = (
+        items: MyDirectoryItem[], 
+        childId: number
+    ): MyDirectoryItem | null => {
+        for (let item of items) {
+            if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                if (item.children.some(child => child.id === childId)) {
+                    return item;
+                }
+                const foundParent = findParent(item.children as MyDirectoryItem[], childId);
+                if (foundParent) {
+                    return foundParent;
+                }
+            }
+        }
+        return null;
+    };
+
+    // 폴더 및 파일 이동
+    const moveItem = async (draggedId: number, targetId: number | null, parentId: number | null) => {
+        const findAndRemoveItem = (items: MyDirectoryItem[], id: number): { item: MyDirectoryItem | null, items: MyDirectoryItem[] } => {
+            let foundItem: MyDirectoryItem | null = null;
+            const updatedItems = items.filter(item => {
+                if (item.id === id) {
+                    foundItem = item;
+                    return false;
+                }
+                if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                    const result = findAndRemoveItem(item.children as MyDirectoryItem[], id);
+                    if (result.item) {
+                        foundItem = result.item;
+                        item.children = result.items;
+                    }
+                }
+                return true;
+            });
+            return { item: foundItem, items: updatedItems };
+        };
+
+        const insertItem = (items: MyDirectoryItem[], newItem: MyDirectoryItem, targetId: number | null, parentId: number | null): MyDirectoryItem[] => {
+            if (parentId === null) {
+                // 최상위 레벨에 삽입
+                if (targetId === null) {
+                    items.push(newItem);
+                } else {
+                    const targetIndex = items.findIndex(item => item.id === targetId);
+                    items.splice(targetIndex + 1, 0, newItem);
+                }
+            } else {
+                for (let item of items) {
+                    if (item.id === parentId) {
+                        if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                            if (targetId === null) {
+                                item.children.push(newItem);
+                            } else {
+                                const targetIndex = item.children.findIndex(child => child.id === targetId);
+                                item.children.splice(targetIndex + 1, 0, newItem);
+                            }
+                        }
+                    } else if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                        item.children = insertItem(item.children as MyDirectoryItem[], newItem, targetId, parentId);
+                    }
+                }
+            }
+            return items;
+        };
+
+        const isValidMove = (draggedItem: MyDirectoryItem, targetId: number | null): boolean => {
+            if (draggedItem.id === targetId) return false;
+
+            const findItemById = (items: MyDirectoryItem[], id: number): MyDirectoryItem | undefined => {
+                for (let item of items) {
+                    if (item.id === id) return item;
+                    if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                        const found = findItemById(item.children as MyDirectoryItem[], id);
+                        if (found) return found;
+                    }
+                }
+                return undefined;
+            };
+
+            const targetItem = findItemById(contents, targetId!);
+            if (!targetItem) return true;
+
+            let currentParent: MyDirectoryItem | null = targetItem;
+            while (currentParent) {
+                if (currentParent.id === draggedItem.id) return false;
+                currentParent = findParent(contents, currentParent.id) as MyDirectoryItem | null;
+            }
+
+            return true;
+        };
+
+        setContents(prevContents => {
+            const { item: draggedItem, items: itemsWithoutDragged } = findAndRemoveItem(prevContents, draggedId);
+            if (!draggedItem || !isValidMove(draggedItem, targetId)) return prevContents;
+
+            return insertItem(itemsWithoutDragged, draggedItem, targetId, parentId);
+        });
+
+        // 디렉토리 이동 API 호출
+        try {
+            console.log(`ID: ${draggedId} parent ID: ${parentId}`);
+            await moveDirectoryItem(draggedId, parentId!);
+            const updatedDirectoryData = await fetchDirectory(rootId);
+            setDirectoryData(updatedDirectoryData)
+        } catch (error) {
+            console.error('디렉토리 이동 에러:', error)
+        }
+    };
+
+
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+        setSidebarWidth(e.clientX);
+    }
+
+    const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp)
+    }
+
     return (
         // 사이드바
-        <div className={Sidebar.sidebar}>
+        <div className={Sidebar.sidebar} style={{ width: sidebarWidth }}>
             <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
                 {renderNameField()}
             </div>
             <img src={Line} alt="line" className={Sidebar.line}/>
-            {renderContents(contents, null)}
             {isCreatingFolder && (
                 <div className={Sidebar.folderSpace}>
                     <div>
@@ -356,6 +526,7 @@ const SideBar: React.FC = () => {
                     </div>
                 </div>
             )}
+            {renderContents(contents, null)}
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 
@@ -371,10 +542,17 @@ const SideBar: React.FC = () => {
                 <img src={ProfileIcon} alt="profile-img" className={Sidebar.profileImage} onClick={() => navigate('/editor/profile')}/>
                 <img src={MakeFileImage} alt="make-file-button" className={Sidebar.makeFileButton} onClick={handleCreateFolder}/>
                 <img src={TrashButton} alt="trash-button" className={Sidebar.trashButton} onClick={() => setTrashModalOpen(true)}/>
-                <TrashModal isOpen={isTrashModalOpen} onClose={() => setTrashModalOpen(false)} />
+                <TrashModal 
+                    isOpen={isTrashModalOpen} 
+                    onClose={() => {
+                        setTrashModalOpen(false);
+                        loadDirectory();
+                    }}
+                />
                 <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} onClick={() => setSettingModalOpen(true)}/>
                 <SettingModal isOpen={isSettingModalOpen} onClose={() => setSettingModalOpen(false)}/>
             </div>
+            <div className={Sidebar.handle} onMouseDown={handleMouseDown}/>
         </div>
     )
 }

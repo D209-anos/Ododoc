@@ -7,7 +7,10 @@ import FileImage from '../../../../assets/images/icon/file.png'
 import FolderImage from '../../../../assets/images/icon/forder.png'
 import Swal from 'sweetalert2';
 import { useAuth } from '../../../../contexts/AuthContext';
-import { fetchTrashbin } from '../../../../api/service/directory';
+import { fetchTrashbin, restoreDirectoryItem, deleteDirectoryItem  } from '../../../../api/service/directory';
+import Restore from '../../../../assets/images/icon/restore.png';
+import ForeverDelete from '../../../../assets/images/icon/foreverDelete.png';
+import { useTrash } from '../../../../contexts/TrashContext';
 
 interface ModalProps {
     isOpen: boolean;
@@ -19,32 +22,15 @@ interface IContentItem {
     id: number;
     type: 'FOLDER' | 'FILE';
     name: string;
-    deletedate: string;
+    trashbinTime: string;
     contents?: string | IContentItem[];
 }
-
-// 임시 데이터
-// const dummyData: IContentItem = {
-//     "id": 1,
-//     "type": "FOLDER",
-//     "name": "sub-folder1",
-//     "deletedate": "2024-04-30",
-//     "contents": [
-//         {
-//             "id": 3,
-//             "type": "FILE",
-//             "name": "file3",
-//             "deletedate": "2024-05-02",
-//             "contents": "파일 3번입니다."
-//         }
-//     ],
-// }
 
 const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const { state, dispatch } = useAuth();
     const { accessToken } = state;
-    const [trashbinData, setTrashbinData] = useState<IContentItem[]>([]);
+    const { trashbinData, loadTrashbin } = useTrash();
     useHandleClickOutside(modalRef, onClose);
 
     const clickExitButton = () => {
@@ -55,47 +41,84 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         handleRestore(item);
     }
 
-    //휴지통 조회
-    useEffect(() => {
-        const loadTrashbin = async () => {
-            if (accessToken) {
+    const handleForeverDelete = async (item: IContentItem) => {
+        Swal.fire({
+            html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제하시겠습니까?</h2>',
+            icon: 'warning',
+            showCancelButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
                 try {
-                    console.log("휴지통에 데이터 잘 들어옴")
-                    console.log(trashbinData)
-                    const data = await fetchTrashbin();
-                    setTrashbinData(data);
+                    await deleteDirectoryItem('delete', item.id);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제되었습니다.</h2>',
+                        icon: 'success',
+                    });
+
+                    loadTrashbin();
                 } catch (error) {
-                    console.error('휴지통 조회 에러:', error)
+                    console.error('영구 삭제 에러:', error);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제에 실패했습니다.</h2>',
+                        icon: 'error',
+                    });
                 }
-            } 
-        };
-        loadTrashbin();
-    }, [])
+            }
+        });
+    };
+
+    //휴지통 조회
+    // useEffect(() => {
+    //     const loadTrashbin = async () => {
+    //         if (accessToken) {
+    //             try {
+    //                 console.log("휴지통에 데이터 잘 들어옴")
+    //                 console.log(trashbinData)
+    //                 const data = await fetchTrashbin();
+    //                 setTrashbinData(data);
+    //             } catch (error) {
+    //                 console.error('휴지통 조회 에러:', error)
+    //             }
+    //         } 
+    //     };
+    //     loadTrashbin();
+    // }, [accessToken])
 
     // 휴지통 복원 모달
-    const handleRestore = (item: IContentItem) => {
+    const handleRestore = async (item: IContentItem) => {
         Swal.fire({
             html: '<h2 style="font-family: hanbitFont, sans-serif;">복원하시겠습니까??</h2>',
             icon: 'warning',
             showCancelButton: true
-        }).then((result) => {
+        }).then(async (result) => {
             onClose();
             if (result.isConfirmed) {
-                //  이 안에 복원시킬 때 사용할 api 들어가야 함
-                Swal.fire({
-                    html: '<h2 style="font-family: hanbitFont, sans-serif;">복원되었습니다.</h2>',
-                    icon: 'success'
-                })
+                try {
+                    await restoreDirectoryItem(item.id);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">복원되었습니다.</h2>',
+                        icon: 'success'
+                    });
+
+                    loadTrashbin();
+                } catch (error) {
+                    console.error('휴지통 복원 에러:', error);
+                    Swal.fire({
+                        html: '<h2 style="font-family: hanbitFont, sans-serif;">복원에 실패했습니다.</h2>',
+                        icon: 'error',
+                    });
+                }
+                onClose();
             }
-        })
-    }
+        });
+    };
 
     if (!isOpen) return null;
 
     // 삭제된 폴더 및 파일 리스트
     const renderTopLevelContent = (data: IContentItem[]) => {
         return data.map((content) => (
-            <div className={Trash.fileItem} key={content.id} onClick={() => handleItemClick(content)}>
+            <div className={Trash.fileItem} key={content.id} >
                 <div className={Trash.nameWrapper}>
                     <img 
                         src={content.type === 'FILE' ? FileImage : FolderImage} 
@@ -104,8 +127,16 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     />
                     <p className={Trash.contentName}>{content.name}</p>
                 </div>
-                <p>{content.deletedate}</p>
+                <p>{content.trashbinTime}</p>
                 <p>{content.type}</p>
+                <p className={Trash.DeleteWrapper}>
+                    <div className={Trash.RestoreWrapper}>
+                        <img src={Restore} alt="restore-image" className={Trash.Restore} onClick={() => handleItemClick(content)}/>
+                    </div>
+                    <div>
+                        <img src={ForeverDelete} alt="forever-Delete-image" className={Trash.ForeverDelete} onClick={() => handleForeverDelete(content)}/>
+                    </div>
+                </p>
             </div>
         ));
     };
@@ -122,14 +153,17 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
                     <p className={Trash.trashTitle} style={{ fontFamily: 'hanbitFont' }}>휴지통</p>
                 </div>
                 <hr />
-                <div className={Trash.deleteFileTitle}>
-                    <p className={Trash.fileName}>파일명</p>
-                    <p>삭제된 날짜</p>
-                    <p>항목 유형</p>
+                <div className={Trash.deleteFileWrapper}>
+                    <div className={Trash.deleteFileTitle}>
+                        <p className={Trash.fileName}>파일명</p>
+                        <p>삭제된 날짜</p>
+                        <p>항목 유형</p>
+                        <p>복원/삭제</p>
+                    </div>
+                    {/* 휴지통에 버린 폴더 및 파일 리스트 */}
+                    {trashbinData && renderTopLevelContent(trashbinData)}
+                    {children}
                 </div>
-                {/* 휴지통에 버린 폴더 및 파일 리스트 */}
-                {trashbinData && renderTopLevelContent(trashbinData)}
-                {children}
             </div>
         </div>
     )
@@ -138,3 +172,4 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
 
 export default TrashModal
+

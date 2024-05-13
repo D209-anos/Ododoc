@@ -50,9 +50,9 @@ function Start() {
                 {/* <img src={Logo} alt="logo" className={start.logo} /> */}
                 <div className={start.list}>
                     <ul>
-                        <li className={start.menuColor} onClick={() => handleSelect('VSCode')}>VSCode</li>
-                        <li className={start.menuColor} onClick={() => handleSelect('IntelliJ')}>IntelliJ</li>
-                        <li className={start.menuColor} onClick={() => handleSelect('Chrome')}>Chrome</li>
+                        <li className={`${start.menuColor} ${selected === 'VSCode' ? start.active : ''}`} onClick={() => handleSelect('VSCode')}>VSCode</li>
+                        <li className={`${start.menuColor} ${selected === 'IntelliJ' ? start.active : ''}`} onClick={() => handleSelect('IntelliJ')}>IntelliJ</li>
+                        <li className={`${start.menuColor} ${selected === 'Chrome' ? start.active : ''}`} onClick={() => handleSelect('Chrome')}>Chrome</li>
                     </ul>
                 </div>
             </header>
