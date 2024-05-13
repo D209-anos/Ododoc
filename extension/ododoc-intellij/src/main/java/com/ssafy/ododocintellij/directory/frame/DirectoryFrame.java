@@ -137,10 +137,10 @@ public class DirectoryFrame extends Application {
                     }
                     else{
                         result.setData(new DirectoryDto());
-                        showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING,"조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요.");
                     }
                 })
-                .doOnError(error -> showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요."));
+                .doOnError(error -> showAlert(Alert.AlertType.WARNING,"조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요."));
     }
 
     private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
@@ -188,6 +188,13 @@ public class DirectoryFrame extends Application {
     private void connectFile() {
         ConnectedFileManager connectedFileManager = ConnectedFileManager.getInstance();
         connectedFileManager.setDirectoryId(currentDirectoryId);
+
+        if(connectedFileManager.getDirectoryId() != -1){
+            showAlert(Alert.AlertType.INFORMATION, "연동 성공", "파일과 연동에 성공하였습니다.");
+        }
+        else{
+            showAlert(Alert.AlertType.WARNING, "연동 실패", "파일과의 연동에 실패하였습니다.");
+        }
     }
 
     private void createFolderOrFile(String type){
@@ -209,15 +216,15 @@ public class DirectoryFrame extends Application {
                     }
                     else if (result.getStatus() == 401) {
                         refreshAccessToken();
-                        showAlert("생성 실패", "다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING, "생성 실패", "다시 시도해주세요.");
                         refreshDirectoryView();
                     }
                     else {
-                        showAlert("생성 실패", "다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING,"생성 실패", "다시 시도해주세요.");
                         refreshDirectoryView();
                     }
                 }, error -> {
-                    showAlert("생성 실패", "다시 시도해주세요.");
+                    showAlert(Alert.AlertType.WARNING,"생성 실패", "다시 시도해주세요.");
                     refreshDirectoryView();
                 });
     }
@@ -234,10 +241,10 @@ public class DirectoryFrame extends Application {
         });
     }
 
-    private void showAlert(String header, String content){
+    private void showAlert(Alert.AlertType type, String header, String content){
         Platform.runLater(() ->{
             Alert alert = AlertHelper.makeAlert(
-                    Alert.AlertType.WARNING,
+                    type,
                     " Ododoc",
                     header,
                     content,
