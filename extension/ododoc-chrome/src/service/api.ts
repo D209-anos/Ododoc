@@ -10,10 +10,14 @@ const api = axios.create({
 api.interceptors.request.use(
     // 토큰 있을 때: 헤더에 토큰 싣기
     function (config) {
-        const accessToken = localStorage.getItem("accessToken");
-        if (accessToken) {
-            config.headers["Authorization"] = `Bearer ${accessToken}`;
+        const authDetails = localStorage.getItem("authDetails");
+        if (authDetails) {
+            const { accessToken } = JSON.parse(authDetails);
+            if (accessToken) {
+                config.headers["Authorization"] = `${accessToken}`;
+            }
         }
+        console.log(config.headers);
         return config;
     },
     // 토큰 없을 때: 에러 띄우기

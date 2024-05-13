@@ -3,111 +3,68 @@ import '../../css/directory/directory.css';
 import Line from '../../images/icon/line.png'
 import FolderItem from './FolderItem';
 import FileItem from './FileItem';
-import { useNavigate } from 'react-router-dom';
+import { fetchDirectory } from '../../service/directory';
 
+// Props 타입 정의
+interface SidebarProps {
+    accessToken: string | null;
+    rootId: string | null;
+    title: string | null;
+  }
 
-interface IContentItem {
+// 디렉토리 타입
+interface MyDirectoryItem {
     id: number;
-    type: 'FOLDER' | 'FILE';
     name: string;
-    contents?: IContentItem[] | string;
+    type: 'FOLDER' | 'FILE';
+    children?: MyDirectoryItem[] | string;
 }
 
-// 임시 데이터
-const dummyData: IContentItem = {
-    "id": 1,
-    "type": "FOLDER",
-    "name": "현재의 정리 공간",
-    "contents": [
-        {
-            "id": 2,
-            "type": "FOLDER",
-            "name": "ododoc 프로젝트",
-            "contents": [
-                {
-                    "id": 7,
-                    "type": "FOLDER",
-                    "name": "프로젝트 이슈 모음집",
-                    "contents": [
-                        {
-                        "id": 13,
-                        "type": "FILE",
-                        "name": "2024-04-20",
-                        "contents": "13번입니다."
-                        },
-                        {
-                        "id": 144,
-                        "type": "FILE",
-                        "name": "2024-04-22",
-                        "contents": "144번입니다."
-                        },
-                        {
-                        "id": 155,
-                        "type": "FILE",
-                        "name": "2024-04-25",
-                        "contents": "155번입니다."
-                        },
-                        {
-                        "id": 166,
-                        "type": "FILE",
-                        "name": "2024-05-03",
-                        "contents": "166번입니다."
-                        },
-                    ]
-                },
-            ]
-            
-        },
-        {
-            "id": 4,
-            "type": "FOLDER",
-            "name": "밀정윷놀이 프로젝트",
-            "contents": [
-                { "id": 999,
-                "type": "FILE",
-                "name": "Project Description",
-                "contents": "안녕 글 내용이야 이렇고 저렇고"
-            }
-          ]
-        },
-        {
-            "id": 5,
-            "type": "FOLDER",
-            "name": "vodle 프로젝트",
-            "contents": []
-        }
-    ]
-};
+const adress = "ws://localhost:18080/process/ws";
 
-const SideBar: React.FC = () => {
-    // const navigate = useNavigate();
-    // const [contents, setContents] = useState<IContentItem[]>([]);
+const SideBar: React.FC<SidebarProps> = ({ accessToken, rootId, title }) => {
+    console.log(accessToken, rootId, title)
+    const [monitoring, setMonitoring] = useState<boolean>(false);
+    const [contents, setContents] = useState<MyDirectoryItem[]>([]);   
     const [modalActive, setModalActive] = useState<Record<number, boolean>>({});        // 파일, 폴더 생성 모달창 열림, 닫힘 여부
-    const [isTrashModalOpen, setTrashModalOpen] = useState<boolean>(false);             // 휴지통 모달창 열림, 닫힘 여부
-    const [isSettingModalOpen, setSettingModalOpen] = useState<boolean>(false);         // 설정 모달창 열림, 닫힘 여부
-    const [isEditing, setIsEditing] = useState<boolean>(false);                         // 사용자 이름 수정 여부
     const [isContentEditing, setIsContentEditing] = useState<boolean>(false);
     // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
-    const [userName, setUserName] = useState<string>(dummyData.name);                  // 사용자 이름 수정
+    const [userName, setUserName] = useState<string>(title || '');                  // 사용자 이름 수정
     const [selectedId, setSelectedId] = useState<number | null>(null);                  // 선택된 id
-    const [selectedItem, setSelectedItem] = useState<IContentItem | null>(null);
+    const [selectedItem, setSelectedItem] = useState<MyDirectoryItem | null>(null);
+    const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
-    // 디렉토리 조회
-    // useEffect(() => {
-    //     const loadDirectory = async () => {
-    //         const rootId = 1;
-    //         const directoryData = await fetchDirectory(rootId);
-    //         const token = localStorage.getItem('accessToken')
-    //         if (directoryData && token) {
-    //             console.log('데이터 들어왔따 ~~~')
-    //             console.log(directoryData)
-    //             setContents(directoryData.contents as IContentItem[]);
-    //             setUserName(directoryData.name);
-    //         }
-    //     };
+    // 디렉토리 조회 (로그인 시 title 매핑)
+    useEffect(() => {
+        const loadDirectory = async () => {
+            if (accessToken && rootId) {
+                console.log(accessToken, rootId);
+                const rootIdNumber = Number(rootId);
+                const data = await fetchDirectory(rootIdNumber, accessToken);
+                setDirectoryData(data)
+            }
+        };
+        
+        loadDirectory();
+    }, [accessToken, rootId])
 
-    //     loadDirectory();
-    // }, [])
+    // 디렉토리 조회 (디렉토리 생성 후 조회)
+    useEffect(() => {
+        if (directoryData){
+            console.log(directoryData)
+            setContents(directoryData.children as MyDirectoryItem[])    // diretoryData 정보 넣음
+            setUserName(directoryData.name);                            // 사용자 이름 넣음
+        } else {
+            console.log("디렉토리 찾을 수 없음.")
+        }
+    }, [directoryData])
+
+    // 닉넴
+    useEffect(() => {
+        if (title) {
+            setUserName(title);
+        }
+    }, [title]);
 
     const toggleModal = (id: number): void => {
         setModalActive(prev => ({ ...prev, [id]: !prev[id] }));
@@ -116,8 +73,8 @@ const SideBar: React.FC = () => {
     // file 클릭
     const fileItemClick = (id: number): void => {
         // navigate(`/editor/${id}`, {state: id})
-        // setSelectedId(id);
-        // console.log(id)
+        setSelectedId(id);
+        console.log(selectedId)
     }
 
     // folder 클릭
@@ -126,35 +83,25 @@ const SideBar: React.FC = () => {
         // console.log(id)
     }
 
-    // // 사용자 이름 저장 함수
-    // const saveUserName = (objectId: number) => {
-    //     setIsEditing(false);
-    //     // 사용자 이름 수정 API 호출 코드 작성
-    // };
-
-    // 사용자 이름 수정 함수
-    const renderNameField = (): JSX.Element => {
-        return (
-            <div onClick={() => setIsEditing(true)} className="nickname">
-                {userName}
-            </div>
-        );
-    };
-
     // 폴더 및 파일 하위 구조
-    const renderContents = (contents: IContentItem[] | undefined, indentLevel: number = 0): JSX.Element[] => {
-        if (!contents) return [];
+    const renderContents = (
+            children: MyDirectoryItem[] | undefined, 
+            parentId: number | null, 
+            indentLevel: number = 0
+    ): JSX.Element[] => {
+        if (!children) return [];
 
-        return contents.map((item: IContentItem) => {
+        return children.map((item: MyDirectoryItem) => {
             const className = `item ${indentLevel > 0 ? 'itemIndent' : ''}`; // 하위 요소 들여쓰기
             if (item.type === 'FOLDER') {
                 return (
                     <div key={item.id} className={className}>
                         <FolderItem 
                         item={item} 
+                        parentId={parentId}
                         toggleModal={toggleModal} 
                         modalActive={modalActive} 
-                        renderContents={() => renderContents(item.contents as IContentItem[], indentLevel + 1)} 
+                        renderContents={() => renderContents(item.children as MyDirectoryItem[], item.id, indentLevel + 1)} 
                         handleItemClick={folderItemClick} 
                         selectedItem={selectedItem} 
                         isContentEditing={isContentEditing} 
@@ -167,6 +114,7 @@ const SideBar: React.FC = () => {
                     <div key={item.id} className={className}>
                         <FileItem 
                         item={item} 
+                        parentId={item.id}
                         selected={item.id === selectedId} 
                         handleItemClick={fileItemClick} 
                         selectedItem={selectedItem} 
@@ -180,15 +128,15 @@ const SideBar: React.FC = () => {
     };
 
     // 선택된 항목 ID 찾기 함수
-    const findItemById = (contents: IContentItem[] | string | undefined, id: number): IContentItem | undefined => {
-        if (!contents || typeof contents === 'string') return undefined;
+    const findItemById = (children: MyDirectoryItem[] | string | undefined, id: number): MyDirectoryItem | undefined => {
+        if (!children || typeof children === 'string') return undefined;
 
-        for (let item of contents) {
+        for (let item of children) {
             if (item.id === id) {
                 return item;
             }
-            if (item.type === 'FOLDER' && Array.isArray(item.contents)) {
-                const found = findItemById(item.contents, id);
+            if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+                const found = findItemById(item.children, id);
                 if (found) return found;
             }
         }
@@ -205,14 +153,143 @@ const SideBar: React.FC = () => {
         }
     }    
 
+    /**  웹소켓 코드 */
+    // const socket = useRef<WebSocket | null>(null);
+
+    // useEffect(() => {
+    //     console.log(monitoring);
+    //     socket.current = new WebSocket(adress);
+    //     console.log("WebSocketClient created");
+
+    //     socket.current.onopen = () => {
+    //         console.log("Connection established");
+    //         // socket.current?.send("Hello Server!");
+    //         const messageData = {
+    //             sourceApplication: "Chrome",
+    //             accessToken: accessToken,
+    //             connectedFileId: 1,
+    //             dataType: "SIGNAL",
+    //             content: "Test message from React",
+    //             timestamp: new Date()
+    //         };
+
+    //         const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+    //         if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+    //             socket.current.send(messageJson); // JSON 문자열을 보냄
+    //         } else {
+    //             console.error("WebSocket connection is not established.");
+    //         }
+
+    //     };
+
+    //     socket.current.onmessage = (event) => {
+    //         console.log("Message from server:", event.data);
+    //     };
+
+    //     socket.current.onerror = (error) => {
+    //         console.error("WebSocket 에러:", error);
+    //     };
+
+    //     socket.current.onclose = () => {
+    //         console.log("소켓 닫혔어요");
+    //     };
+
+    //     const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+    //         console.log(monitoring, ", 변화 :", changeInfo.status, ", url : ", tab.url)
+    //         if (monitoring && changeInfo.status === 'complete' && tab.url) {
+    //             chrome.scripting.executeScript({
+    //                 target: { tabId: tabId },
+    //                 func: getHtml
+    //             }, (results) => {
+    //                 if (results[0]) {
+    //                     const pageHtml = results[0].result;
+    //                     let message = '';
+
+    //                     if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
+    //                         const urlParams = new URLSearchParams(new URL(tab.url).search);
+    //                         const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
+    //                         message = JSON.stringify({
+    //                             type: 'search',
+    //                             query: searchQuery
+    //                         });
+    //                     } else {
+    //                         message = JSON.stringify({
+    //                             type: 'page',
+    //                             url: tab.url,
+    //                             html: pageHtml
+    //                         });
+    //                     }
+
+    //                     const messageData = {
+    //                         sourceApplication: "Chrome",
+    //                         accessToken: accessToken,
+    //                         connectedFileId: 1,
+    //                         dataType: "SIGNAL",
+    //                         content: message,
+    //                         timestamp: new Date()
+    //                     };
+    //                     const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
+    //                     if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
+    //                         socket.current.send(messageJson); // JSON 문자열을 보냄
+    //                     } else {
+    //                         console.error("WebSocket connection is not established.");
+    //                     }
+    //                 }
+    //             });
+    //         }
+    //     };
+      
+    //     const getHtml = () => document.documentElement.outerHTML;
+
+    //     chrome.tabs.onUpdated.addListener(handleTabUpdate);
+
+    //     // Cleanup on component unmount
+    //     return () => {
+    //         socket.current?.close();
+    //         chrome.tabs.onUpdated.removeListener(handleTabUpdate);
+    //     };
+    // }, [monitoring]);
+
+    const handleStartMonitoring = () => {
+        console.log("기록 시작할게요");
+        setMonitoring(true);
+        chrome.runtime.sendMessage({ command: "start" });
+    };
+    
+      const handleStopMonitoring = () => {
+        console.log("기록 중지할게요");
+        setMonitoring(false);
+        chrome.runtime.sendMessage({ command: "stop" });
+    };
+
+    
+
+    // const sendMessage = (message: string) => {
+    //     const messageObject = { text: message };
+
+    //     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+    //         socket.current.send(messageObject);
+    //     } else {
+    //         console.log("Connection not ready.");
+    //     }
+    // };
+    /***********************  웹소켓 코드 *********************************/
+
+
     return (
         // 사이드바
-        <div className="sidebar">
-            <div className="nicknameSpace" style={{ fontFamily: 'hanbitFont' }}>
-                {renderNameField()}
+        <div>
+            <div className="sidebar">
+                <div className="nicknameSpace" style={{ fontFamily: 'hanbitFont' }}>
+                    <div className='nickname'>{userName}</div>
+                </div>
+                <img src={Line} alt="line" className="line"/>
+                {renderContents(contents, null)}
             </div>
-            <img src={Line} alt="line" className="line"/>
-            {renderContents(dummyData.contents as IContentItem[])}
+            <div className="buttons-container">
+                <button onClick={handleStartMonitoring}>기록 시작</button>
+                <button onClick={handleStopMonitoring}>기록 중지</button>
+            </div>
         </div>
     )
 }
