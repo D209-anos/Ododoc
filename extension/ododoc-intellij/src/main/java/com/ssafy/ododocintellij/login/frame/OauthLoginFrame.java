@@ -264,7 +264,6 @@ public class OauthLoginFrame extends Stage {
                 Alert alert = WebSocketReConnectAlert.makeAlert();
                 Optional<ButtonType> result = alert.showAndWait();
                 if(result.isPresent() && result.get() == ButtonType.OK) {
-                    System.out.println("연결 시도");
                     connectWebSocket();
                 }
                 else {

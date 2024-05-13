@@ -30,6 +30,7 @@ public class StartUpActivity implements ProjectActivity {
             // JavaFX 플랫폼
             Platform.startup(() -> {
                 javafxInitialized = true;
+                Platform.setImplicitExit(false);
                 runActivity(tokenManager, projectProvider);
             });
 
