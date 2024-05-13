@@ -64,6 +64,13 @@ public class FileController {
         return fileService.saveFile(saveRequest, member);
     }
 
+    /**
+     * 플러그인 파일 내용 저장 api.
+     *
+     * @param addRequest 저장할 디렉토리 아이디, 저장 타입, visitedCount, 저장할 내용
+     * @param member 로그인 한 멤버
+     * @return 저장된 파일 내용
+     */
     @PutMapping("/add")
     public FileResponse addFile(@RequestBody @Valid AddRequest addRequest,
                                 @AuthenticationPrincipal Member member) {
