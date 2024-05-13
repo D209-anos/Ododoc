@@ -16,7 +16,6 @@ import com.ssafy.ododoc.file.exception.FileBadRequestException;
 import com.ssafy.ododoc.file.repository.FileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
-import com.ssafy.ododoc.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
