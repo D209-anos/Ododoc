@@ -47,6 +47,10 @@
         "command": "ododoc.refreshTreeView",
         "title": "Treeview: Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "ododoc.createTerminal",
+        "title": "Create Ododoc Terminal"
       }
     ],
     "menus": {
@@ -61,8 +65,13 @@
     "terminal": {
       "profiles": [
         {
-          "title": "My Custom Terminal",
-          "id": "myterminal.my-custom-terminal"
+          "title": "Ododoc Terminal",
+          "id": "ododoc-terminal",
+          "path": null,
+          "args": [],
+          "icon": "terminal",
+          "overrideName": true,
+          "isTransient": true
         }
       ]
     },

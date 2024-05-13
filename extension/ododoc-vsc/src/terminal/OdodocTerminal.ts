@@ -27,7 +27,8 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
   }
 
   initializeTerminal() {
-    this.ptyProcess = spawn("cmd", [], { shell: true }); // Or 'bash.exe' on Mac
+    const shell = process.platform === "win32" ? "cmd" : "bash";
+    this.ptyProcess = spawn(shell, [], { shell: true });
 
     // handle output
     this.ptyProcess.stdout.on("data", (data: Buffer) => {
