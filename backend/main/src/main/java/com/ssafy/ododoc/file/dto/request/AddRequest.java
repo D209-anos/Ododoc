@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 @Builder
 @Getter
@@ -21,5 +21,5 @@ public class AddRequest {
     private String type;
 
     private int visitedCount;
-    private List<Block> fileBlock;
+    private LinkedHashMap<String, Block> fileBlock;
 }
