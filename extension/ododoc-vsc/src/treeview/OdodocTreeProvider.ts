@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import AccountsItem from "./tree_items/AccountsItem";
+import AccountsItem from "./tree-items/AccountsItem";
 import { getLoggedInSession } from "../authentication/AuthService";
 import axios from "axios";
-import DirectoryItem from "./tree_items/DirectoryItem";
+import DirectoryItem from "./tree-items/DirectoryItem";
 
 export default class OdodocTreeProvider
   implements vscode.TreeDataProvider<vscode.TreeItem>
@@ -16,11 +16,20 @@ export default class OdodocTreeProvider
     void | vscode.TreeItem | vscode.TreeItem[] | null | undefined
   > = this._onDidChangeTreeData.event;
 
+  private static instance: OdodocTreeProvider;
   private context: vscode.ExtensionContext;
   private directoryCache: Directory | null = null; // 전체 디렉토리 구조를 저장하는 캐시
   private connectedFileItem: DirectoryItem | null = null; // 연결할 파일
 
-  constructor(context: vscode.ExtensionContext) {
+  public static getInstance(
+    context: vscode.ExtensionContext
+  ): OdodocTreeProvider {
+    if (!this.instance) {
+      this.instance = new OdodocTreeProvider(context);
+    }
+    return this.instance;
+  }
+  private constructor(context: vscode.ExtensionContext) {
     this.context = context;
     // TreeView를 생성하고 확장 기능에 등록
     const treeView = vscode.window.createTreeView("ododoc.main", {

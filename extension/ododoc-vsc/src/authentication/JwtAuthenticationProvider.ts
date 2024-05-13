@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import * as jwt from "jsonwebtoken";
 import LoginWebView from "./LoginWebView";
 import WebSocketClient from "../network/WebSocketClient";
+import FileWatcher from "../source-code-management/FileWatcher";
 
 const AUTH_TYPE = "jwtProvider";
 const AUTH_NAME = "Ododoc";
@@ -82,6 +83,7 @@ export default class JwtAuthenticationProvider
       });
 
       WebSocketClient.getInstance(this.context).connect();
+      FileWatcher.getInstance(this.context).activate();
 
       return session;
     } catch (error) {
@@ -120,6 +122,7 @@ export default class JwtAuthenticationProvider
         });
 
         WebSocketClient.getInstance(this.context).disconnect();
+        FileWatcher.getInstance(this.context).deactivate();
       }
     }
   }

@@ -5,6 +5,7 @@ import LoginWebView from "./authentication/LoginWebView";
 import JwtAuthenticationProvider from "./authentication/JwtAuthenticationProvider";
 import { getLoggedInSession } from "./authentication/AuthService";
 import WebSocketClient from "./network/WebSocketClient";
+import FileWatcher from "./source-code-management/FileWatcher";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('"ododoc" 활성화.');
@@ -18,10 +19,14 @@ export function activate(context: vscode.ExtensionContext) {
   JwtAuthenticationProvider.getInstance(context);
 
   // extension view 생성
-  new OdodocTreeProvider(context);
+  OdodocTreeProvider.getInstance(context);
+
+  // 파일 변경 watcher 생성
+  FileWatcher.getInstance(context);
 
   if (getLoggedInSession() !== undefined) {
     WebSocketClient.getInstance(context).connect();
+    FileWatcher.getInstance(context).activate();
   }
 
   // 터미널 생성
