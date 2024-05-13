@@ -22,7 +22,7 @@ public class Props {
     private String rel;
     private String url;
     private String title;
-    private int size;
+    private Integer size;
     private String name;
     private String format;
 }
