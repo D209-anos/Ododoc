@@ -13,6 +13,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     position: relative;
 }
 
@@ -20,54 +21,75 @@
     fill: none;
     stroke: black;
     stroke-width: 3px;
-    z-index: 2000;
+    stroke-dasharray: 100%;
+    stroke-dashoffset: 100%;
+    animation: draw 10s ease forwards;
 }
 
-.path1 {
-    stroke-dasharray: 6884;
-    animation: drawPath1 1s linear, floating 2.2s linear infinite;
-    z-index: 2000;
+.path1,
+.path2,
+.path3,
+.path4 {
+    stroke-dasharray: 0;
+    stroke-dashoffset: 0;
 }
 
-.content1 {
-    background-color: #fdedd5;
-    min-height: 500px;
-    position: relative;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
+.draw {
+    animation: drawPath 4s forwards;
 }
 
-.content2 {
-    background-color: #fdedd5;
-    min-height: 500px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
+@keyframes drawPath {
+    to {
+        stroke-dashoffset: 0;
+    }
 }
 
-.path2 {
-    stroke: black;
-    z-index: 2000;
-}
-
-.content3 {
-    background-color: #fdedd5;
-    min-height: 500px;
-}
-
-.footer {
-    height: 30vh;
-    background-color: #fdedd5;
-}
-
-@keyframes drawPath1 {
-    0% {
-        stroke-dashoffset: 6884;
+@keyframes draw1 {
+    from {
+        stroke-dashoffset: 100%;
     }
 
-    100% {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw2 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw3 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw4 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes draw5 {
+    from {
+        stroke-dashoffset: 100%;
+    }
+
+    to {
         stroke-dashoffset: 0;
     }
 }
@@ -76,6 +98,49 @@
     50% {
         transform: translate3d(0, 40px, 0);
     }
+}
+
+.path1 {
+    animation: draw1 4s ease forwards;
+    animation: drawPath1 1s linear, floating 2.2s linear infinite;
+}
+
+.content1,
+.content2,
+.content3,
+.content4 {
+    background-color: #fdedd5;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content1,
+.content2 {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.content1 {
+    min-height: 500px;
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
+.path2 {
+    stroke: black;
+    z-index: 2000;
+    animation: draw2 40s ease forwards;
+}
+
+.footer {
+    height: 30vh;
+    background-color: #fdedd5;
 }
 
 .vscodeGuide {
@@ -98,112 +163,27 @@
     font-weight: bold;
 }
 
-.Explain1 {
+.Explain1,
+.Explain2,
+.Explain3,
+.Explain4 {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.VscodeExplain1 {
-    position: absolute;
-    right: 26vh;
-    top: 12vh;
-    font-family: 'hanbitFont';
-    font-size: 20px;
-    margin-top: 8vh;
+.path3 {
+    animation: draw3 10s ease forwards;
+    /* Explain3 애니메이션 10초 */
 }
 
-.VscodeExplain1Image {
-    position: absolute;
-    width: 800px;
-    height: auto;
-    right: 11vh;
-    border-radius: 10px;
-    margin-top: 10vh;
+.path4 {
+    animation: draw4 12s ease forwards;
+    /* Explain4 애니메이션 12초 */
 }
 
-.Explain2 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.VscodeExplain2 {
-    position: absolute;
-    left: 16vh;
-    top: 60vh;
-    font-family: 'hanbitFont';
-    font-size: 20px;
-    margin-top: 8vh;
-}
-
-.VscodeExplain2Image {
-    position: absolute;
-    width: 800px;
-    height: auto;
-    left: 15vh;
-    border-radius: 10px;
-    top: 75vh;
-}
-
-.VscodeExplain3 {
-    position: absolute;
-    right: 60vh;
-    top: 205vh;
-    font-family: 'hanbitFont';
-    font-size: 20px;
-    margin-top: 8vh;
-}
-
-.VscodeExplain3Image {
-    position: absolute;
-    width: 800px;
-    height: auto;
-    right: 10vh;
-    border-radius: 10px;
-    top: 220vh;
-}
-
-.Explain3 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.VscodeExplain4 {
-    position: absolute;
-    left: 12vh;
-    top: 470vh;
-    font-family: 'hanbitFont';
-    font-size: 20px;
-    margin-top: 8vh;
-}
-
-.VscodeExplain4Image {
-    position: absolute;
-    width: 800px;
-    height: auto;
-    left: 10vh;
-    border-radius: 10px;
-    top: 485vh;
-}
-
-.VscodeExplain5 {
-    position: absolute;
-    right: 25vh;
-    top: 630vh;
-    font-family: 'hanbitFont';
-    font-size: 20px;
-    margin-top: 8vh;
-}
-
-.VscodeCheck1 {
-    position: absolute;
-    width: 50px;
-    height: auto;
-    left: 81vh;
-    top: 70vh;
+.path5 {
+    animation: draw5 14s ease forwards;
+    /* Explain5 애니메이션 14초 */
 }

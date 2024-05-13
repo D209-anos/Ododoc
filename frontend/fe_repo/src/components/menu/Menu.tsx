@@ -56,13 +56,13 @@ function Menu() {
           {accessToken ? (
             <>
               <div className={`${menu.loginOpenBtn} ${showLogin ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={handleLogout}>Logout</div>
-              <div className={`${menu.startOpenBtn} ${showStart ? 'animate__animated animate__slideInRight' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/start')}>Start</div>
+              <div className={`${menu.startOpenBtn} ${showStart ? 'animate__animated animate__slideInRight' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/start')}>Guide</div>
               <div className={`${menu.editorOpenBtn} ${showEditor ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/editor')}>Editor</div>
             </>
           ) : (
             <>
               <div className={`${menu.loginOpenBtn} ${showLogin ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => setLoginOpen(true)}>Login</div>
-              <div className={`${menu.startOpenBtn} ${showStart ? 'animate__animated animate__slideInRight' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/start')}>Start</div>
+              <div className={`${menu.startOpenBtn} ${showStart ? 'animate__animated animate__slideInRight' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/start')}>Guide</div>
               <div className={`${menu.editorOpenBtn} ${showHome ? 'animate__animated animate__slideInUp' : 'animate__animated animate__bounceOut'}`} onClick={() => navigate('/')}>Home</div>
             </>
           )}

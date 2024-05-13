@@ -27,6 +27,7 @@
 .list {
     flex-grow: 1;
     padding: 20px;
+    padding-left: 40px;
 }
 
 .right {
@@ -50,5 +51,9 @@
 }
 
 .list li:hover {
+    color: #ff914d;
+}
+
+.list .active {
     color: #ff914d;
 }
