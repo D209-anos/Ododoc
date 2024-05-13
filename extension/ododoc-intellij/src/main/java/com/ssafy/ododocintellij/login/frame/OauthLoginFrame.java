@@ -7,6 +7,7 @@ import com.ssafy.ododocintellij.directory.manager.DirectoryInfoManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
+import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import com.ssafy.ododocintellij.tracker.CodeListener;
 import com.ssafy.ododocintellij.tracker.manager.ProjectProvider;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
@@ -14,21 +15,22 @@ import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.java_websocket.client.WebSocketClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +44,6 @@ public class OauthLoginFrame extends Stage {
     private String firstLocation;
     private String lastLocation;
     private String loginUri;
-    private final String WEBSOCKET_URI = "ws://localhost:18080/process/ws";
     private final int TIME_OUT = 5; // 로그인 응답 대기 시간
 
     private ScheduledExecutorService scheduler;
@@ -196,6 +197,8 @@ public class OauthLoginFrame extends Stage {
                         throw new RuntimeException(e);
                     }
 
+                    webEngine.executeScript("document.body.style.display = 'none';");
+
                     // 쿠키의 refresh 토큰을 싱글톤 객체에 저장
                     cookieManager.getCookieStore().getCookies().forEach(cookie -> {
                         if (cookie.getName().equals("refreshToken")) {
@@ -203,12 +206,23 @@ public class OauthLoginFrame extends Stage {
                         }
                     });
 
+                    // 로그인 성공 여부 다시 확인
+                    if(tokenManager.getAccessToken() == null || tokenManager.getRefreshToken() == null){
+                        Platform.runLater(() -> {
+                            alert.showAndWait();
+                            close();
+                            cookieManager.getCookieStore().removeAll();
+                        });
+
+                        return;
+                    }
+
                     // 지금 현재 등록되어 있는 모든 프로젝트들에게 codeListener 추가하기
                     addCodeListener(ProjectProvider.getInstance());
-                    connectWebSocket();
 
                     try {
                         new DirectoryFrame().start(mainLoginFrame);
+                        connectWebSocket();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -236,6 +250,28 @@ public class OauthLoginFrame extends Stage {
 
     // 처리 서버와 webSocket 연결해주기
     private void connectWebSocket() {
-        BuildResultSender.getINSTANCE(WEBSOCKET_URI);
+        BuildResultSender.setINSTANCE(null);
+        BuildResultSender.getINSTANCE();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        if(!BuildResultSender.isConnected()){
+            Platform.runLater(() -> {
+                Alert alert = WebSocketReConnectAlert.makeAlert();
+                Optional<ButtonType> result = alert.showAndWait();
+                if(result.isPresent() && result.get() == ButtonType.OK) {
+                    System.out.println("연결 시도");
+                    connectWebSocket();
+                }
+                else {
+                    this.close();
+                }
+            });
+        }
     }
+
 }

@@ -1,7 +1,7 @@
 package com.ssafy.ododoc.file.controller;
 
+import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
-import com.ssafy.ododoc.file.dto.annotation.CheckActionType;
 import com.ssafy.ododoc.file.dto.response.FileResponse;
 import com.ssafy.ododoc.file.dto.response.ImageResponse;
 import com.ssafy.ododoc.file.dto.annotation.CheckFile;
@@ -54,15 +54,26 @@ public class FileController {
     /**
      * 파일 내용 저장 api.
      *
-     * @param actionType save 또는 add. 프론트는 save로 요청, 플러그인은 add로 요청
      * @param saveRequest 저장할 디렉토리 아이디와 저장할 내용
      * @param member 로그인 한 멤버
      * @return 저장된 파일 내용
      */
-    @PostMapping("/{actionType}")
-    public FileResponse saveFile(@PathVariable @CheckActionType String actionType,
-                                 @RequestBody @Valid FileRequest saveRequest,
+    @PutMapping("")
+    public FileResponse saveFile(@RequestBody @Valid FileRequest saveRequest,
                                  @AuthenticationPrincipal Member member) {
-        return fileService.saveFile(actionType, saveRequest, member);
+        return fileService.saveFile(saveRequest, member);
+    }
+
+    /**
+     * 플러그인 파일 내용 저장 api.
+     *
+     * @param addRequest 저장할 디렉토리 아이디, 저장 타입, visitedCount, 저장할 내용
+     * @param member 로그인 한 멤버
+     * @return 저장된 파일 내용
+     */
+    @PutMapping("/add")
+    public FileResponse addFile(@RequestBody @Valid AddRequest addRequest,
+                                @AuthenticationPrincipal Member member) {
+        return fileService.addFile(addRequest, member);
     }
 }
