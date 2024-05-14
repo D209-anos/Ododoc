@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.entity;
+package com.ssafy.ododoc.process.common.entity;
 
 import lombok.Getter;
 import lombok.ToString;

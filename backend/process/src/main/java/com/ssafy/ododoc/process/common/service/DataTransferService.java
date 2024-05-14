@@ -1,14 +1,14 @@
-package com.ssafy.ododoc.process.service;
+package com.ssafy.ododoc.process.common.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.ododoc.process.dto.receive.IDEContentDto;
-import com.ssafy.ododoc.process.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.dto.receive.ModifiedFileDto;
-import com.ssafy.ododoc.process.dto.save.BuildResultPropsDto;
-import com.ssafy.ododoc.process.dto.save.ContentDto;
-import com.ssafy.ododoc.process.dto.save.FileBlockDto;
-import com.ssafy.ododoc.process.dto.save.DefaultPropsDto;
-import com.ssafy.ododoc.process.type.DataType;
+import com.ssafy.ododoc.process.common.dto.receive.IDEContentDto;
+import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.common.dto.receive.ModifiedFileDto;
+import com.ssafy.ododoc.process.common.dto.save.BuildResultPropsDto;
+import com.ssafy.ododoc.process.common.dto.save.ContentDto;
+import com.ssafy.ododoc.process.common.dto.save.FileBlockDto;
+import com.ssafy.ododoc.process.common.dto.save.DefaultPropsDto;
+import com.ssafy.ododoc.process.common.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;

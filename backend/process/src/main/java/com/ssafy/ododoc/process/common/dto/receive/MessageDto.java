@@ -1,7 +1,7 @@
-package com.ssafy.ododoc.process.dto.receive;
+package com.ssafy.ododoc.process.common.dto.receive;
 
-import com.ssafy.ododoc.process.type.DataType;
-import com.ssafy.ododoc.process.type.SourceApplicationType;
+import com.ssafy.ododoc.process.common.type.DataType;
+import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import lombok.Getter;
 import lombok.ToString;
 

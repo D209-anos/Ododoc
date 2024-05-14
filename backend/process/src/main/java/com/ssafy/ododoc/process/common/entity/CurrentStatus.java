@@ -1,7 +1,7 @@
-package com.ssafy.ododoc.process.entity;
+package com.ssafy.ododoc.process.common.entity;
 
-import com.ssafy.ododoc.process.type.SourceApplicationType;
-import com.ssafy.ododoc.process.type.StatusType;
+import com.ssafy.ododoc.process.common.type.SourceApplicationType;
+import com.ssafy.ododoc.process.common.type.StatusType;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;

@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.type;
+package com.ssafy.ododoc.process.common.type;
 
 public enum DataType {
     SIGNAL,

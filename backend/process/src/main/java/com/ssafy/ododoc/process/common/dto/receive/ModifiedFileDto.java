@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.dto.receive;
+package com.ssafy.ododoc.process.common.dto.receive;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
