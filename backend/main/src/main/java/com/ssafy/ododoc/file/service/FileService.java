@@ -13,6 +13,7 @@ import com.ssafy.ododoc.directory.repository.DirectoryRepository;
 import com.ssafy.ododoc.directory.type.DirectoryType;
 import com.ssafy.ododoc.file.entity.File;
 import com.ssafy.ododoc.file.exception.FileBadRequestException;
+import com.ssafy.ododoc.file.exception.VisitCountNotNullException;
 import com.ssafy.ododoc.file.repository.FileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
@@ -117,6 +118,10 @@ public class FileService {
                 editMember.setErrorCount(editMember.getErrorCount() + 1);
             }
             case SEARCH -> {
+                if(addRequest.getVisitedCount() == null) {
+                    throw new VisitCountNotNullException("type이 search인 경우 visitCount는 null일 수 없습니다.");
+                }
+
                 editMember.setSearchCount(editMember.getSearchCount() + 1);
                 editMember.setVisitCount(editMember.getVisitCount() + addRequest.getVisitedCount());
             }
