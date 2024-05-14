@@ -1,8 +1,7 @@
-package com.ssafy.ododoc.process.repository;
+package com.ssafy.ododoc.process.common.repository;
 
-import com.ssafy.ododoc.process.entity.CurrentStatus;
-import com.ssafy.ododoc.process.type.SourceApplicationType;
-import com.ssafy.ododoc.process.type.StatusType;
+import com.ssafy.ododoc.process.common.entity.CurrentStatus;
+import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import org.springframework.data.repository.CrudRepository;
 
 public interface CurrentStatusRepository extends CrudRepository<CurrentStatus, Integer>{

@@ -1,18 +1,16 @@
-package com.ssafy.ododoc.process.service.MessageHandler;
+package com.ssafy.ododoc.process.common.service.MessageHandler;
 
 import com.ssafy.ododoc.gpt.GptService;
 import com.ssafy.ododoc.gpt.dto.GptResponseDto;
-import com.ssafy.ododoc.process.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.entity.CurrentStatus;
-import com.ssafy.ododoc.process.entity.MessageRecord;
-import com.ssafy.ododoc.process.repository.CurrentStatusRepository;
-import com.ssafy.ododoc.process.repository.MessageRecordRepository;
-import com.ssafy.ododoc.process.type.SourceApplicationType;
-import com.ssafy.ododoc.process.type.StatusType;
+import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.common.entity.CurrentStatus;
+import com.ssafy.ododoc.process.common.entity.MessageRecord;
+import com.ssafy.ododoc.process.common.repository.CurrentStatusRepository;
+import com.ssafy.ododoc.process.common.repository.MessageRecordRepository;
+import com.ssafy.ododoc.process.common.type.SourceApplicationType;
+import com.ssafy.ododoc.process.common.type.StatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

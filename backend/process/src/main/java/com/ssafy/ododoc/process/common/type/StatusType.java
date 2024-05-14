@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.type;
+package com.ssafy.ododoc.process.common.type;
 
 public enum StatusType {
     WAITING, // 아무 상태도 아님

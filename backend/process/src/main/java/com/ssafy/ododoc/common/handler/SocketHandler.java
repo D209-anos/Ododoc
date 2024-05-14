@@ -1,8 +1,8 @@
 package com.ssafy.ododoc.common.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.ododoc.process.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.service.DataTypeHandlerService;
+import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.common.service.DataTypeHandlerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -29,8 +29,12 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        MessageDto MessageDto = objectMapper.readValue(message.getPayload(), MessageDto.class);
-        dataTypeHandlerService.handle(MessageDto);
+        MessageDto messageDto = objectMapper.readValue(message.getPayload(), MessageDto.class);
+        switch (messageDto.getSourceApplication()){
+            case VSCODE -> System.out.println("VSCODE");
+            case IntelliJ -> System.out.println("IntelliJ");
+            case Chrome -> System.out.println("Chrome");
+        }
     }
 
 }
