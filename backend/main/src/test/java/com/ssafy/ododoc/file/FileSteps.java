@@ -96,4 +96,20 @@ public class FileSteps {
                 .fileBlock(contentMap)
                 .build();
     }
+
+    public AddRequest 플러그인_저장파일_visitNull_생성(Long directoryId) {
+        LinkedHashMap<String, Block> contentMap = new LinkedHashMap<>();
+        contentMap.put(blockId, Block.builder()
+                .id(blockId)
+                .value(value)
+                .type(type)
+                .meta(meta)
+                .build());
+
+        return AddRequest.builder()
+                .connectedFileId(directoryId)
+                .type("search")
+                .fileBlock(contentMap)
+                .build();
+    }
 }
