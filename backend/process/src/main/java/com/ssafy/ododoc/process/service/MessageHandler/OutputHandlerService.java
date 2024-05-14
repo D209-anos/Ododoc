@@ -49,20 +49,14 @@ public class OutputHandlerService {
             case WAITING:
                 processInit();
                 break;
-            case PREPARING:
-                processPreparing();
-                break;
             case RUNNING:
                 processRunning();
                 break;
-            case ERROR:
+            case TROUBLED:
                 processError();
                 break;
             case ALGORITHM:
                 processAlgorithm();
-                break;
-            case SEARCHING:
-                processSearching();
                 break;
         }
         System.out.println("!output process end!");
@@ -95,13 +89,6 @@ public class OutputHandlerService {
         if (nextStatus.getStatus() == StatusType.ALGORITHM) {
             processAlgorithm();
         }
-    }
-
-    private void processPreparing() {
-        System.out.println("processing Preparing");
-        prompt = messageData.getContent().toString() + "\n이게 터미널 출력이고 서버를 여는 상황이야, 이게 지금 서버를 아직도 여는 상황이면 PREPARING, 알고리즘을 푸는 상황인 것 같으면 ALGORITHM을 반환해줘 [PREPARING, ALGORITHM] 둘 중에 하나로 단답형으로 ";
-        chat = gptService.chat("gpt-3.5-turbo", prompt, "http://localhost:8080/api");
-
     }
 
     private void processRunning() {

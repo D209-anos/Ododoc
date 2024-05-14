@@ -7,8 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface CurrentStatusRepository extends CrudRepository<CurrentStatus, Integer>{
     CurrentStatus findFirstByConnectedFileIdAndSourceApplicationOrderByTimestamp(Long connectedFileId, SourceApplicationType sourceApplicationType);
-    CurrentStatus findFirstByConnectedFileIdOrderByTimestampDesc(Long connectedFileId);
-    CurrentStatus findByConnectedFileIdAndSourceApplication(Long connectedFileId, SourceApplicationType sourceApplicationType);
 
-    CurrentStatus findByStatus(StatusType statusType);
 }
