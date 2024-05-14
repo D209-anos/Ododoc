@@ -569,7 +569,7 @@ public class FileApiTest extends ApiTest {
                         "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - type에는 <b>success, fail, search</b>만 가능합니다. 이외의 값은 <b>400 Bad Request</b>가 반환됩니다." +
-                        "<br> - visitedCount는 <b>type이 search일 경우</b>에만 작성해주시면 됩니다." +
+                        "<br> - visitedCount는 <b>type이 search일 경우</b> 필수입니다. 그렇지 않으면 <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
                         "<br> - directoryId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
                         "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
@@ -614,7 +614,7 @@ public class FileApiTest extends ApiTest {
     }
 
     @Test
-    void 파일_추가_잘못된type_200() throws Exception {
+    void 파일_추가_잘못된type_400() throws Exception {
         String token = memberTestUtil.회원가입_토큰반환(mockMvc);
         Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
         Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
@@ -627,6 +627,26 @@ public class FileApiTest extends ApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(fileSteps.플러그인_저장파일_잘못된type_생성(directoryId)))
         )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(400))
+                .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
+                        FileDocument.addRequestFields));
+    }
+
+    @Test
+    void 파일_추가_visitNull_400() throws Exception {
+        String token = memberTestUtil.회원가입_토큰반환(mockMvc);
+        Long rootId = memberTestUtil.회원가입_루트아이디_반환(mockMvc);
+        Long directoryId = directoryTestUtil.파일_생성(token, rootId, mockMvc);
+
+        fileTestUtil.파일_저장(token, directoryId, mockMvc);
+
+        mockMvc.perform(
+                        put("/file/add")
+                                .header(AUTH_HEADER, token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(fileSteps.플러그인_저장파일_visitNull_생성(directoryId)))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(400))
                 .andDo(document(DEFAULT_RESTDOC_PATH, CommonDocument.AccessTokenHeader,
