@@ -1,8 +1,8 @@
-package com.ssafy.ododoc.process.entity;
+package com.ssafy.ododoc.process.common.entity;
 
-import com.ssafy.ododoc.process.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.type.DataType;
-import com.ssafy.ododoc.process.type.SourceApplicationType;
+import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.common.type.DataType;
+import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;

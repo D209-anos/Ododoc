@@ -1,4 +1,4 @@
-package com.ssafy.ododoc.process.dto.save;
+package com.ssafy.ododoc.process.common.dto.save;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

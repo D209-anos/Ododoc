@@ -1,9 +1,9 @@
-package com.ssafy.ododoc.process.service;
+package com.ssafy.ododoc.process.common.service;
 
-import com.ssafy.ododoc.process.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.service.MessageHandler.OutputHandlerService;
-import com.ssafy.ododoc.process.service.MessageHandler.SourceCodeHandlerService;
-import com.ssafy.ododoc.process.type.DataType;
+import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
+import com.ssafy.ododoc.process.common.service.MessageHandler.OutputHandlerService;
+import com.ssafy.ododoc.process.common.service.MessageHandler.SourceCodeHandlerService;
+import com.ssafy.ododoc.process.common.type.DataType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
