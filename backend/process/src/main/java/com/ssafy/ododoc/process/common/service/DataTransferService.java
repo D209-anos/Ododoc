@@ -1,5 +1,6 @@
 package com.ssafy.ododoc.process.common.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.process.common.dto.receive.IDEContentDto;
 import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
@@ -22,15 +23,10 @@ import java.util.UUID;
 public class DataTransferService {
 
     private final ObjectMapper objectMapper;
-    private final String URI = "http://localhost:8080/api/directory/test";
     private final RedisFileRepository redisFileRepository;
 
-    public void transferDataForSave(MessageDto messageDto) {
-        sendRequest(makeFileBlock(messageDto), messageDto);
-    }
-
     // 블럭으로 가공하는 로직
-    private FileBlockDto makeFileBlock(MessageDto messageDto) {
+    public void makeFileBlock(MessageDto messageDto) {
         IDEContentDto ideContentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
 
         RedisFile redisFile = redisFileRepository.findById(messageDto.getConnectedFileId())
@@ -53,6 +49,26 @@ public class DataTransferService {
          */
         List<ModifiedFileDto> modifiedFileList = ideContentDto.getModifiedFiles();
 
+        FileBlockDto totalHeader = FileBlockDto.builder()
+                .id(UUID.randomUUID().toString())
+                .value(List.of(ValueDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .type("heading-two")
+                        .children(List.of(ContentDto.builder()
+                                .text("개발 결과")
+                                .build()))
+                        .props(PropsDto.builder()
+                                .nodeType("block")
+                                .build())
+                        .build()))
+                .type("HeadingThree")
+                .meta(MetaDto.builder()
+                        .order(lastOrder++)
+                        .depth(0)
+                        .build())
+                .build();
+
+        content.putLast(totalHeader.getId(), totalHeader);
         if(!modifiedFileList.isEmpty()) {
             // 변경된 코드 헤더 만들기
             FileBlockDto modifiedHeader = FileBlockDto.builder()
@@ -297,38 +313,16 @@ public class DataTransferService {
             content.putLast(terminalBlock.getId(), terminalBlock);
         }
 
+        try {
+            System.out.println(objectMapper.writeValueAsString(redisFile));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         redisFile.setLastOrder(lastOrder - 1);
         redisFile.setContent(content);
         redisFileRepository.save(redisFile);
-
-        return null;
     }
 
-    private void sendRequest(FileBlockDto fileBlockDto, MessageDto messageDto) {
-        WebClient webClient = WebClient.builder()
-                .baseUrl(URI)
-                .defaultHeader("Content-type","application/json")
-                .defaultHeader("Authorization", messageDto.getAccessToken())
-                .build();
-
-        String type = "success";
-        switch (messageDto.getDataType()) {
-            case ERROR -> type = "fail";
-            case OUTPUT -> type = "success";
-        }
-
-        Integer visitedCount = null;
-        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("connectedFileId", messageDto.getConnectedFileId());
-        requestBody.add("type", type);
-        requestBody.add("fileBlock", fileBlockDto);
-
-        webClient.post()
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-    }
 
 }

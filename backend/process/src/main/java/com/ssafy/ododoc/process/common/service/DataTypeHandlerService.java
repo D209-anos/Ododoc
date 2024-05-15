@@ -33,7 +33,7 @@ public class DataTypeHandlerService {
 
             case ERROR:
                 processError(messageDto);
-                dataTransferService.transferDataForSave(messageDto);
+//                dataTransferService.transferDataForSave(messageDto);
                 break;
 
             case KEYWORD:
