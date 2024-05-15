@@ -5,8 +5,6 @@ import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -27,6 +25,7 @@ public class BuildResultSender {
     private BuildResultSender() {}
 
     public static WebSocketClient getINSTANCE() {
+
         if(INSTANCE == null) {
             // 두 번째로 null 체크를 한 후 다중 스레드 환경에서 동시에 여러 인스턴스가 생성되는 것을 방지
             synchronized (lock) {

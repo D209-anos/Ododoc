@@ -6,10 +6,12 @@ public class ProjectInfo implements Cloneable{
 
     private PsiFile psiFile;
     private String hash;
+    private String sourceCode;
 
-    public ProjectInfo(PsiFile psiFile, String hash) {
+    public ProjectInfo(PsiFile psiFile, String hash, String sourceCode) {
         this.psiFile = psiFile;
         this.hash = hash;
+        this.sourceCode = sourceCode;
     }
 
     public PsiFile getPsiFile() {
@@ -18,6 +20,10 @@ public class ProjectInfo implements Cloneable{
 
     public String getHash() {
         return hash;
+    }
+
+    public String getSourceCode() {
+        return sourceCode;
     }
 
     @Override

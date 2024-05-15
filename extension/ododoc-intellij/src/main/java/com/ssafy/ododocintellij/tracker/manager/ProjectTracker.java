@@ -42,8 +42,9 @@ public class ProjectTracker {
             beforeProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
+                String sourceCode = file.getText();
                 String codeHash = getEncrypt(file.getText());
-                beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
+                beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, sourceCode));
                 fileHash += getEncrypt(file.getName());
             }
             allBeforeProjectStatus = getEncrypt(fileHash);
@@ -58,8 +59,9 @@ public class ProjectTracker {
             currentProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
+                String sourceCode = file.getText();
                 String codeHash = getEncrypt(file.getText());
-                currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash));
+                currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, sourceCode));
                 fileHash += getEncrypt(file.getName());
             }
             allCurrentProjectStatus = getEncrypt(fileHash);
