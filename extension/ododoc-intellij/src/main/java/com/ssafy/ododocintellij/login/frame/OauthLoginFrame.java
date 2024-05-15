@@ -243,8 +243,10 @@ public class OauthLoginFrame extends Stage {
         Project tempProject = null;
         for(int i = 0; i < size; i++){
             tempProject = projectProvider.getProjects().poll();
-            tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
-            projectTracker.initHashStatus(tempProject);
+            if(tempProject.isOpen()){
+                tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+                projectTracker.initHashStatus(tempProject);
+            }
         }
     }
 

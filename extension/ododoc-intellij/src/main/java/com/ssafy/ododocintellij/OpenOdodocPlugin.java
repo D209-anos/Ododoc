@@ -16,8 +16,6 @@ public class OpenOdodocPlugin extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Platform.runLater(() -> {
             if(TokenManager.getInstance().getAccessToken() == null || TokenManager.getInstance().getRefreshToken() == null){
-                System.out.println("열기");
-                System.out.println(MainLoginFrame.isFrameVisible());
                 if(!MainLoginFrame.isFrameVisible()){
                     new MainLoginFrame();
                 }
