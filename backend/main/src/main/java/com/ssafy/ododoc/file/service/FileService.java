@@ -12,12 +12,15 @@ import com.ssafy.ododoc.directory.exception.DirectoryNotFoundException;
 import com.ssafy.ododoc.directory.repository.DirectoryRepository;
 import com.ssafy.ododoc.directory.type.DirectoryType;
 import com.ssafy.ododoc.file.entity.File;
+import com.ssafy.ododoc.file.entity.RedisFile;
 import com.ssafy.ododoc.file.exception.FileBadRequestException;
 import com.ssafy.ododoc.file.exception.VisitCountNotNullException;
 import com.ssafy.ododoc.file.repository.FileRepository;
+import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +34,7 @@ public class FileService {
 
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
+    private final RedisFileRepository redisFileRepository;
     private final S3Util s3Util;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
@@ -51,47 +55,47 @@ public class FileService {
 
         checkDirectory(directory, member);
 
-        File file = fileRepository.findByDirectoryId(directoryId)
-                .orElseGet(() -> fileRepository.save(File.builder()
-                        .directoryId(directoryId)
+        RedisFile redisFile = redisFileRepository.findById(directoryId)
+                .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
+                        .id(directoryId)
                         .content(new LinkedHashMap<>())
                         .build()));
 
         return FileResponse.builder()
-                .directoryId(file.getDirectoryId())
+                .directoryId(redisFile.getId())
                 .title(directory.getName())
-                .content(file.getContent())
+                .content(redisFile.getContent())
                 .build();
     }
 
-    public FileResponse saveFile(FileRequest fileRequest, Member member) {
+    public FileResponse saveFileInRedis(FileRequest fileRequest, Member member) {
         Directory directory = directoryRepository.findById(fileRequest.getDirectoryId())
                 .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
 
         checkDirectory(directory, member);
 
-        File file = fileRepository.findByDirectoryId(fileRequest.getDirectoryId())
-                .orElseGet(() -> fileRepository.save(File.builder()
-                        .directoryId(fileRequest.getDirectoryId())
+        RedisFile redisFile = redisFileRepository.findById(fileRequest.getDirectoryId())
+                .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
+                        .id(fileRequest.getDirectoryId())
                         .content(new LinkedHashMap<>())
                         .build()));
 
         LinkedHashMap<String, Block> content = fileRequest.getContent().entrySet().stream()
-                        .sorted(Comparator.comparingInt(e -> e.getValue().getMeta().getOrder()))
-                                .collect(Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        Map.Entry::getValue,
-                                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
-                                ));
+                .sorted(Comparator.comparingInt(e -> e.getValue().getMeta().getOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
 
-        file.setContent(content);
+        redisFile.setContent(content);
 
-        fileRepository.save(file);
+        redisFileRepository.save(redisFile);
 
         return FileResponse.builder()
-                .directoryId(file.getDirectoryId())
+                .directoryId(redisFile.getId())
                 .title(directory.getName())
-                .content(file.getContent())
+                .content(redisFile.getContent())
                 .build();
     }
 
@@ -151,6 +155,28 @@ public class FileService {
                 .title(directory.getName())
                 .content(file.getContent())
                 .build();
+    }
+
+    @Scheduled(fixedDelay = 1800000)
+    public void saveFileInMongo() {
+        List<File> redisFiles = redisFileRepository.findAll().stream()
+                .map(redisFile -> File.builder()
+                        .directoryId(redisFile.getId())
+                        .content(redisFile.getContent())
+                        .build())
+                .toList();
+
+        Map<Long, File> mongoFiles = fileRepository.findAll().stream()
+                .collect(Collectors.toMap(File::getDirectoryId, file -> file));
+
+        for(File redis : redisFiles) {
+            File mongo = mongoFiles.get(redis.getDirectoryId());
+            if(mongo != null) {
+                redis.setId(mongo.getId());
+            }
+        }
+
+        fileRepository.saveAll(redisFiles);
     }
 
     private void checkDirectory(Directory directory, Member member) {

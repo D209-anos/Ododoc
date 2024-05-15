@@ -52,16 +52,16 @@ public class FileController {
     }
 
     /**
-     * 파일 내용 저장 api.
+     * 파일 내용 Redis 저장 api.
      *
      * @param saveRequest 저장할 디렉토리 아이디와 저장할 내용
      * @param member 로그인 한 멤버
      * @return 저장된 파일 내용
      */
     @PutMapping("")
-    public FileResponse saveFile(@RequestBody @Valid FileRequest saveRequest,
-                                 @AuthenticationPrincipal Member member) {
-        return fileService.saveFile(saveRequest, member);
+    public FileResponse saveFileInRedis(@RequestBody @Valid FileRequest saveRequest,
+                                        @AuthenticationPrincipal Member member) {
+        return fileService.saveFileInRedis(saveRequest, member);
     }
 
     /**
