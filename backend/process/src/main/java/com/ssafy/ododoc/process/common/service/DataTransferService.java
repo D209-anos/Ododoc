@@ -4,18 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.process.common.dto.receive.IDEContentDto;
 import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
 import com.ssafy.ododoc.process.common.dto.receive.ModifiedFileDto;
-import com.ssafy.ododoc.process.common.dto.save.BuildResultPropsDto;
-import com.ssafy.ododoc.process.common.dto.save.ContentDto;
-import com.ssafy.ododoc.process.common.dto.save.FileBlockDto;
-import com.ssafy.ododoc.process.common.dto.save.DefaultPropsDto;
-import com.ssafy.ododoc.process.common.type.DataType;
+import com.ssafy.ododoc.process.common.dto.save.*;
+import com.ssafy.ododoc.process.common.entity.RedisFile;
+import com.ssafy.ododoc.process.common.repository.RedisFileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +23,7 @@ public class DataTransferService {
 
     private final ObjectMapper objectMapper;
     private final String URI = "http://localhost:8080/api/directory/test";
+    private final RedisFileRepository redisFileRepository;
 
     public void transferDataForSave(MessageDto messageDto) {
         sendRequest(makeFileBlock(messageDto), messageDto);
@@ -32,121 +31,277 @@ public class DataTransferService {
 
     // 블럭으로 가공하는 로직
     private FileBlockDto makeFileBlock(MessageDto messageDto) {
-        IDEContentDto contentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
+        IDEContentDto ideContentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
+
+        RedisFile redisFile = redisFileRepository.findById(messageDto.getConnectedFileId())
+                .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
+                        .id(messageDto.getConnectedFileId())
+                        .lastOrder(0)
+                        .content(new LinkedHashMap<>())
+                        .build()));
+
+        int lastOrder = redisFile.getLastOrder();
+
+        if(lastOrder != 0) {
+            lastOrder++;
+        }
+
+        LinkedHashMap<String, FileBlockDto> content = redisFile.getContent();
 
         /**
          *  코드 블럭 만들기
          */
-        List<FileBlockDto> codeBlocks = new ArrayList<>();
-        List<ModifiedFileDto> modifiedFileList = contentDto.getModifiedFiles();
-        for (ModifiedFileDto file : modifiedFileList) {
+        List<ModifiedFileDto> modifiedFileList = ideContentDto.getModifiedFiles();
 
-            // 변경된 코드 내용이 담긴 코드 블럭
-            FileBlockDto codeBlock = FileBlockDto.builder()
+        if(!modifiedFileList.isEmpty()) {
+            // 변경된 코드 헤더 만들기
+            FileBlockDto modifiedHeader = FileBlockDto.builder()
                     .id(UUID.randomUUID().toString())
-                    .type("procode")
-                    .props(BuildResultPropsDto.builder()
-                            .data(file.getSourceCode())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("heading-three")
+                            .children(List.of(ContentDto.builder()
+                                    .text("변경된 코드")
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("HeadingThree")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
                             .build())
                     .build();
 
-            List<FileBlockDto> children = new ArrayList<>();
-            children.add(codeBlock);
+            content.putLast(modifiedHeader.getId(), modifiedHeader);
 
-            // 파일 이름 블럭
-            FileBlockDto fileNameBlock = FileBlockDto.builder()
-                    .id(UUID.randomUUID().toString())
-                    .type("bulletListItem")
-                    .props(DefaultPropsDto.builder()
-                            .textColor("default")
-                            .backgroundColor("default")
-                            .textAlignment("left")
-                            .build())
-                    .content(ContentDto.builder()
-                            .type("text")
-                            .text(file.getFileName())
-                            .build())
-                    .children(children)
-                    .build();
+            for (ModifiedFileDto file : modifiedFileList) {
+                // 파일 이름 블럭
+                FileBlockDto fileNameBlock = FileBlockDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(List.of(ValueDto.builder()
+                                .id(UUID.randomUUID().toString())
+                                .type("bulleted-list")
+                                .children(List.of(ContentDto.builder()
+                                        .text(file.getFileName())
+                                        .build()))
+                                .props(PropsDto.builder()
+                                        .nodeType("block")
+                                        .build())
+                                .build()))
+                        .type("BulletedList")
+                        .meta(MetaDto.builder()
+                                .order(lastOrder++)
+                                .depth(1)
+                                .build())
+                        .build();
 
-            codeBlocks.add(fileNameBlock);
+                content.putLast(fileNameBlock.getId(), fileNameBlock);
+
+                // 변경된 코드 내용이 담긴 코드 블럭
+                FileBlockDto codeBlock = FileBlockDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(List.of(
+                                        ValueDto.builder()
+                                                .id(UUID.randomUUID().toString())
+                                                .type("code")
+                                                .children(List.of(ContentDto.builder()
+                                                        .text(file.getSourceCode())
+                                                        .build()))
+                                                .props(PropsDto.builder()
+                                                        .nodeType("void")
+                                                        .language("java")
+                                                        .theme("GithubLight")
+                                                        .build())
+                                                .build()
+                                )
+                        )
+                        .type("Code")
+                        .meta(MetaDto.builder()
+                                .order(lastOrder++)
+                                .depth(1)
+                                .build())
+                        .build();
+
+                content.putLast(codeBlock.getId(), codeBlock);
+            }
         }
 
-        // 코드 헤드 블럭
-        FileBlockDto codeHeaderBlock = FileBlockDto.builder()
-                .id(UUID.randomUUID().toString())
-                .type("heading")
-                .props(DefaultPropsDto.builder()
-                        .textColor("default")
-                        .backgroundColor("default")
-                        .textAlignment("left")
-                        .level(3)
-                        .build()
-                )
-                .content(ContentDto.builder()
-                        .type("text")
-                        .text("변경된 코드")
-                        .build())
-                .children(codeBlocks)
-                .build();
+        /**
+         * 에러 발생 코드 블럭 만들기
+         */
+        if(ideContentDto.getErrorFile() != null) {
+            // 변경된 코드와 에러 발생 코드 사이 띄어쓰기
+            FileBlockDto emptyLine = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("paragraph")
+                            .children(List.of(ContentDto.builder()
+                                    .text("")
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("Paragraph")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
+                            .build())
+                    .build();
+
+            content.putLast(emptyLine.getId(), emptyLine);
+
+            // 에러 발생 코드 헤더 만들기
+            FileBlockDto errorHeader = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("heading-three")
+                            .children(List.of(ContentDto.builder()
+                                    .text("에러 발생 코드")
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("HeadingThree")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
+                            .build())
+                    .build();
+
+            content.putLast(errorHeader.getId(), errorHeader);
+
+            // 파일 이름 블럭
+            FileBlockDto errorFileNameBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("bulleted-list")
+                            .children(List.of(ContentDto.builder()
+                                    .text(ideContentDto.getErrorFile().getFileName())
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("BulletedList")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(1)
+                            .build())
+                    .build();
+
+            content.putLast(errorFileNameBlock.getId(), errorFileNameBlock);
+
+            // 에러 발생 코드 내용이 담긴 코드 블럭
+            FileBlockDto errorCodeBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(
+                                    ValueDto.builder()
+                                            .id(UUID.randomUUID().toString())
+                                            .type("code")
+                                            .children(List.of(ContentDto.builder()
+                                                    .text(ideContentDto.getErrorFile().getSourceCode())
+                                                    .build()))
+                                            .props(PropsDto.builder()
+                                                    .nodeType("void")
+                                                    .language("java")
+                                                    .theme("GithubLight")
+                                                    .build())
+                                            .build()
+                            )
+                    )
+                    .type("Code")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(1)
+                            .build())
+                    .build();
+
+            content.putLast(errorCodeBlock.getId(), errorCodeBlock);
+        }
 
         /**
          *  터미널 블럭 만들기
          */
-        FileBlockDto terminalBlock = FileBlockDto.builder()
-                .id(UUID.randomUUID().toString())
-                .type("terminal")
-                .props(BuildResultPropsDto.builder()
-                        .data(contentDto.getDetails())
-                        .build())
-                .build();
+        if(ideContentDto.getDetails() != null) {
+            // 에러 발생 코드와 터미널 사이 띄어쓰기
+            FileBlockDto emptyLine = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("paragraph")
+                            .children(List.of(ContentDto.builder()
+                                    .text("")
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("Paragraph")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
+                            .build())
+                    .build();
 
-        List<FileBlockDto> terminalBlocks = new ArrayList<>();
-        terminalBlocks.add(terminalBlock);
+            content.putLast(emptyLine.getId(), emptyLine);
 
-        FileBlockDto terminalHeaderBlock = FileBlockDto.builder()
-                .id(UUID.randomUUID().toString())
-                .type("heading")
-                .props(DefaultPropsDto.builder()
-                        .textColor("default")
-                        .backgroundColor("default")
-                        .textAlignment("left")
-                        .level(3)
-                        .build()
-                )
-                .content(ContentDto.builder()
-                        .type("text")
-                        .text("터미널 결과")
-                        .build())
-                .children(terminalBlocks)
-                .build();
+            FileBlockDto terminalHeader = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("heading-three")
+                            .children(List.of(ContentDto.builder()
+                                    .text("터미널 로그")
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("HeadingThree")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
+                            .build())
+                    .build();
 
-        /**
-         *  헤더 블럭 만들기
-         */
-        List<FileBlockDto> codeAndTerminalBlocks = new ArrayList<>();
-        codeAndTerminalBlocks.add(codeHeaderBlock);
-        codeAndTerminalBlocks.add(terminalHeaderBlock);
+            content.putLast(terminalHeader.getId(), terminalHeader);
 
-        String headerText = messageDto.getDataType() == DataType.OUTPUT ? "빌드 성공" : "빌드 실패";
-        FileBlockDto headerBlock = FileBlockDto.builder()
-                .id(UUID.randomUUID().toString())
-                .type("heading")
-                .props(DefaultPropsDto.builder()
-                        .textColor("default")
-                        .backgroundColor("default")
-                        .textAlignment("left")
-                        .level(2)
-                        .build()
-                )
-                .content(ContentDto.builder()
-                        .type("text")
-                        .text(headerText)
-                        .build())
-                .children(codeAndTerminalBlocks)
-                .build();
+            FileBlockDto terminalBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("code")
+                            .children(List.of(ContentDto.builder()
+                                    .text(ideContentDto.getDetails())
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("void")
+                                    .language("yaml")
+                                    .theme("GithubDark")
+                                    .build())
+                            .build()))
+                    .type("Code")
+                    .meta(MetaDto.builder()
+                            .order(lastOrder++)
+                            .depth(0)
+                            .build())
+                    .build();
 
-        return headerBlock;
+            content.putLast(terminalBlock.getId(), terminalBlock);
+        }
+
+        redisFile.setLastOrder(lastOrder - 1);
+        redisFile.setContent(content);
+        redisFileRepository.save(redisFile);
+
+        return null;
     }
 
     private void sendRequest(FileBlockDto fileBlockDto, MessageDto messageDto) {
@@ -156,8 +311,16 @@ public class DataTransferService {
                 .defaultHeader("Authorization", messageDto.getAccessToken())
                 .build();
 
+        String type = "success";
+        switch (messageDto.getDataType()) {
+            case ERROR -> type = "fail";
+            case OUTPUT -> type = "success";
+        }
+
+        Integer visitedCount = null;
         MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("connectedFileId", messageDto.getConnectedFileId());
+        requestBody.add("type", type);
         requestBody.add("fileBlock", fileBlockDto);
 
         webClient.post()
