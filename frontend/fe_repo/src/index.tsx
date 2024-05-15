@@ -8,6 +8,7 @@ import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './contexts/AuthContext'
 import { FileProvider } from '../src/contexts/FileContext'
 import { TrashProvider } from './contexts/TrashContext';
+import { DirectoryProvider } from './contexts/DirectoryContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,9 +18,11 @@ root.render(
     <DndProvider backend={HTML5Backend}>
       <AuthProvider>
         <FileProvider>
-          <TrashProvider>
-            <App />
-          </TrashProvider>
+          <DirectoryProvider>
+            <TrashProvider>
+              <App />
+            </TrashProvider>
+          </DirectoryProvider>
         </FileProvider>
       </AuthProvider>
     </DndProvider>

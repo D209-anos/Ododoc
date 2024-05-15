@@ -19,6 +19,7 @@ import { fetchDirectory, createDirectory, deleteDirectoryItem, editDirectoryItem
 import { useAuth } from '../../../contexts/AuthContext';
 import { useFileContext } from '../../../contexts/FileContext';
 import { useTrash } from '../../../contexts/TrashContext';
+import { useDirectory } from '../../../contexts/DirectoryContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -69,7 +70,8 @@ const SideBar: React.FC = () => {
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
     useHandleClickOutside(contextMenuRef, hideMenu);                                    // contextMenu 밖 클릭 시 닫힘
 
-    const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
+    const { directoryData, setDirectoryData } = useDirectory();                         // directory data 저장
+    // const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
     // 디렉토리 조회 (로그인 시 title 매핑)
     const loadDirectory = async () => {

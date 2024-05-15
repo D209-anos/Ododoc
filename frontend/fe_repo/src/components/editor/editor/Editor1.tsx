@@ -1,5 +1,4 @@
 import YooptaEditor, { YooptaBlock, createYooptaEditor } from '@yoopta/editor';
-
 import Paragraph from '@yoopta/paragraph';
 import Blockquote from '@yoopta/blockquote';
 import Embed from '@yoopta/embed';
@@ -23,7 +22,14 @@ import { editDirectoryItem, fetchDirectory } from '../../../api/service/director
 import { fetchFile, saveFile } from '../../../api/service/editor'
 import { useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useDirectory } from '../../../contexts/DirectoryContext';
 
+interface MyDirectoryItem {
+    id: number;
+    name: string;
+    type: 'FOLDER' | 'FILE';
+    children?: MyDirectoryItem[] | string;
+}
 
 const plugins = [
   Paragraph,
@@ -108,6 +114,7 @@ function Edito1() {
   const [documentData, setDocumentData] = useState();
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
 
+  const { directoryData, setDirectoryData } = useDirectory();
 
   console.log('fetchDirectory : ' + fetchDirectory(rootId))
 
@@ -137,11 +144,35 @@ function Edito1() {
       try {
         await editDirectoryItem(directoryId, newTitle);
         console.log('Title updated successfully');
+
+        if (directoryData) {
+          const updatedData = updateDirectoryItemTitle(directoryData, directoryId, newTitle);
+          setDirectoryData(updatedData);
+        }
       } catch (error) {
         console.error('Failed to update title:', error);
       }
     }
-  }, [directoryId, title]);
+  }, [directoryId, title, directoryData, setDirectoryData]);
+
+  // directoryData 내의 특정 항목의 제목을 업데이트하는 함수
+  const updateDirectoryItemTitle = (data: MyDirectoryItem, targetId: number, newTitle: string): MyDirectoryItem => {
+    if (data.id === targetId) {
+      return { ...data, name: newTitle };
+    }
+
+    if (Array.isArray(data.children)) {
+      const updatedChildren = data.children.map(child => {
+        if (typeof child === 'object') {
+          return updateDirectoryItemTitle(child, targetId, newTitle);
+        }
+        return child;
+      });
+      return { ...data, children: updatedChildren };
+    }
+
+    return data;
+  };
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
