@@ -13,5 +13,5 @@ public class IDEContentDto {
 
     private String details;
     private List<ModifiedFileDto> modifiedFiles;
-
+    private ErrorFileDto errorFile;
 }
