@@ -13,24 +13,49 @@ import Code from '@yoopta/code';
 import ActionMenuList, { DefaultActionMenuRender } from '@yoopta/action-menu-list';
 import Toolbar, { DefaultToolbarRender } from '@yoopta/toolbar';
 import LinkTool, { DefaultLinkToolRender } from '@yoopta/link-tool';
-import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css'
+import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { uploadToCloudinary } from '../../..//utils/cloudinary';
 
 import { editDirectoryItem, fetchDirectory } from '../../../api/service/directory';
-import { fetchFile, saveFile } from '../../../api/service/editor'
-import { useLocation, useParams } from 'react-router-dom';
+import { fetchFile, saveFile } from '../../../api/service/editor';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useDirectory } from '../../../contexts/DirectoryContext';
 import { useDarkMode } from '../../../contexts/DarkModeContext';
+import { YooptaContentValue } from '@yoopta/editor/dist/editor/types';
 
-interface MyDirectoryItem {
-    id: number;
-    name: string;
-    type: 'FOLDER' | 'FILE';
-    children?: MyDirectoryItem[] | string;
-}
+
+const convertApiResponseToEditorFormat = (apiResponse: any): YooptaContentValue => {
+  const content = apiResponse.content;
+  const result: YooptaContentValue = {};
+
+  Object.keys(content).forEach((key) => {
+    const item = content[key];
+    result[item.id] = {
+      id: item.id,
+      type: item.type,
+      value: item.value.map((valueItem: any) => ({
+        ...valueItem,
+        children: valueItem.children.map((child: any) => ({
+          ...child,
+          text: child.text || '',
+        })),
+        props: {
+          ...valueItem.props,
+        },
+      })),
+      meta: {
+        ...item.meta,
+        order: item.meta?.order ?? 0,
+        depth: item.meta?.depth ?? 0,
+      },
+    };
+  });
+
+  return result;
+};
 
 const plugins = [
   Paragraph,
@@ -49,7 +74,6 @@ const plugins = [
     options: {
       async onUpload(file) {
         const data = await uploadToCloudinary(file, 'image');
-
         return {
           src: data.secure_url,
           alt: 'cloudinary',
@@ -61,21 +85,6 @@ const plugins = [
       },
     },
   }),
-  // Video.extend({
-  //   options: {
-  //     onUpload: async (file) => {
-  //       const data = await uploadToCloudinary(file, 'video');
-  //       return {
-  //         src: data.secure_url,
-  //         alt: 'cloudinary',
-  //         sizes: {
-  //           width: data.width,
-  //           height: data.height,
-  //         },
-  //       };
-  //     },
-  //   },
-  // }),
   File.extend({
     options: {
       onUpload: async (file) => {
@@ -103,42 +112,46 @@ const TOOLS = {
 
 const MARKS = [Bold, Italic, CodeMark, Underline, Strike, Highlight];
 
-function Edito1() {
-  const { state, dispatch } = useAuth();
-  const { accessToken, rootId } = state;
+function Editor1() {
+  const { state } = useAuth();
+  const { rootId } = state;
   const location = useLocation();
   const directoryId = location.state;
   const editor = useMemo(() => createYooptaEditor(), []);
   const selectionRef = useRef(null);
 
-  const [title, setTitle] = useState();
-  const [documentData, setDocumentData] = useState();
+  const [title, setTitle] = useState('');
+  const [documentData, setDocumentData] = useState<YooptaContentValue>({});
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false); // 데이터 로드 상태
   const { directoryData, setDirectoryData } = useDirectory();
   const { isDarkMode, setDarkMode } = useDarkMode();
 
-  console.log('fetchDirectory : ' + fetchDirectory(rootId))
 
-  //제목 조회하기
-  //파일 내용 조회하기
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const fileData = await fetchFile(directoryId);
-        setDocumentData(fileData.contnet);
-        setTitle(fileData.title)
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
 
-    if (directoryId) {
-      loadData();
+  const loadData = useCallback(async (dirId : any) => {
+    setIsLoading(true);
+    try {
+      const fileData = await fetchFile(dirId);
+      setTitle(fileData.title);
+      const convertedData = convertApiResponseToEditorFormat(fileData);
+      setDocumentData(convertedData);
+      setIsDataLoaded(true); // 데이터 로드 완료 설정
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [directoryId]);
+  }, []);
 
-  // 제목 변경 이벤트 핸들러
+  useEffect(() => {
+    if (directoryId) {
+      loadData(directoryId);
+      setIsDataLoaded(false); // 데이터 로드 시작 설정
+    }
+  }, [directoryId, loadData]);
+
   const handleTitleChange = useCallback(async (event: any) => {
     const newTitle = event.target.innerText;
     setTitle(newTitle);
@@ -146,35 +159,11 @@ function Edito1() {
       try {
         await editDirectoryItem(directoryId, newTitle);
         console.log('Title updated successfully');
-
-        if (directoryData) {
-          const updatedData = updateDirectoryItemTitle(directoryData, directoryId, newTitle);
-          setDirectoryData(updatedData);
-        }
       } catch (error) {
         console.error('Failed to update title:', error);
       }
     }
-  }, [directoryId, title, directoryData, setDirectoryData]);
-
-  // directoryData 내의 특정 항목의 제목을 업데이트하는 함수
-  const updateDirectoryItemTitle = (data: MyDirectoryItem, targetId: number, newTitle: string): MyDirectoryItem => {
-    if (data.id === targetId) {
-      return { ...data, name: newTitle };
-    }
-
-    if (Array.isArray(data.children)) {
-      const updatedChildren = data.children.map(child => {
-        if (typeof child === 'object') {
-          return updateDirectoryItemTitle(child, targetId, newTitle);
-        }
-        return child;
-      });
-      return { ...data, children: updatedChildren };
-    }
-
-    return data;
-  };
+  }, [directoryId, title]);
 
   const handleKeyDown = (event: any) => {
     if (event.key === 'Enter') {
@@ -183,12 +172,11 @@ function Edito1() {
     }
   };
 
-  // 파일 변경시 저장하기
   const handleEditorChange = useCallback(async () => {
+    if (isLoading) return; // 로딩 중에는 변경 사항을 무시
     if (editor.selection) {
       const block = editor.getEditorValue(); // 에디터의 현재 값 가져오기
-      setBlocks(block)
-      // API 호출을 통해 서버에 저장
+      setBlocks(block);
       try {
         console.log('저장 할 내용:', JSON.stringify(block, null, 2));
         await saveFile(directoryId, block);
@@ -196,15 +184,12 @@ function Edito1() {
         console.error('파일 저장 실패', error);
       }
     }
-  }, [editor, directoryId]);
+  }, [editor, directoryId, isLoading]);
 
   useEffect(() => {
     editor.on('change', handleEditorChange);
     return () => editor.off('change', handleEditorChange);
   }, [editor, handleEditorChange]);
-
-
-  console.log("directoryId : " + directoryId)
 
   return (
     <>
@@ -213,42 +198,27 @@ function Edito1() {
         ref={selectionRef}
 
       >
-        <p>
-          <h1 
-            contentEditable="true" 
-            onBlur={handleTitleChange} 
-            suppressContentEditableWarning={true} 
-            onKeyDown={handleKeyDown} 
-            className={EditorDetailStyle.title}
-          >
-            {title}
-          </h1>
-        </p>
+        <h1 contentEditable="true" onBlur={handleTitleChange} suppressContentEditableWarning={true} onKeyDown={handleKeyDown} className={EditorDetailStyle.editableTitle}>
+          {title}
+        </h1>
         <hr />
-        <YooptaEditor
-          editor={editor}
-          //@ts-ignore
-          plugins={plugins}
-          tools={TOOLS}
-          marks={MARKS}
-          selectionBoxRoot={selectionRef}
-          // readOnly = {true}
-          //@ts-ignore
-          value={documentData}
-          autoFocus
-          style={{ zIndex: 0, important: 'true' }}
-        />
-      </div>
-      <div>
-        <div>Document JSON:</div>
-        <div>
-          <pre>
-            <code>{JSON.stringify(blocks, null, 2)}</code>
-          </pre>
-        </div>
+        {isDataLoaded && (
+          <YooptaEditor
+            key={directoryId}
+            editor={editor}
+            //@ts-ignore
+            plugins={plugins}
+            tools={TOOLS}
+            marks={MARKS}
+            selectionBoxRoot={selectionRef}
+            value={documentData}
+            autoFocus
+            style={{ zIndex: 0, important: 'true' }}
+          />
+        )}
       </div>
     </>
   );
 }
 
-export default Edito1;
+export default Editor1;
