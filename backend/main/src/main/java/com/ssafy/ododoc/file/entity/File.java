@@ -17,5 +17,6 @@ public class File {
     private String id;
 
     private Long directoryId;
+    private Integer lastOrder;
     private LinkedHashMap<String, Block> content;
 }

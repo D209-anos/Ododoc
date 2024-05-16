@@ -58,6 +58,7 @@ public class FileService {
         RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(directoryId)
+                        .lastOrder(0)
                         .content(new LinkedHashMap<>())
                         .build()));
 
@@ -77,18 +78,19 @@ public class FileService {
         RedisFile redisFile = redisFileRepository.findById(fileRequest.getDirectoryId())
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(fileRequest.getDirectoryId())
+                        .lastOrder(0)
                         .content(new LinkedHashMap<>())
                         .build()));
 
-        LinkedHashMap<String, Block> content = fileRequest.getContent().entrySet().stream()
-                .sorted(Comparator.comparingInt(e -> e.getValue().getMeta().getOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
-                ));
+        int lastOrder = redisFile.getLastOrder();
+        for(Map.Entry<String, Block> entry : fileRequest.getContent().entrySet()) {
+            if(lastOrder < entry.getValue().getMeta().getOrder()) {
+                lastOrder = entry.getValue().getMeta().getOrder();
+            }
+        }
 
-        redisFile.setContent(content);
+        redisFile.setLastOrder(lastOrder);
+        redisFile.setContent(fileRequest.getContent());
 
         redisFileRepository.save(redisFile);
 
@@ -159,9 +161,16 @@ public class FileService {
 
     @Scheduled(fixedDelay = 1800000)
     public void saveFileInMongo() {
-        List<File> redisFiles = redisFileRepository.findAll().stream()
+        List<RedisFile> redisFiles = redisFileRepository.findAll();
+
+        if(redisFiles.isEmpty()) {
+            return;
+        }
+
+        List<File> files = redisFiles.stream()
                 .map(redisFile -> File.builder()
                         .directoryId(redisFile.getId())
+                        .lastOrder(redisFile.getLastOrder())
                         .content(redisFile.getContent())
                         .build())
                 .toList();
@@ -169,14 +178,14 @@ public class FileService {
         Map<Long, File> mongoFiles = fileRepository.findAll().stream()
                 .collect(Collectors.toMap(File::getDirectoryId, file -> file));
 
-        for(File redis : redisFiles) {
+        for(File redis : files) {
             File mongo = mongoFiles.get(redis.getDirectoryId());
             if(mongo != null) {
                 redis.setId(mongo.getId());
             }
         }
 
-        fileRepository.saveAll(redisFiles);
+        fileRepository.saveAll(files);
     }
 
     private void checkDirectory(Directory directory, Member member) {
