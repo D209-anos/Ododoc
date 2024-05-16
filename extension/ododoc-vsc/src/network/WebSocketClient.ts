@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import WebSocket from "ws";
-import { MessageData } from "./MessageData";
+import WebSocket, { MessageEvent } from "ws";
+import { MessageData } from "./types";
 import { getLoggedInSession } from "../authentication/AuthService";
 import FileWatcher from "../source-code-management/FileWatcher";
 
@@ -27,28 +27,32 @@ export default class WebSocketClient {
     this.socket = socket;
     console.log("WebSocketClient created");
 
-    socket.on("open", () => {
+    socket.onopen = () => {
       console.log("Connection established");
       this.sendMessage("SIGNAL", "vsc에서 연결합니다.");
-    });
+    };
 
-    socket.on("sourcecode", (data) => {
-      console.log("Source code request from server:", data);
-      this.sendSourcecode(data);
-    });
+    socket.onmessage = (event: MessageEvent) => {
+      const message = JSON.parse(event.data.toString());
 
-    socket.on("message", (data) => {
-      console.log("Message from server:", data);
-    });
+      switch (message.dataType) {
+        case "SOURCECODE":
+          console.log("Source code request from server:", message);
+          this.sendSourcecode(message);
+          break;
+        default:
+          console.log("Message from server:", message);
+      }
+    };
 
-    socket.on("error", (error) => {
+    socket.onerror = (error) => {
       console.error("WebSocket error:", error);
-    });
+    };
 
-    socket.on("close", () => {
+    socket.onclose = () => {
       console.log("Connection closed");
       this.socket = null;
-    });
+    };
   }
 
   public disconnect() {
@@ -89,6 +93,7 @@ export default class WebSocketClient {
         content: {
           details: message,
           modifiedFiles: [],
+          errorFile: null,
         },
         timestamp: new Date().toISOString(),
       };
@@ -126,6 +131,10 @@ export default class WebSocketClient {
           this.context
         ).getModifiedFiles();
 
+        if (modifiedFiles.length === 0) {
+          return;
+        }
+
         const messageData: MessageData = {
           sourceApplication: "VSCODE",
           accessToken: session.accessToken,
@@ -134,6 +143,7 @@ export default class WebSocketClient {
           content: {
             details: "",
             modifiedFiles: modifiedFiles,
+            errorFile: null,
           },
           timestamp: new Date().toISOString(),
         };

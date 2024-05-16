@@ -138,6 +138,8 @@ export default class FileWatcher {
       });
     });
 
+    this.changedFiles.clear();
+
     return modifiedFiles;
   }
 

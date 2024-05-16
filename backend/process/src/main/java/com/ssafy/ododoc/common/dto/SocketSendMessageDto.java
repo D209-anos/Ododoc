@@ -8,4 +8,9 @@ import lombok.ToString;
 public class SocketSendMessageDto {
     private String dataType;
     private String data;
+
+    public SocketSendMessageDto(String dataType) {
+        this.dataType = dataType;
+        this.data = "";
+    }
 }
