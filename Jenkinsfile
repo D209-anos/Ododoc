@@ -50,6 +50,7 @@ pipeline {
             steps {
                 echo '백엔드 EC2에 배포 시작!'
                 // 기존 컨테이너 중지 및 제거
+                sh 'docker rm -f d209-be || true'
                 sh 'docker rm -f backend || true'
                 sh "docker run -d -p 8080:8080 --name backend d209-be"
                 echo '백엔드 EC2에 배포 완료!'
@@ -73,6 +74,7 @@ pipeline {
             steps {
                 echo '처리 서버 EC2에 배포 시작!'
                 // 기존 컨테이너 중지 및 제거
+                sh 'docker rm -f d209-pro || true'
                 sh 'docker rm -f process || true'
                 sh "docker run -d -p 18080:18080 --name process d209-pro"
                 echo '처리 서버 EC2에 배포 완료!'
@@ -104,6 +106,7 @@ pipeline {
         stage('Deploy to EC2-FE') {
             steps {
                 echo '프론트 EC2에 배포 시작!'
+                sh 'docker rm -f d209-fe || true'
                 sh 'docker rm -f frontend || true'
                 sh "docker run -d -p 3000:3000 --name frontend d209-fe"
                 echo '프론트 EC2에 배포 완료!'
