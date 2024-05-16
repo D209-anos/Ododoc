@@ -5,7 +5,7 @@ import com.ssafy.ododoc.gpt.GptService;
 import com.ssafy.ododoc.gpt.dto.GptResponseDto;
 import com.ssafy.ododoc.process.common.dto.receive.IDEContentDto;
 import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.common.service.DataTransferService;
+import com.ssafy.ododoc.process.common.service.SendBlockService;
 import com.ssafy.ododoc.process.common.type.DataType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class IntellijMessageProcessingService {
+public class IntelliJMessageProcessingService {
 
-    private final DataTransferService dataTransferService;
+    private final IntelliJDataTransferService dataTransferService;
     private final ObjectMapper objectMapper;
     private final GptService gptService;
+    private final SendBlockService sendBlockService;
 
     public void handle(MessageDto messageDto) {
         DataType dataType = messageDto.getDataType();
@@ -39,10 +40,12 @@ public class IntellijMessageProcessingService {
         if(result.equals("SERVER")){
             ideContentDto.setDetails(null);
         }
+
+        sendBlockService.sendRequest(dataTransferService.makeFileBlock(messageDto), messageDto);
     }
 
     private void processError(MessageDto messageDto){
-        dataTransferService.makeFileBlock(messageDto);
+        sendBlockService.sendRequest(dataTransferService.makeFileBlock(messageDto), messageDto);
     }
 
     private String classificationByGpt(List<String> list, String content) {
