@@ -1,22 +1,24 @@
 package com.ssafy.ododoc.file.entity;
 
 import com.ssafy.ododoc.file.dto.Block;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 
 @Builder
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class File {
+@RedisHash(value = "file")
+public class RedisFile implements Serializable {
 
     @Id
-    private String id;
+    private Long id;
 
-    private Long directoryId;
     private Integer lastOrder;
     private LinkedHashMap<String, Block> content;
 }
