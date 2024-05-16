@@ -1,5 +1,7 @@
 .container{
     max-width: 100%;
+    padding-left: 9%;
+    padding-right: 9%;
 }
 
 .editableTitle {
@@ -17,6 +19,11 @@
   }
 
   .title {
-    padding-top: 7%;
+    padding-top: 50px;
+    margin: 0;
   }
 
+.darkMode {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}

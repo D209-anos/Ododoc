@@ -23,6 +23,7 @@ import { fetchFile, saveFile } from '../../../api/service/editor'
 import { useLocation, useParams } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useDirectory } from '../../../contexts/DirectoryContext';
+import { useDarkMode } from '../../../contexts/DarkModeContext';
 
 interface MyDirectoryItem {
     id: number;
@@ -115,6 +116,7 @@ function Edito1() {
   const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
 
   const { directoryData, setDirectoryData } = useDirectory();
+  const { isDarkMode, setDarkMode } = useDarkMode();
 
   console.log('fetchDirectory : ' + fetchDirectory(rootId))
 
@@ -207,8 +209,9 @@ function Edito1() {
   return (
     <>
       <div
-        className={EditorDetailStyle.container}
+        className={`${EditorDetailStyle.container} ${isDarkMode ? EditorDetailStyle.darkMode : ''}`}
         ref={selectionRef}
+
       >
         <p>
           <h1 

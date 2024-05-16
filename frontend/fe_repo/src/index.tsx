@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { FileProvider } from '../src/contexts/FileContext'
 import { TrashProvider } from './contexts/TrashContext';
 import { DirectoryProvider } from './contexts/DirectoryContext';
+import { DarkModeProvider } from './contexts/DarkModeContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,13 +18,15 @@ root.render(
   <React.StrictMode>
     <DndProvider backend={HTML5Backend}>
       <AuthProvider>
-        <FileProvider>
-          <DirectoryProvider>
-            <TrashProvider>
-              <App />
-            </TrashProvider>
-          </DirectoryProvider>
-        </FileProvider>
+        <DarkModeProvider>
+          <FileProvider>
+            <DirectoryProvider>
+              <TrashProvider>
+                <App />
+              </TrashProvider>
+            </DirectoryProvider>
+          </FileProvider>
+        </DarkModeProvider>
       </AuthProvider>
     </DndProvider>
   </React.StrictMode>
