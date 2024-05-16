@@ -26,6 +26,13 @@ import { useDirectory } from '../../../contexts/DirectoryContext';
 import { useDarkMode } from '../../../contexts/DarkModeContext';
 import { YooptaContentValue } from '@yoopta/editor/dist/editor/types';
 
+interface MyDirectoryItem {
+    id: number;
+    name: string;
+    type: 'FOLDER' | 'FILE';
+    children?: MyDirectoryItem[] | string;
+}
+
 
 const convertApiResponseToEditorFormat = (apiResponse: any): YooptaContentValue => {
   const content = apiResponse.content;
@@ -129,7 +136,6 @@ function Editor1() {
   const { isDarkMode, setDarkMode } = useDarkMode();
 
 
-
   const loadData = useCallback(async (dirId : any) => {
     setIsLoading(true);
     try {
@@ -159,6 +165,12 @@ function Editor1() {
       try {
         await editDirectoryItem(directoryId, newTitle);
         console.log('Title updated successfully');
+
+        if (directoryData) {
+          const updatedData = updateDirectoryItemTitle(directoryData, directoryId, newTitle);
+          setDirectoryData(updatedData);
+        }
+
       } catch (error) {
         console.error('Failed to update title:', error);
       }
@@ -190,6 +202,26 @@ function Editor1() {
     editor.on('change', handleEditorChange);
     return () => editor.off('change', handleEditorChange);
   }, [editor, handleEditorChange]);
+
+  // directory 이름 업데이트
+  const updateDirectoryItemTitle = (data: MyDirectoryItem, targetId: number, newTitle: string): MyDirectoryItem => {
+    if (data.id === targetId) {
+      return { ...data, name: newTitle };
+    }
+
+    if (Array.isArray(data.children)) {
+      const updatedChildren = data.children.map(child => {
+        if (typeof child === 'object') {
+          return updateDirectoryItemTitle(child, targetId, newTitle);
+        }
+        return child;
+      });
+      return { ...data, children: updatedChildren };
+    }
+
+    return data;
+  };
+
 
   return (
     <>
