@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
-import WebSocket from "ws";
-import { MessageData } from "./MessageData";
+import WebSocket, { MessageEvent } from "ws";
+import { MessageData } from "./types";
 import { getLoggedInSession } from "../authentication/AuthService";
+import FileWatcher from "../source-code-management/FileWatcher";
 
 const URL = "ws://localhost:18080/process/ws";
 
@@ -26,23 +27,32 @@ export default class WebSocketClient {
     this.socket = socket;
     console.log("WebSocketClient created");
 
-    socket.on("open", () => {
+    socket.onopen = () => {
       console.log("Connection established");
       this.sendMessage("SIGNAL", "vsc에서 연결합니다.");
-    });
+    };
 
-    socket.on("message", (data) => {
-      console.log("Message from server:", data);
-    });
+    socket.onmessage = (event: MessageEvent) => {
+      const message = JSON.parse(event.data.toString());
 
-    socket.on("error", (error) => {
+      switch (message.dataType) {
+        case "SOURCECODE":
+          console.log("Source code request from server:", message);
+          this.sendSourcecode(message);
+          break;
+        default:
+          console.log("Message from server:", message);
+      }
+    };
+
+    socket.onerror = (error) => {
       console.error("WebSocket error:", error);
-    });
+    };
 
-    socket.on("close", () => {
+    socket.onclose = () => {
       console.log("Connection closed");
       this.socket = null;
-    });
+    };
   }
 
   public disconnect() {
@@ -75,13 +85,16 @@ export default class WebSocketClient {
         return;
       }
 
-      this.context.secrets.get("rootId");
       const messageData: MessageData = {
         sourceApplication: "VSCODE",
         accessToken: session.accessToken,
         connectedFileId: parseInt(connectedFileId),
         dataType: dataType,
-        content: message,
+        content: {
+          details: message,
+          modifiedFiles: [],
+          errorFile: null,
+        },
         timestamp: new Date().toISOString(),
       };
 
@@ -89,6 +102,57 @@ export default class WebSocketClient {
       this.socket.send(JSON.stringify(messageData));
     } else {
       console.log("Connection not ready.");
+    }
+  }
+
+  private async sendSourcecode(data: any) {
+    try {
+      const session = await getLoggedInSession();
+      // 로그인은 되어 있는데 소켓 연결이 끊기면 재연결 시도
+      if (session !== undefined && this.socket === null) {
+        await this.connect();
+        await this.retryConnection(); // WebSocket Open 될 때까지 기다려줌
+      }
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        if (session === undefined) {
+          console.log("Session not found.");
+          return;
+        }
+
+        const connectedFileId = await this.context.secrets.get(
+          "connectedFileId"
+        );
+        if (connectedFileId === undefined) {
+          console.log("Root ID not found.");
+          return;
+        }
+
+        const modifiedFiles = await FileWatcher.getInstance(
+          this.context
+        ).getModifiedFiles();
+
+        if (modifiedFiles.length === 0) {
+          return;
+        }
+
+        const messageData: MessageData = {
+          sourceApplication: "VSCODE",
+          accessToken: session.accessToken,
+          connectedFileId: parseInt(connectedFileId),
+          dataType: "SOURCECODE",
+          content: {
+            details: "",
+            modifiedFiles: modifiedFiles,
+            errorFile: null,
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        console.log("Sending sourcecode:", messageData);
+        this.socket.send(JSON.stringify(messageData));
+      }
+    } catch (error) {
+      console.log("Error while sending source code:", error);
     }
   }
 

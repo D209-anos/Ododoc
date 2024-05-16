@@ -28,16 +28,19 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
 
   initializeTerminal() {
     const shell = process.platform === "win32" ? "cmd" : "bash";
-    this.ptyProcess = spawn(shell, [], { shell: true });
+    this.ptyProcess = spawn(shell, [], {
+      shell: true,
+      env: { ...process.env, LANG: "en_US.UTF-8", LC_ALL: "en_US.UTF-8" }, // 한글 출력을 위한 환경변수 설정
+    });
 
     // handle output
     this.ptyProcess.stdout.on("data", (data: Buffer) => {
-      this.writeEmitter.fire(data.toString());
+      this.writeEmitter.fire(data.toString("utf8"));
     });
 
     // handle error
     this.ptyProcess.stderr.on("data", (data: Buffer) => {
-      this.writeEmitter.fire(data.toString());
+      this.writeEmitter.fire(data.toString("utf8"));
     });
   }
 
@@ -184,13 +187,14 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
     if (this.ptyProcess) {
       const subprocess = spawn(command, args, {
         cwd: this.folderPath || process.cwd(),
-        shell: true, // cmd or bash
+        shell: true, // cmd or bash,
+        env: { ...process.env, LANG: "en_US.UTF-8", LC_ALL: "en_US.UTF-8" }, // 한글 출력을 위한 환경변수 설정
       });
 
       this.subprocesses.push(subprocess);
 
       subprocess.stdout.on("data", (data) => {
-        const formattedData = data.toString().replace(/\n/g, "\r\n"); // all CRLF => \r\n
+        const formattedData = data.toString("utf8").replace(/\n/g, "\r\n"); // UTF-8로 변환 및 all CRLF => \r\n
         this.writeEmitter.fire(formattedData);
         if (this.webSocketClient) {
           this.webSocketClient.sendMessage("OUTPUT", formattedData);
@@ -198,7 +202,7 @@ export class OdodocTerminal implements vscode.Pseudoterminal {
       });
 
       subprocess.stderr.on("data", (data) => {
-        const formattedData = data.toString().replace(/\n/g, "\r\n");
+        const formattedData = data.toString("utf8").replace(/\n/g, "\r\n");
         this.writeEmitter.fire(formattedData);
         if (this.webSocketClient) {
           this.webSocketClient.sendMessage("ERROR", formattedData);
