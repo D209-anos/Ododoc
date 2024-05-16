@@ -2,7 +2,7 @@ package com.ssafy.ododoc.common.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.common.service.DataTypeHandlerService;
+import com.ssafy.ododoc.process.vscode.service.MessageProcessingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -14,8 +14,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 @RequiredArgsConstructor
 public class SocketHandler extends TextWebSocketHandler {
 
-    private final DataTypeHandlerService dataTypeHandlerService;
     private final ObjectMapper objectMapper;
+    private final MessageProcessingService messageProcessingService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -30,8 +30,8 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         MessageDto messageDto = objectMapper.readValue(message.getPayload(), MessageDto.class);
-        switch (messageDto.getSourceApplication()){
-            case VSCODE -> System.out.println("VSCODE");
+        switch (messageDto.getSourceApplication()) {
+            case VSCODE -> messageProcessingService.handle(messageDto, session);
             case IntelliJ -> System.out.println("IntelliJ");
             case Chrome -> System.out.println("Chrome");
         }

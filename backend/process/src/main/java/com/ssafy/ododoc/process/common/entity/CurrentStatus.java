@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.index.Indexed;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @RedisHash(value = "CurrentStatus")
 public class CurrentStatus {
     @Id
@@ -22,4 +21,11 @@ public class CurrentStatus {
     private SourceApplicationType sourceApplication;
     private LocalDateTime timestamp;
     private StatusType status;
+
+    public CurrentStatus(MessageRecord messageRecord, StatusType status) {
+        this.connectedFileId = messageRecord.getConnectedFileId();
+        this.sourceApplication = messageRecord.getSourceApplication();
+        this.timestamp = messageRecord.getTimestamp();
+        this.status = status;
+    }
 }
