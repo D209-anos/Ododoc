@@ -114,7 +114,7 @@ function Mypage() {
     const quoteForLevel = levelToQuote[nickname]; // 닉네임에 해당하는 문구를 가져옴
 
     return (
-        <div style={{width: '100%' ,textAlign: 'center', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+        <div style={{width: '100%' ,textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
             <div style={{ width: '100%', height: '85vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-around' }}>
                 <h1 style={{fontSize : '3rem'}}>개발 경험치</h1>
                 <CountUp
