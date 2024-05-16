@@ -150,6 +150,7 @@ public class FileService {
             file.getContent().put(entry.getKey(), entry.getValue());
         }
 
+        file.setLastOrder(lastOrder);
         fileRepository.save(file);
 
         return FileResponse.builder()
