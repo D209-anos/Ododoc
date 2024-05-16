@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import SideBar from '../../src/components/editor/sidebar/SideBar';
 import EditorStyle from '../css/view/editor/Editor.module.css';
@@ -5,9 +6,31 @@ import Mypage from '../components/editor/mypage/Mypage';
 import Editor1 from '../components/editor/editor/Editor1';
 
 function Editor() {
+    const [sidebarWidth, setSidebarWidth] = useState(300);
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>): void => {
+        e.preventDefault();  // 기본 이벤트 방지
+        document.addEventListener('mousemove', handleMouseMove as any);
+        document.addEventListener('mouseup', handleMouseUp as any);
+    }
+
+    const handleMouseMove = (e: MouseEvent): void => {
+        const newWidth = Math.max(150, Math.min(2500, e.clientX));  // 최소 150px, 최대 500px 제한
+        setSidebarWidth(newWidth);
+    }
+
+    const handleMouseUp = (): void => {
+        document.removeEventListener('mousemove', handleMouseMove as any);
+        document.removeEventListener('mouseup', handleMouseUp as any);
+    }
+
     return (
         <div className={EditorStyle.editorContainer}>
-            <div className={EditorStyle.sidebarWrapper}>
+            <div 
+                className={EditorStyle.sidebarWrapper}
+                style={{ width: `${sidebarWidth}px` }}
+                onMouseDown={handleMouseDown}
+            >
                 <SideBar />
             </div>
             <div className={EditorStyle.editorWrapper}>

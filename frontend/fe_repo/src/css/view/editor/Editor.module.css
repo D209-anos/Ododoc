@@ -2,17 +2,38 @@
     max-width: 100%;
     display: flex;
     flex-direction: row;
+    height: 100vh;
 }
 
 .sidebarWrapper{
-    min-width: 250px;
-    z-index: 1000;
+    flex: 0 0 auto;;
+    width: 250px;
+    min-width: 300px;
+    max-width: 800px;
+    height: 100%;
+    position: relative;
+    overflow-y: hidden;
+    background-color: rgb(190, 190, 190);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.handle {
+    width: 5px;
+    height: 100%;
+    background-color: #000;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: ew-resize;
 }
 
 .editorWrapper{
-    width: 70%;
-    margin-left: 7.5%;
-    margin-right: 7.5%;
-    margin-top: 3%;
-    z-index: 1;
+    flex-grow: 1;
+    overflow-y: auto;
+    height: 100%;
+    /* width: 70%; */
+    padding-left: 7.5%;
+    padding-right: 6%;
+    /* margin-top: 3%; */
+    /* z-index: 1; */
 }

@@ -60,11 +60,7 @@ const SideBar: React.FC = () => {
     const [createFolderParentId, setCreateFolderParentId] = useState<number | null>(null);  // 생성한 폴더 부모 id (부모 id 넘겨줘야하니깐)
     const [createFileParentId, setCreateFileParentId] = useState<number | null>(null);      // 생성한 파일 부모 id
     const [addingFolderId, setAddingFolderId] = useState<number | null>(null);          // 추가한 폴더 ID
-    const [addingFileId, setAddingFileId] = useState<number | null>(null);
-    const [isAddingSubFile, setIsAddingSubFile] = useState<boolean>(false);
     const [openFolders, setOpenFolders] = useState<Record<number, boolean>>({});        // 폴더 열림 닫힘 상태
-    const [sidebarWidth, setSidebarWidth] = useState<number>(250);                      // 초기 사이드바 너비 설정
-    const [dragOverFolder, setDragOverFolder] = useState<number | null>(null);  
  
     const { menuState, handleContextMenu, hideMenu } = useContextMenu();                // 우클릭 context menu
     const contextMenuRef = useRef<HTMLUListElement>(null);                              
@@ -491,31 +487,17 @@ const SideBar: React.FC = () => {
     };
 
 
-
-    const handleMouseDown = (e: React.MouseEvent) => {
-        e.preventDefault();
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-        setSidebarWidth(e.clientX);
-    }
-
-    const handleMouseUp = () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp)
-    }
-
     return (
         // 사이드바
-        <div className={Sidebar.sidebar} style={{ width: sidebarWidth }}>
-            <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
-                {renderNameField()}
+        <div className={Sidebar.sidebar}>
+            <div>
+                <div className={Sidebar.nicknameSpace} style={{ fontFamily: 'hanbitFont' }}>
+                    {renderNameField()}
+                </div>
+                <img src={Line} alt="line" className={Sidebar.line}/>
             </div>
-            <img src={Line} alt="line" className={Sidebar.line}/>
-            {isCreatingFolder && (
-                <div className={Sidebar.folderSpace}>
+            <div className={Sidebar.folderSpace}>
+                {isCreatingFolder && (
                     <div>
                         <NameEditor 
                             objectId={rootId || 0}
@@ -526,9 +508,9 @@ const SideBar: React.FC = () => {
                             type='FOLDER'
                         />
                     </div>
-                </div>
-            )}
-            {renderContents(contents, null)}
+                )}
+                {renderContents(contents, null)}
+            </div>
             {menuState.visible && (
                 <ContextMenu 
                     ref={contextMenuRef} 
@@ -554,7 +536,7 @@ const SideBar: React.FC = () => {
                 <img src={SettingButton} alt="setting-button" className={Sidebar.settingButton} onClick={() => setSettingModalOpen(true)}/>
                 <SettingModal isOpen={isSettingModalOpen} onClose={() => setSettingModalOpen(false)}/>
             </div>
-            <div className={Sidebar.handle} onMouseDown={handleMouseDown}/>
+            <div className={Sidebar.handle}/>
         </div>
     )
 }

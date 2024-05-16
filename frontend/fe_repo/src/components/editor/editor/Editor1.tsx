@@ -211,7 +211,13 @@ function Edito1() {
         ref={selectionRef}
       >
         <p>
-          <h1 contentEditable="true" onBlur={handleTitleChange} suppressContentEditableWarning={true} onKeyDown={handleKeyDown}>
+          <h1 
+            contentEditable="true" 
+            onBlur={handleTitleChange} 
+            suppressContentEditableWarning={true} 
+            onKeyDown={handleKeyDown} 
+            className={EditorDetailStyle.title}
+          >
             {title}
           </h1>
         </p>
