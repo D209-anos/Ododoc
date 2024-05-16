@@ -20,6 +20,5 @@ public class AddRequest {
     @CheckFileType
     private String type;
 
-    private Integer visitedCount;
     private LinkedHashMap<String, Block> fileBlock;
 }
