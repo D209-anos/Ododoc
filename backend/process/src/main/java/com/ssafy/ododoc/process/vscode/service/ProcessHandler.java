@@ -8,6 +8,7 @@ import com.ssafy.ododoc.process.common.dto.receive.IDEContentDto;
 import com.ssafy.ododoc.process.common.entity.CurrentStatus;
 import com.ssafy.ododoc.process.common.entity.MessageRecord;
 import com.ssafy.ododoc.process.common.repository.CurrentStatusRepository;
+import com.ssafy.ododoc.process.common.service.SendBlockService;
 import com.ssafy.ododoc.process.common.type.DataType;
 import com.ssafy.ododoc.process.common.type.StatusType;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +24,12 @@ public class ProcessHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final GptService gptService;
     private final CurrentStatusRepository currentStatusRepository;
+    private final SendBlockService sendBlockService;
+    private final VscodeDataTransferService vscodeDataTransferService;
     private String classificationResult;
     private IDEContentDto ideContentDto;
     private SocketSendMessageDto socketSendMessageDto;
     private String summary;
-
 
     public void handle(StatusType status, DataType dataType, MessageRecord messageRecord, WebSocketSession webSocketSession) {
         System.out.println("when: " + status);
@@ -69,18 +71,30 @@ public class ProcessHandler {
                     }
                     break;
                 case ERROR:
+                    ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
+
                     currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
                     // status = troubled 변경 & 메인서버 전송
                     System.out.println(messageRecord.getContent());
 
-                    socketSendMessageDto = new SocketSendMessageDto("SOURCECODE");
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeTroubleBlocks(messageRecord), messageRecord);
+                    summary = summarizeByGpt(ideContentDto.getDetails());
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
 
+                    socketSendMessageDto = new SocketSendMessageDto("SOURCECODE");
                     webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketSendMessageDto)));
 
                     break;
                 case SOURCECODE:
-                    // 메인서버로 전송
-                    System.out.println(messageRecord.getContent());
+                    ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
+
+                    summary = summarizeByGpt(objectMapper.writeValueAsString(ideContentDto.getModifiedFiles()));
+
+                    currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
+
+
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeChangedCodeBlocks(messageRecord), messageRecord);
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
                     break;
                 case KEYWORD:
                 case SEARCH:
@@ -93,36 +107,89 @@ public class ProcessHandler {
 
     private void handleRunning(DataType dataType, MessageRecord messageRecord, WebSocketSession webSocketSession) {
         try {
+            switch (dataType) {
+                    case SIGNAL:
+                        System.out.println(messageRecord.getContent());
+                        break;
+                    case OUTPUT:
+                        // 일반 출력 => 무시
+                        // 서버 종료 => status = waiting
+                        // 런타임 에러 => status = troubled, status = running & 메인서버 전송
+                        ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
 
-        switch (dataType) {
+                        classificationResult = classificationByGpt(List.of("종료", "런타임에러", "알고리즘출력"), ideContentDto.getDetails());
+                        if (classificationResult.equals("종료")) {
+                            currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
+                        } else if (classificationResult.equals("런타임에러")) {
+                            currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
+                            sendBlockService.sendRequest(vscodeDataTransferService.makeTroubleBlocks(messageRecord), messageRecord);
+
+                            summary = summarizeByGpt(ideContentDto.getDetails());
+                            sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
+                        } else {
+                            handleAlgorithm(dataType, messageRecord, webSocketSession);
+                        }
+
+
+                        break;
+                    case ERROR:
+                        // status = troubled 변경 & 메인서버 전송
+                        currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
+                        sendBlockService.sendRequest(vscodeDataTransferService.makeTroubleBlocks(messageRecord), messageRecord);
+
+                        break;
+                    case SOURCECODE:
+                        ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
+
+                        summary = summarizeByGpt(objectMapper.writeValueAsString(ideContentDto.getModifiedFiles()));
+                        currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
+
+                        sendBlockService.sendRequest(vscodeDataTransferService.makeChangedCodeBlocks(messageRecord), messageRecord);
+                        sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
+                        break;
+
+                    case KEYWORD:
+                    case SEARCH:
+                        break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void handleTroubled(DataType dataType, MessageRecord messageRecord, WebSocketSession webSocketSession) {
+        try {
+            switch (dataType) {
                 case SIGNAL:
                     System.out.println(messageRecord.getContent());
                     break;
                 case OUTPUT:
                     // 일반 출력 => 무시
-                    // 서버 종료 => status = waiting
-                    // 런타임 에러 => status = troubled, status = running & 메인서버 전송
+                    // 서버 실행 => status = running
                     ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
 
-                    classificationResult = classificationByGpt(List.of("종료", "런타임에러", "알고리즘출력"), ideContentDto.getDetails());
-                    if (classificationResult.equals("종료")) {
-                        currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
-                    } else if (classificationResult.equals("런타임에러")) {
-                        currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
+                    classificationResult = classificationByGpt(List.of("서버실행", "알고리즘출력"), ideContentDto.getDetails());
+                    System.out.println(classificationResult);
+                    if (classificationResult.equals("서버실행")) {
+                        currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.RUNNING));
                     } else {
                         handleAlgorithm(dataType, messageRecord, webSocketSession);
+                        // do nothing
                     }
-
 
                     break;
                 case ERROR:
-                    // status = troubled 변경 & 메인서버 전송
-                    currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
+                    // status = troubled 유지
 
                     break;
                 case SOURCECODE:
-                    // 메인서버로 전송
-                    System.out.println(messageRecord.getContent());
+                    ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
+
+                    summary = summarizeByGpt(objectMapper.writeValueAsString(ideContentDto.getModifiedFiles()));
+                    summary = summarizeByGpt(ideContentDto.getModifiedFiles().toString());
+                    currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
+
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeChangedCodeBlocks(messageRecord), messageRecord);
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
                     break;
 
                 case KEYWORD:
@@ -134,42 +201,6 @@ public class ProcessHandler {
         }
     }
 
-    private void handleTroubled(DataType dataType, MessageRecord messageRecord, WebSocketSession webSocketSession) {
-        switch (dataType) {
-            case SIGNAL:
-                System.out.println(messageRecord.getContent());
-                break;
-            case OUTPUT:
-                // 일반 출력 => 무시
-                // 서버 실행 => status = running
-                ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
-
-                classificationResult = classificationByGpt(List.of("서버실행", "알고리즘출력"), ideContentDto.getDetails());
-                System.out.println(classificationResult);
-                if (classificationResult.equals("서버실행")) {
-                    currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.RUNNING));
-                } else if(classificationResult.equals("알고리즘출력")) {
-                    handleAlgorithm(dataType, messageRecord, webSocketSession);
-                    // do nothing
-                }
-
-                break;
-            case ERROR:
-                // status = troubled 유지
-
-                break;
-            case SOURCECODE:
-                // 메인서버로 전송
-
-                System.out.println(messageRecord.getContent());
-                break;
-
-            case KEYWORD:
-            case SEARCH:
-                break;
-        }
-    }
-
     private void handleAlgorithm(DataType dataType, MessageRecord messageRecord, WebSocketSession webSocketSession) {
         try {
             switch (dataType) {
@@ -178,7 +209,6 @@ public class ProcessHandler {
                     currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
                     break;
                 case OUTPUT:
-                    ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
                     socketSendMessageDto = new SocketSendMessageDto("SOURCECODE");
 
                     webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketSendMessageDto)));
@@ -191,11 +221,14 @@ public class ProcessHandler {
 
                     break;
                 case SOURCECODE:
-                    System.out.println(messageRecord.getContent());
-                    summary = summarizeByGpt(ideContentDto.getModifiedFiles().toString());
-                    System.out.println(summary);
+                    System.out.println(ideContentDto.getModifiedFiles().toString());
+                    ideContentDto = objectMapper.convertValue(messageRecord.getContent(), IDEContentDto.class);
+
+                    summary = summarizeByGpt(objectMapper.writeValueAsString(ideContentDto.getModifiedFiles()));
                     currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.WAITING));
 
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeChangedCodeBlocks(messageRecord), messageRecord);
+                    sendBlockService.sendRequest(vscodeDataTransferService.makeSummaryBlocks(summary), messageRecord);
                     break;
                 case KEYWORD:
                 case SEARCH:

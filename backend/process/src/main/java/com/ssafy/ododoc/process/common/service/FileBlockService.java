@@ -21,6 +21,7 @@ public class FileBlockService {
      */
     public LinkedHashMap<String, FileBlockDto> makeCodeBlock(LinkedHashMap<String, FileBlockDto> contentMap, List<ModifiedFileDto> modifiedFileList) {
         for(ModifiedFileDto modifiedFile : modifiedFileList) {
+            System.out.println("modified file name?? " + modifiedFile.getFileName());
             // 파일 이름 블럭
             FileBlockDto fileNameBlock = FileBlockDto.builder()
                     .id(UUID.randomUUID().toString())
