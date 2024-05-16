@@ -1,17 +1,29 @@
-.container {
-  max-width: 100%;
+.container{
+    max-width: 100%;
+    padding-left: 9%;
+    padding-right: 9%;
 }
 
 .editableTitle {
-  border: none;
-  outline: none;
-  padding: 0;
-  background: none;
-  font-size: 2em; /* 제목 크기 조정 */
-  font-weight: bold;
-  color: #333; /* 글자 색상 조정 */
-}
+    border: none;
+    outline: none;
+    padding: 0;
+    background: none;
+    font-size: 2em; /* 제목 크기 조정 */
+    font-weight: bold;
+    color: #333; /* 글자 색상 조정 */
+    }
+  
+  .editableTitle:focus {
+    outline: none; /* 편집 시 아웃라인 제거 */
+  }
 
-.editableTitle:focus {
-  outline: none; /* 편집 시 아웃라인 제거 */
+  .title {
+    padding-top: 50px;
+    margin: 0;
+  }
+
+.darkMode {
+  background-color: #1e1e1e;
+  color: #ffffff;
 }
