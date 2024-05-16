@@ -4,7 +4,6 @@ import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import com.ssafy.ododoc.process.common.type.StatusType;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
@@ -12,8 +11,6 @@ import org.springframework.data.redis.core.index.Indexed;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@Builder
 @RedisHash(value = "CurrentStatus")
 public class CurrentStatus {
     @Id
@@ -24,4 +21,11 @@ public class CurrentStatus {
     private SourceApplicationType sourceApplication;
     private LocalDateTime timestamp;
     private StatusType status;
+
+    public CurrentStatus(MessageRecord messageRecord, StatusType status) {
+        this.connectedFileId = messageRecord.getConnectedFileId();
+        this.sourceApplication = messageRecord.getSourceApplication();
+        this.timestamp = messageRecord.getTimestamp();
+        this.status = status;
+    }
 }

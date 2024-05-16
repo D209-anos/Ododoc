@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import WebSocket from "ws";
 import { MessageData } from "./MessageData";
 import { getLoggedInSession } from "../authentication/AuthService";
+import FileWatcher from "../source-code-management/FileWatcher";
 
 const URL = "ws://localhost:18080/process/ws";
 
@@ -29,6 +30,11 @@ export default class WebSocketClient {
     socket.on("open", () => {
       console.log("Connection established");
       this.sendMessage("SIGNAL", "vsc에서 연결합니다.");
+    });
+
+    socket.on("sourcecode", (data) => {
+      console.log("Source code request from server:", data);
+      this.sendSourcecode(data);
     });
 
     socket.on("message", (data) => {
@@ -75,13 +81,15 @@ export default class WebSocketClient {
         return;
       }
 
-      this.context.secrets.get("rootId");
       const messageData: MessageData = {
         sourceApplication: "VSCODE",
         accessToken: session.accessToken,
         connectedFileId: parseInt(connectedFileId),
         dataType: dataType,
-        content: message,
+        content: {
+          details: message,
+          modifiedFiles: [],
+        },
         timestamp: new Date().toISOString(),
       };
 
@@ -89,6 +97,52 @@ export default class WebSocketClient {
       this.socket.send(JSON.stringify(messageData));
     } else {
       console.log("Connection not ready.");
+    }
+  }
+
+  private async sendSourcecode(data: any) {
+    try {
+      const session = await getLoggedInSession();
+      // 로그인은 되어 있는데 소켓 연결이 끊기면 재연결 시도
+      if (session !== undefined && this.socket === null) {
+        await this.connect();
+        await this.retryConnection(); // WebSocket Open 될 때까지 기다려줌
+      }
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        if (session === undefined) {
+          console.log("Session not found.");
+          return;
+        }
+
+        const connectedFileId = await this.context.secrets.get(
+          "connectedFileId"
+        );
+        if (connectedFileId === undefined) {
+          console.log("Root ID not found.");
+          return;
+        }
+
+        const modifiedFiles = await FileWatcher.getInstance(
+          this.context
+        ).getModifiedFiles();
+
+        const messageData: MessageData = {
+          sourceApplication: "VSCODE",
+          accessToken: session.accessToken,
+          connectedFileId: parseInt(connectedFileId),
+          dataType: "SOURCECODE",
+          content: {
+            details: "",
+            modifiedFiles: modifiedFiles,
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        console.log("Sending sourcecode:", messageData);
+        this.socket.send(JSON.stringify(messageData));
+      }
+    } catch (error) {
+      console.log("Error while sending source code:", error);
     }
   }
 

@@ -1,12 +1,13 @@
 import * as vscode from "vscode";
 import { diffLines } from "diff";
-import WebSocketClient from "../network/WebSocketClient";
+import { ChangeDetail, ModifiedFile } from "./types";
 
 export default class FileWatcher {
   private static instance: FileWatcher;
   private watcher: vscode.FileSystemWatcher;
   private fileContents: Map<string, string>;
   private isActive: boolean;
+  private changedFiles: Map<string, string>;
 
   public static getInstance(context: vscode.ExtensionContext): FileWatcher {
     if (!FileWatcher.instance) {
@@ -23,6 +24,7 @@ export default class FileWatcher {
       false
     );
     this.fileContents = new Map<string, string>();
+    this.changedFiles = new Map<string, string>();
     this.isActive = false;
 
     this.watcher.onDidChange(this.onFileChange, this);
@@ -61,10 +63,7 @@ export default class FileWatcher {
     }
     console.log(`File changed: ${uri.fsPath}`);
     const newContent = await this.readFileContent(uri);
-    const oldContent = this.fileContents.get(uri.fsPath) || "";
-    this.fileContents.set(uri.fsPath, newContent || "");
-    const changes = this.getChanges(oldContent, newContent || "");
-    this.sendFileEvent("change", uri.fsPath, changes);
+    this.changedFiles.set(uri.fsPath, newContent || "");
   }
 
   private async onFileCreate(uri: vscode.Uri) {
@@ -72,7 +71,7 @@ export default class FileWatcher {
       return;
     }
     console.log(`File created: ${uri.fsPath}`);
-    this.fileContents.set(uri.fsPath, "");
+    this.changedFiles.set(uri.fsPath, "");
   }
 
   private onFileDelete(uri: vscode.Uri) {
@@ -123,20 +122,23 @@ export default class FileWatcher {
     return changeDetails;
   }
 
-  private sendFileEvent(
-    event: string,
-    filePath: string,
-    content: string | ChangeDetail[]
-  ) {
-    const webSocketClient = WebSocketClient.getInstance(this.context);
-    // 루트디렉토리까지 포함한 파일명만 전송
-    const fileName = filePath.split(
-      vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || ""
-    )[1];
-    webSocketClient.sendMessage(
-      "SOURCECODE",
-      JSON.stringify({ event, fileName, content })
-    );
+  public async getModifiedFiles(): Promise<ModifiedFile[]> {
+    const modifiedFiles: ModifiedFile[] = [];
+
+    this.changedFiles.forEach((newContent, filePath) => {
+      // 변경 전과 변경 후 데이터를 포함하는 ModifiedFile 객체 생성
+      modifiedFiles.push({
+        fileName: `변경 전 ${filePath}`,
+        sourceCode: this.fileContents.get(filePath) || "",
+      });
+
+      modifiedFiles.push({
+        fileName: `변경 후 ${filePath}`,
+        sourceCode: newContent,
+      });
+    });
+
+    return modifiedFiles;
   }
 
   private async getFiles(dir: vscode.Uri): Promise<vscode.Uri[]> {
@@ -166,10 +168,4 @@ export default class FileWatcher {
     this.isActive = false;
     console.log("FileWatcher deactivated");
   }
-}
-
-interface ChangeDetail {
-  line: number;
-  added: string;
-  removed: string;
 }

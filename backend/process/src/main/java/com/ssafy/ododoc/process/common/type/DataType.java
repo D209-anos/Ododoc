@@ -5,5 +5,6 @@ public enum DataType {
     OUTPUT,
     ERROR,
     KEYWORD,
-    SEARCH
+    SEARCH,
+    SOURCECODE
 }
