@@ -14,7 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 @Service
 @RequiredArgsConstructor
-public class MessageProcessingService {
+public class VscodeMessageProcessingService {
     private final MessageRecordRepository messageRecordRepository;
     private final CurrentStatusRepository currentStatusRepository;
     private final ProcessHandler processHandler;

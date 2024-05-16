@@ -93,6 +93,7 @@ public class ProcessHandler {
             case ERROR:
                 // status = troubled 변경 & 메인서버 전송
                 currentStatusRepository.save(new CurrentStatus(messageRecord, StatusType.TROUBLED));
+
                 break;
             case SOURCECODE:
                 // 메인서버로 전송
