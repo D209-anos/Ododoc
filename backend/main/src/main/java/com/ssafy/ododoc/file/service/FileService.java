@@ -58,7 +58,7 @@ public class FileService {
         RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(directoryId)
-                        .lastOrder(0)
+                        .lastOrder(-1)
                         .content(new LinkedHashMap<>())
                         .build()));
 
@@ -78,7 +78,7 @@ public class FileService {
         RedisFile redisFile = redisFileRepository.findById(fileRequest.getDirectoryId())
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(fileRequest.getDirectoryId())
-                        .lastOrder(0)
+                        .lastOrder(-1)
                         .content(new LinkedHashMap<>())
                         .build()));
 
@@ -150,6 +150,7 @@ public class FileService {
             file.getContent().put(entry.getKey(), entry.getValue());
         }
 
+        file.setLastOrder(lastOrder);
         fileRepository.save(file);
 
         return FileResponse.builder()
