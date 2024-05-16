@@ -3,7 +3,7 @@ package com.ssafy.ododoc.common.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.process.chrome.service.ChromeMessageProcessingService;
 import com.ssafy.ododoc.process.common.dto.receive.MessageDto;
-import com.ssafy.ododoc.process.intelliJ.service.IntellijMessageProcessingService;
+import com.ssafy.ododoc.process.intelliJ.service.IntelliJMessageProcessingService;
 import com.ssafy.ododoc.process.vscode.service.VscodeMessageProcessingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class SocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
-    private final IntellijMessageProcessingService intellijMessageProcessingService;
+    private final IntelliJMessageProcessingService intellijMessageProcessingService;
     private final VscodeMessageProcessingService vscodeMessageProcessingService;
     private final ChromeMessageProcessingService chromeMessageProcessingService;
 
