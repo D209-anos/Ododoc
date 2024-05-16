@@ -14,7 +14,6 @@ import com.ssafy.ododoc.directory.type.DirectoryType;
 import com.ssafy.ododoc.file.entity.File;
 import com.ssafy.ododoc.file.entity.RedisFile;
 import com.ssafy.ododoc.file.exception.FileBadRequestException;
-import com.ssafy.ododoc.file.exception.VisitCountNotNullException;
 import com.ssafy.ododoc.file.repository.FileRepository;
 import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
@@ -108,9 +107,10 @@ public class FileService {
 
         checkDirectory(directory, member);
 
-        File file = fileRepository.findByDirectoryId(addRequest.getConnectedFileId())
-                .orElseGet(() -> fileRepository.save(File.builder()
-                        .directoryId(addRequest.getConnectedFileId())
+        RedisFile redisFile = redisFileRepository.findById(addRequest.getConnectedFileId())
+                .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
+                        .id(addRequest.getConnectedFileId())
+                        .lastOrder(-1)
                         .content(new LinkedHashMap<>())
                         .build()));
 
@@ -123,40 +123,26 @@ public class FileService {
                 editMember.setBuildCount(editMember.getBuildCount() + 1);
                 editMember.setErrorCount(editMember.getErrorCount() + 1);
             }
-            case SEARCH -> {
-                if(addRequest.getVisitedCount() == null) {
-                    throw new VisitCountNotNullException("type이 search인 경우 visitCount는 null일 수 없습니다.");
-                }
-
-                editMember.setSearchCount(editMember.getSearchCount() + 1);
-                editMember.setVisitCount(editMember.getVisitCount() + addRequest.getVisitedCount());
-            }
+            case KEYWORD -> editMember.setSearchCount(editMember.getSearchCount() + 1);
+            case SEARCH -> editMember.setVisitCount(editMember.getVisitCount() + 1);
         }
 
-        int lastOrder = 0;
+        int lastOrder = redisFile.getLastOrder();
 
-        for(Map.Entry<String, Block> entry : file.getContent().entrySet()) {
-            if(lastOrder < entry.getValue().getMeta().getOrder()) {
-                lastOrder = entry.getValue().getMeta().getOrder();
-            }
-        }
-
-        if(lastOrder != 0) {
-            lastOrder++;
-        }
+        lastOrder++;
 
         for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
             entry.getValue().getMeta().setOrder(lastOrder++);
-            file.getContent().put(entry.getKey(), entry.getValue());
+            redisFile.getContent().put(entry.getKey(), entry.getValue());
         }
 
-        file.setLastOrder(lastOrder);
-        fileRepository.save(file);
+        redisFile.setLastOrder(lastOrder - 1);
+        redisFileRepository.save(redisFile);
 
         return FileResponse.builder()
-                .directoryId(file.getDirectoryId())
+                .directoryId(redisFile.getId())
                 .title(directory.getName())
-                .content(file.getContent())
+                .content(redisFile.getContent())
                 .build();
     }
 

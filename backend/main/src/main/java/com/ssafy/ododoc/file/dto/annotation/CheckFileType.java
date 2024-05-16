@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = CheckFileTypevalidator.class)
 public @interface CheckFileType {
 
-    String message() default "success, fail, search 중 하나만 입력 가능합니다.";
+    String message() default "success, fail, keyword, search 중 하나만 입력 가능합니다.";
     Class[] groups() default {};
     Class[] payload() default {};
 }
