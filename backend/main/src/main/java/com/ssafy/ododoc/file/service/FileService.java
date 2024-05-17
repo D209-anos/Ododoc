@@ -105,9 +105,11 @@ public class FileService {
 
     @Transactional
     public FileResponse addFile(AddRequest addRequest, Member member) {
+        log.info("addFile 시작!!!!");
         Directory directory;
 
-        if(addRequest.getConnectedFileId() == 0) {
+        if(addRequest.getConnectedFileId() == 0L) {
+            log.info("connectedFileId가 0 입니다.");
             Directory root = directoryRepository.findByMemberAndParentIsNull(member)
                     .orElseGet(() -> directoryRepository.save(Directory.builder()
                             .name(member.getNickname() + "님의 정리공간")
@@ -124,6 +126,7 @@ public class FileService {
                             .build()));
         }
         else {
+            log.info("connectedFileId가 {} 입니다.", addRequest.getConnectedFileId());
             directory = directoryRepository.findById(addRequest.getConnectedFileId())
                     .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
         }
