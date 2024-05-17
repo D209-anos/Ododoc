@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,63 +44,76 @@ public class CodeListener implements ExecutionListener {
     private boolean capturingError;
     private boolean errorFlag;
     private boolean connectFlag;
+
     public CodeListener(Project project) {
         this.project = project;
     }
 
     @Override
     public void processStarted(@NotNull String executorId, @NotNull ExecutionEnvironment env, @NotNull ProcessHandler handler) {
-        AppExecutorUtil.getAppExecutorService().execute(() -> {
-            getCurrentProject();
-        });
+        CompletableFuture.runAsync(() -> getCurrentProject())
+                .thenRun(this::initializeProjectTracker)
+                .thenRun(() -> {
+                    // 파일 연동이 되어있다면
+                    if (ConnectedFileManager.getInstance().getDirectoryId() != -1L) {
+                        connectFlag = true;
+                        startSignal();
+                    } else {
+                        Platform.runLater(() -> {
+                            Alert alert = AlertHelper.makeAlert(
+                                    Alert.AlertType.WARNING,
+                                    " Ododoc",
+                                    "파일 연동 오류",
+                                    "파일이 연동되지 않았습니다.\n파일을 연동해주세요.",
+                                    "/image/button/icon.png"
+                            );
+                            alert.showAndWait();
+                        });
+                    }
 
-        // 파일 연동이 되어있다면
-        if(ConnectedFileManager.getInstance().getDirectoryId() != -1L){
-            connectFlag = true;
-            startSignal();
-        }
-        // 파일 연동이 되어 있지 않다면
-        else{
-            Platform.runLater(() -> {
-                Alert alert =  AlertHelper.makeAlert(
-                        Alert.AlertType.WARNING,
-                        " Ododoc",
-                        "파일 연동 오류",
-                        "파일이 연동되지 않았습니다.\n파일을 연동해주세요.",
-                        "/image/button/icon.png"
-                );
-                alert.showAndWait();
-            });
-        }
-
-        handler.addProcessListener(new OdodocProcessListener());
+                    handler.addProcessListener(new OdodocProcessListener());
+                });
     }
 
-    private void getCurrentProject(){
+    private void getCurrentProject() {
         psiFiles = new ArrayList<>();
         currentProjectInfo.clear();
-        ApplicationManager.getApplication().runReadAction(() -> {
-            GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
-            Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, "java", scope);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            ApplicationManager.getApplication().runReadAction(() -> {
+                GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+                Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, "java", scope);
 
-            PsiManager psiManager = PsiManager.getInstance(project);
+                PsiManager psiManager = PsiManager.getInstance(project);
+                psiFiles = files.stream()
+                        .map(psiManager::findFile)
+                        .collect(Collectors.toList());
 
-            psiFiles = files.stream()
-                    .map(file -> psiManager.findFile(file))
-                    .toList();
-
-            for(PsiFile file : psiFiles){
-                currentProjectInfo.put(file.getName(), new ProjectInfo(file,"", file.getText()));
-            }
-
+                psiFiles.forEach(file ->
+                        currentProjectInfo.put(file.getName(), new ProjectInfo(file, "", file.getText())));
+            });
         });
-
-
     }
 
-    private void startSignal(){
+    private void initializeProjectTracker() {
+        ProjectTracker projectTracker = ProjectTracker.getInstance();
+        projectTracker.currentHashStatus(project);
+
+        // Ensuring project status is updated
+        projectTracker.setBeforeProjectStatus(
+                projectTracker.getCurrentProjectStatus().entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
+                            try {
+                                return (ProjectInfo) e.getValue().clone();
+                            } catch (CloneNotSupportedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }))
+        );
+    }
+
+    private void startSignal() {
         RequestDto requestDto = new RequestDto();
-        requestDto.setSourceApplication("IntelliJ");
+        requestDto.setSourceApplication("INTELLIJ");
         requestDto.setDataType("SIGNAL");
         requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
         requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
@@ -112,7 +126,6 @@ public class CodeListener implements ExecutionListener {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private List<ModifiedFileInfo> getModifiedFiles() {
@@ -124,102 +137,81 @@ public class CodeListener implements ExecutionListener {
         String allBeforeProjectStatus = projectTracker.getAllBeforeProjectStatus();
         String allCurrentProjectStatus = projectTracker.getAllCurrentProjectStatus();
 
-        String before, current= "";
-        boolean isChange = false; // 변경된 파일이 있는지 확인
+        String before, current = "";
+        boolean isChange = false;
         List<ModifiedFileInfo> modifiedFileInfoList = new ArrayList<>();
 
         // 파일을 추가하거나 삭제하지 않은 경우
-        if(allBeforeProjectStatus.equals(allCurrentProjectStatus)){
-            for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
+        if (allBeforeProjectStatus.equals(allCurrentProjectStatus)) {
+            for (Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()) {
                 before = entry.getValue().getHash();
-                current = currentProjectStatus.get(entry.getKey()).getHash();
+                current = Optional.ofNullable(currentProjectStatus.get(entry.getKey()))
+                        .map(ProjectInfo::getHash).orElse("");
 
                 // 바뀐 파일이라면 해당 파일
-                if(!before.equals(current)){
+                if (!before.equals(current)) {
                     isChange = true;
                     PsiFile modifiedFile = currentProjectStatus.get(entry.getKey()).getPsiFile();
                     addModifiedFile(modifiedFileInfoList, modifiedFile);
                 }
             }
-        }
-
-        // 파일을 추가하거나 삭제한 경우
-        else{
+        } else {
             int beforeSize = beforeProjectStatus.size();
             int currentSize = currentProjectStatus.size();
 
-            // 추가한 경우
-            if(beforeSize <= currentSize){
-                for(Map.Entry<String, ProjectInfo> entry : currentProjectStatus.entrySet()){
-
-                    // 추가된 파일이 아닐 경우
-                    if(beforeProjectStatus.containsKey(entry.getKey())){
+            if (beforeSize <= currentSize) {
+                for (Map.Entry<String, ProjectInfo> entry : currentProjectStatus.entrySet()) {
+                    if (beforeProjectStatus.containsKey(entry.getKey())) {
                         before = beforeProjectStatus.get(entry.getKey()).getHash();
                         current = entry.getValue().getHash();
 
-                        // 바뀐 파일이라면 해당 파일 저장
-                        if(!before.equals(current)){
+                        if (!before.equals(current)) {
                             isChange = true;
                             PsiFile modifiedFile = entry.getValue().getPsiFile();
                             addModifiedFile(modifiedFileInfoList, modifiedFile);
                         }
-                    }
-
-                    // 추가된 파일일 경우
-                    else{
+                    } else {
                         isChange = true;
                         PsiFile modifiedFile = entry.getValue().getPsiFile();
                         addModifiedFile(modifiedFileInfoList, modifiedFile);
                     }
-
                 }
-            }
-            // 삭제한 경우
-            else if(beforeSize > currentSize){
-                for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
-
-                    // 삭제된 파일이 아닐 경우
-                    if(currentProjectStatus.containsKey(entry.getKey())){
+            } else if (beforeSize > currentSize) {
+                for (Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()) {
+                    if (currentProjectStatus.containsKey(entry.getKey())) {
                         before = entry.getValue().getHash();
                         current = currentProjectStatus.get(entry.getKey()).getHash();
 
-                        // 바뀐 파일이라면 해당 파일 저장
-                        if(!before.equals(current)){
+                        if (!before.equals(current)) {
                             isChange = true;
                             PsiFile modifiedFile = currentProjectStatus.get(entry.getKey()).getPsiFile();
                             addModifiedFile(modifiedFileInfoList, modifiedFile);
                         }
-                    }
-
-                    // 삭제된 파일일 경우
-                    else{
+                    } else {
                         isChange = true;
                     }
-
                 }
             }
         }
 
-        // 변경된 파일이 있을 경우 현재 상태를 전 상태로 돌리기 (깊은 복사 )
-        if (isChange){
+        if (isChange) {
             deepCopy(currentProjectStatus);
         }
 
         return modifiedFileInfoList;
     }
 
-    private void addModifiedFile(List<ModifiedFileInfo> modifiedFileInfoList, PsiFile modifiedFile){
+    private void addModifiedFile(List<ModifiedFileInfo> modifiedFileInfoList, PsiFile modifiedFile) {
         String fileName = modifiedFile.getName();
         String sourceCode = modifiedFile.getText();
-
         modifiedFileInfoList.add(new ModifiedFileInfo(fileName, sourceCode));
     }
 
-    private void deepCopy(Map<String, ProjectInfo> currentProjectStatus){
+    private void deepCopy(Map<String, ProjectInfo> currentProjectStatus) {
         ProjectTracker projectTracker = ProjectTracker.getInstance();
         projectTracker.setBeforeProjectStatus(
                 currentProjectStatus.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e-> {
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             try {
                                 return (ProjectInfo) e.getValue().clone();
                             } catch (CloneNotSupportedException ex) {
@@ -230,35 +222,31 @@ public class CodeListener implements ExecutionListener {
     }
 
     private class OdodocProcessListener implements ProcessListener {
-        StringBuilder allOutputLog = new StringBuilder(); // 전체 로그만 담는 변수
-        StringBuilder errorLog = new StringBuilder(); // 에러 출력만 담는 변수
-        StringBuilder stdOutLog = new StringBuilder(); // 표준 출력만 담는 변수
+        StringBuilder allOutputLog = new StringBuilder();
+        StringBuilder errorLog = new StringBuilder();
+        StringBuilder stdOutLog = new StringBuilder();
 
-        // 프로세스가 끝이 났을 경우
         @Override
         public void processTerminated(@NotNull ProcessEvent event) {
-
-            if(connectFlag) {
+            if (connectFlag) {
                 RequestDto requestDto = new RequestDto();
                 BuildResultInfo buildResultInfo = new BuildResultInfo();
 
-                requestDto.setSourceApplication("IntelliJ");
+                requestDto.setSourceApplication("INTELLIJ");
                 requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
                 requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
                 requestDto.setTimestamp(LocalDateTime.now());
 
-                // 오류가 발생했다면
-                if(errorFlag){
+                if (errorFlag) {
                     buildResultInfo.setDetails(errorLog.toString());
-                    buildResultInfo.setErrorFile(errorFiles.get(0));
+                    if (errorFiles.size() > 1) {
+                        buildResultInfo.setErrorFile(errorFiles.get(0));
+                    }
                     buildResultInfo.setModifiedFiles(getModifiedFiles());
 
                     requestDto.setDataType("ERROR");
                     requestDto.setContent(buildResultInfo);
-                }
-
-                // 오류가 발생하지 않았다면
-                else{
+                } else {
                     buildResultInfo.setDetails(stdOutLog.toString());
                     buildResultInfo.setModifiedFiles(getModifiedFiles());
 
@@ -269,12 +257,12 @@ public class CodeListener implements ExecutionListener {
                 ObjectMapper objectMapper = new ObjectMapper();
                 try {
                     String output = objectMapper.writeValueAsString(requestDto);
+//                    System.out.println(output);
                     BuildResultSender.sendMessage(output);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
 
-                // 초기화
                 allOutputLog.setLength(0);
                 errorLog.setLength(0);
                 stdOutLog.setLength(0);
@@ -282,33 +270,25 @@ public class CodeListener implements ExecutionListener {
             }
         }
 
-        // 터미널 파싱
         @Override
         public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
             String text = event.getText();
-            // 표준 에러 출력일 경우 (에러가 발생한 상황)
-            if(outputType.equals(ProcessOutputTypes.STDERR)){
+            if (outputType.equals(ProcessOutputTypes.STDERR)) {
                 errorFlag = true;
                 errorLog.append(text);
-            }
-
-            else if(outputType.equals(ProcessOutputTypes.STDOUT)){
-
-                // 표준 출력이지만 에러로그인 경우
-                if(text.contains("ERROR")){
+            } else if (outputType.equals(ProcessOutputTypes.STDOUT)) {
+                if (text.contains("ERROR")) {
                     errorFlag = true;
                     errorLog.append(text);
-                    capturingError = true; // 오류 로그 캡쳐 시작
-                }
-                else if(capturingError){
-                    if(text.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{2}:\\d{2} .*")){
-                        capturingError = false; // 캡쳐 종료
-                    }
-                    else{
+                    capturingError = true;
+                } else if (capturingError) {
+                    if (text.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{2}:\\d{2} .*")) {
+                        capturingError = false;
+                    } else {
                         Pattern pattern = Pattern.compile("\\(([^)]+):(\\d+)\\)");
                         Matcher matcher = pattern.matcher(text);
-                        if(matcher.find()){
-                            if(currentProjectInfo.containsKey(matcher.group(1))){
+                        if (matcher.find()) {
+                            if (currentProjectInfo.containsKey(matcher.group(1))) {
                                 ProjectInfo projectInfo = currentProjectInfo.get(matcher.group(1));
                                 String fileName = projectInfo.getPsiFile().getName();
                                 String sourceCode = projectInfo.getSourceCode();
@@ -318,9 +298,7 @@ public class CodeListener implements ExecutionListener {
                         }
                         errorLog.append(text);
                     }
-                }
-
-                else{
+                } else {
                     stdOutLog.append(text);
                 }
             }
