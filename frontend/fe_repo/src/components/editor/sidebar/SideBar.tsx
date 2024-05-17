@@ -68,7 +68,6 @@ const SideBar: React.FC = () => {
     useHandleClickOutside(contextMenuRef, hideMenu);                                    // contextMenu 밖 클릭 시 닫힘
 
     const { directoryData, setDirectoryData } = useDirectory();                         // directory data 저장
-    // const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
     const { currentDirectoryId, editorData, saveToServer, setCurrentId } = useEditorContext();
 
@@ -166,7 +165,6 @@ const SideBar: React.FC = () => {
         }
     };
 
-
     // 사용자 이름 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isUsernameEditing) {
@@ -202,8 +200,8 @@ const SideBar: React.FC = () => {
 
         return children
             .map((item: MyDirectoryItem) => {
-                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`;
-                // console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
+                const isSelected = selectedId === item.id; // 선택된 아이템인지 확인
+                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''} ${isSelected ? Sidebar.selectedItem : ''}`;
                 return (
                     <div key={item.id} className={className}>
                         <Item
@@ -305,6 +303,7 @@ const SideBar: React.FC = () => {
     // make-file-button 클릭 시 폴더 생성되는 함수
     const handleCreateFolder = () => {
         setIsCreatingFolder(true);
+        setNewFolderName('')
         setCreateFolderParentId(rootId);        // 최상위 폴더에 생성
     }
 
