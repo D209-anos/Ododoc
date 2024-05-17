@@ -1,6 +1,8 @@
 package com.ssafy.ododoc.file.service;
 
 import com.ssafy.ododoc.common.util.S3Util;
+import com.ssafy.ododoc.directory.entity.DirectoryClosure;
+import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
 import com.ssafy.ododoc.file.dto.Block;
 import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
@@ -37,6 +39,7 @@ public class FileService {
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
     private final RedisFileRepository redisFileRepository;
+    private final DirectoryClosureRepository directoryClosureRepository;
     private final S3Util s3Util;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
@@ -105,9 +108,11 @@ public class FileService {
 
     @Transactional
     public FileResponse addFile(AddRequest addRequest, Member member) {
+        log.info("addFile 시작!!!!");
         Directory directory;
 
-        if(addRequest.getConnectedFileId() == 0) {
+        if(addRequest.getConnectedFileId() == 0L) {
+            log.info("connectedFileId가 0 입니다.");
             Directory root = directoryRepository.findByMemberAndParentIsNull(member)
                     .orElseGet(() -> directoryRepository.save(Directory.builder()
                             .name(member.getNickname() + "님의 정리공간")
@@ -115,15 +120,20 @@ public class FileService {
                             .member(member)
                             .build()));
 
-            directory = directoryRepository.findById(addRequest.getConnectedFileId())
-                    .orElseGet(() -> directoryRepository.save(Directory.builder()
-                            .name(LocalDate.now().toString())
-                            .type(DirectoryType.FILE)
-                            .member(member)
-                            .parent(root)
-                            .build()));
+            directory = directoryRepository.save(Directory.builder()
+                    .name(LocalDate.now().toString())
+                    .type(DirectoryType.FILE)
+                    .member(member)
+                    .parent(root)
+                    .build());
+
+            directoryClosureRepository.save(DirectoryClosure.builder()
+                    .ancestor(directory)
+                    .descendant(directory)
+                    .build());
         }
         else {
+            log.info("connectedFileId가 {} 입니다.", addRequest.getConnectedFileId());
             directory = directoryRepository.findById(addRequest.getConnectedFileId())
                     .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
         }
