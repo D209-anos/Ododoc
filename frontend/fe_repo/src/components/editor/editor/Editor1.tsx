@@ -1,4 +1,4 @@
-import YooptaEditor, { YooptaBlock, createYooptaEditor } from '@yoopta/editor';
+import YooptaEditor, { createYooptaEditor } from '@yoopta/editor';
 import Paragraph from '@yoopta/paragraph';
 import Blockquote from '@yoopta/blockquote';
 import Embed from '@yoopta/embed';
@@ -17,14 +17,15 @@ import EditorDetailStyle from '../../../css/components/editor/Editor1.module.css
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { uploadToCloudinary } from '../../..//utils/cloudinary';
-
-import { editDirectoryItem, fetchDirectory } from '../../../api/service/directory';
-import { fetchFile, saveFile } from '../../../api/service/editor';
+import { fetchFile } from '../../../api/service/editor';
+import { editDirectoryItem } from '../../../api/service/directory';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
-import { useDirectory } from '../../../contexts/DirectoryContext';
 import { useDarkMode } from '../../../contexts/DarkModeContext';
 import { YooptaContentValue } from '@yoopta/editor/dist/editor/types';
+import { useEditorContext } from '../../../contexts/EditorContext';
+import { useDirectory } from '../../../contexts/DirectoryContext';
+
 
 interface MyDirectoryItem {
     id: number;
@@ -129,12 +130,11 @@ function Editor1() {
 
   const [title, setTitle] = useState('');
   const [documentData, setDocumentData] = useState<YooptaContentValue>({});
-  const [blocks, setBlocks] = useState<YooptaBlock[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // 데이터 로드 상태
-  const { directoryData, setDirectoryData } = useDirectory();
-  const { isDarkMode, setDarkMode } = useDarkMode();
-
+  const { isDarkMode } = useDarkMode();
+  const { directoryData, setDirectoryData} = useDirectory();
+  const { editorData, updateEditorData, setCurrentId, saveToServer } = useEditorContext(); // useEditorContext에서 필요한 값들을 가져옵니다.
 
   const loadData = useCallback(async (dirId : any) => {
     setIsLoading(true);
@@ -155,8 +155,9 @@ function Editor1() {
     if (directoryId) {
       loadData(directoryId);
       setIsDataLoaded(false); // 데이터 로드 시작 설정
+      setCurrentId(directoryId); // 현재 directoryId 설정
     }
-  }, [directoryId, loadData]);
+  }, [directoryId, loadData, setCurrentId]);
 
 
   const handleTitleChange = useCallback(async (event: any) => {
@@ -186,25 +187,20 @@ function Editor1() {
   };
 
 
-  const handleEditorChange = useCallback(async () => {
+  const handleEditorChange = useCallback(() => {
     if (isLoading) return; // 로딩 중에는 변경 사항을 무시
     if (editor.selection) {
       const block = editor.getEditorValue(); // 에디터의 현재 값 가져오기
-      setBlocks(block);
-      try {
-        console.log('저장 할 내용:', JSON.stringify(block, null, 2));
-        await saveFile(directoryId, block);
-      } catch (error) {
-        console.error('파일 저장 실패', error);
-      }
+      updateEditorData(directoryId, block); // 전역 상태 업데이트
     }
-  }, [editor, directoryId, isLoading]);
+  }, [editor, directoryId, isLoading, updateEditorData]);
 
 
   useEffect(() => {
     editor.on('change', handleEditorChange);
     return () => editor.off('change', handleEditorChange);
   }, [editor, handleEditorChange]);
+
 
   // directory 이름 업데이트
   const updateDirectoryItemTitle = (data: MyDirectoryItem, targetId: number, newTitle: string): MyDirectoryItem => {
@@ -225,13 +221,44 @@ function Editor1() {
     return data;
   };
 
+  // 페이지를 떠나기 전에 저장
+  useEffect(() => {
+    const handleBeforeUnload = async (event: any) => {
+      await saveToServer(directoryId);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [saveToServer, directoryId]);
+
+  // 페이지 숨김 상태에서도 저장
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden') {
+        await saveToServer(directoryId);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [saveToServer, directoryId]);
+
+  // 5분마다 서버로 저장
+  useEffect(() => {
+    const interval = setInterval(() => saveToServer(directoryId), 300000); // 5분 = 300,000ms
+    return () => clearInterval(interval);
+  }, [directoryId, saveToServer]);
+
 
   return (
     <>
       <div
         className={`${EditorDetailStyle.container} ${isDarkMode ? EditorDetailStyle.darkMode : ''}`}
         ref={selectionRef}
-
       >
         <h1 contentEditable="true" onBlur={handleTitleChange} suppressContentEditableWarning={true} onKeyDown={handleKeyDown} className={EditorDetailStyle.editableTitle}>
           {title}
@@ -246,9 +273,9 @@ function Editor1() {
             tools={TOOLS}
             marks={MARKS}
             selectionBoxRoot={selectionRef}
+            //@ts-ignore
             value={documentData}
             autoFocus
-            style={{ zIndex: 0, important: 'true' }}
           />
         )}
       </div>

@@ -47,7 +47,6 @@ export const saveFile = async (directoryId: string, content: any): Promise<any> 
       directoryId: directoryId,
       content: content
     })
-    console.log('save 성공 : ' + JSON.stringify(response, null, 2))
     return response.data;
   } catch (error: any) {
     console.error('Failed to save File:', error.response?.data || error.message);

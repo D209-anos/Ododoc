@@ -20,6 +20,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useFileContext } from '../../../contexts/FileContext';
 import { useTrash } from '../../../contexts/TrashContext';
 import { useDirectory } from '../../../contexts/DirectoryContext';
+import { useEditorContext } from '../../../contexts/EditorContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -67,7 +68,9 @@ const SideBar: React.FC = () => {
     useHandleClickOutside(contextMenuRef, hideMenu);                                    // contextMenu 밖 클릭 시 닫힘
 
     const { directoryData, setDirectoryData } = useDirectory();                         // directory data 저장
-    // const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
+
+    const { currentDirectoryId, editorData, saveToServer, setCurrentId } = useEditorContext();
+
 
     // 디렉토리 조회 (로그인 시 title 매핑)
     const loadDirectory = async () => {
@@ -107,9 +110,16 @@ const SideBar: React.FC = () => {
     };
 
     // file 클릭    
-    const fileItemClick = (id: number): void => {
-        navigate(`/editor/${id}`, {state: id})          // 파일 클릭 시 해당 id의 route로 이동
-    }
+    const fileItemClick = async (id : any) => {
+        // 현재 파일 저장
+        if (currentDirectoryId && editorData[currentDirectoryId]) {
+          await saveToServer(currentDirectoryId);
+        }
+        // 새로운 파일로 이동
+        setSelectedId(id);
+        setCurrentId(id);
+        navigate(`/editor/${id}`, { state: id });
+      };
 
     // folder 클릭
     const folderItemClick = (id: number): void => {
@@ -156,7 +166,6 @@ const SideBar: React.FC = () => {
         }
     };
 
-
     // 사용자 이름 수정 함수
     const renderNameField = (): JSX.Element => {
         if (isUsernameEditing) {
@@ -192,8 +201,8 @@ const SideBar: React.FC = () => {
 
         return children
             .map((item: MyDirectoryItem) => {
-                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''}`;
-                // console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
+                const isSelected = selectedId === item.id; // 선택된 아이템인지 확인
+                const className = `${Sidebar.item} ${indentLevel > 0 ? Sidebar.itemIndent : ''} ${isSelected ? Sidebar.selectedItem : ''}`;
                 return (
                     <div key={item.id} className={className}>
                         <Item
@@ -295,6 +304,7 @@ const SideBar: React.FC = () => {
     // make-file-button 클릭 시 폴더 생성되는 함수
     const handleCreateFolder = () => {
         setIsCreatingFolder(true);
+        setNewFolderName('');  
         setCreateFolderParentId(rootId);        // 최상위 폴더에 생성
     }
 
@@ -338,41 +348,50 @@ const SideBar: React.FC = () => {
 
     // 새로운 파일 저장
     const saveNewFile = async (objectId: number, newName: string) => {
-        const newFile: IContentItemCreate = {
-            id: Date.now(),
-            parentId: createFileParentId,
-            type: 'FILE',
-            name: newFileName,
-            children: ''
-        };
-
-        await createDirectory(objectId, newName, 'FILE')
+    try {
+        const response = await createDirectory(objectId, newName, 'FILE');
+        const newFileId = response.data.id; // 백엔드에서 반환된 파일 ID 사용
 
         setContents((prevContents) => {
             const updateContents = [...prevContents];
             const parentIndex = updateContents.findIndex(item => item.id === createFileParentId);
 
             if (parentIndex !== -1 && Array.isArray(updateContents[parentIndex].children)) {
-                (updateContents[parentIndex].children as MyDirectoryItem[]).push(newFile);
+                (updateContents[parentIndex].children as MyDirectoryItem[]).push({
+                    id: newFileId,
+                    type: 'FILE',
+                    name: newName,
+                    children: ''
+                });
             } else {
-                newFile.name = newFileName;
-                updateContents.push(newFile);
+                updateContents.push({
+                    id: newFileId,
+                    type: 'FILE',
+                    name: newName,
+                    children: ''
+                });
             }
             return updateContents;
-        })
+        });
 
-        // directoryData 갱신
         const updatedDirectoryData = await fetchDirectory(rootId);
         setDirectoryData(updatedDirectoryData);
 
-        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[]);
 
         setOpenFolders(prev => ({ ...prev, [createFileParentId!]: true }));
 
         setIsCreatingFile(false);
         setNewFileName('');
         setCreateFileParentId(null);
+
+        // 파일 생성 후 해당 경로로 이동
+        setSelectedId(newFileId);
+        navigate(`/editor/${newFileId}`, { state: newFileId });
+    } catch (error) {
+        console.error('파일 생성 에러:', error);
     }
+};
 
     // 부모를 찾는 함수
     const findParent = (
