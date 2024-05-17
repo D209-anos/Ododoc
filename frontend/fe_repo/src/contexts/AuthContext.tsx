@@ -2,6 +2,7 @@ import React, { createContext, useReducer, useContext, ReactNode, Dispatch, useE
 
 interface AuthState {
     accessToken: string | null;
+    refreshToken: string | null;
     isAuthenticated: boolean;
     rootId: number | null;
     title: string | null;
@@ -9,7 +10,7 @@ interface AuthState {
 }
 
 type AuthAction = 
-    | { type: 'SET_AUTH_DETAILS'; payload: Pick<AuthState, 'accessToken' | 'rootId' | 'title' | 'type'> }
+    | { type: 'SET_AUTH_DETAILS'; payload: Pick<AuthState, 'accessToken' | 'refreshToken' | 'rootId' | 'title' | 'type'> }
     | { type: 'LOGOUT' };
 
 
@@ -20,6 +21,7 @@ interface AuthContextType {
 
 const initialState: AuthState = {
     accessToken: null,
+    refreshToken: null,
     isAuthenticated: false,
     rootId: null,
     title: null,

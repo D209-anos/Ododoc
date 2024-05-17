@@ -1,6 +1,8 @@
-import api from '../instances/api'
+import api from '../instances/api';
+import Cookies from 'js-cookie';
 import { useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+
 
 // 인가 코드 백엔드로 전송
 export const useSendCodeToBackend = () => {
@@ -14,10 +16,11 @@ export const useSendCodeToBackend = () => {
             });
             console.log('Login Info:', response.data);
 
-            const { accessToken, rootId, title, type } = response.data.data;
+            const { accessToken, refreshToken, rootId, title, type } = response.data.data;
             // 상태 업데이트
-            dispatch({ type: 'SET_AUTH_DETAILS', payload: { accessToken, rootId, title, type } });
-            localStorage.setItem('authDetails', JSON.stringify({ accessToken, rootId, title, type }))
+            dispatch({ type: 'SET_AUTH_DETAILS', payload: { accessToken, refreshToken, rootId, title, type } });
+            localStorage.setItem('authDetails', JSON.stringify({ accessToken, refreshToken, rootId, title, type }))
+            // Cookies.set('refreshToken', refreshToken, { secure: true, sameSite: 'strict' });
         } catch (error) {
             console.error('Error sending authorization code:', error);
         }
