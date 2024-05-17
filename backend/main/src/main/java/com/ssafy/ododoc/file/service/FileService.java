@@ -19,16 +19,19 @@ import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
     private final DirectoryRepository directoryRepository;
@@ -102,17 +105,44 @@ public class FileService {
 
     @Transactional
     public FileResponse addFile(AddRequest addRequest, Member member) {
-        Directory directory = directoryRepository.findById(addRequest.getConnectedFileId())
-                .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+        Directory directory;
+
+        if(addRequest.getConnectedFileId() == 0) {
+            Directory root = directoryRepository.findByMemberAndParentIsNull(member)
+                    .orElseGet(() -> directoryRepository.save(Directory.builder()
+                            .name(member.getNickname() + "님의 정리공간")
+                            .type(DirectoryType.FOLDER)
+                            .member(member)
+                            .build()));
+
+            directory = directoryRepository.findById(addRequest.getConnectedFileId())
+                    .orElseGet(() -> directoryRepository.save(Directory.builder()
+                            .name(LocalDate.now().toString())
+                            .type(DirectoryType.FILE)
+                            .member(member)
+                            .parent(root)
+                            .build()));
+        }
+        else {
+            directory = directoryRepository.findById(addRequest.getConnectedFileId())
+                    .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
+        }
 
         checkDirectory(directory, member);
 
-        RedisFile redisFile = redisFileRepository.findById(addRequest.getConnectedFileId())
+        Long directoryId = directory.getId();
+
+        log.info("directory.getId : {}", directory.getId());
+        log.info("directoryId : {}", directoryId);
+
+        RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
-                        .id(addRequest.getConnectedFileId())
+                        .id(directoryId)
                         .lastOrder(-1)
                         .content(new LinkedHashMap<>())
                         .build()));
+
+        log.info("redisFile : {}", redisFile);
 
         AddType type = AddType.valueOf(addRequest.getType().toUpperCase());
         Member editMember = directory.getMember();

@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 public class AddRequest {
 
     @NotNull(message = "directory 아이디는 null 일 수 없습니다.")
-    @Min(value = 1, message = "directory 아이디는 1 이상이어야 합니다.")
+    @Min(value = 0, message = "directory 아이디는 0 이상이어야 합니다.")
     private Long connectedFileId;
 
     @CheckFileType
