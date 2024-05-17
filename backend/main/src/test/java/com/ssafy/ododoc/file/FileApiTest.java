@@ -566,13 +566,14 @@ public class FileApiTest extends ApiTest {
                 .andDo(document(DEFAULT_RESTDOC_PATH, "플러그인 파일 저장 API 입니다." +
                         "<br><b>header에 올바른 JWT accessToken</b>을, <b>body에 올바른 request</b>를 담아 <b>put 요청</b> 해주세요." +
                         "<br> - 정상 처리 시 response body의 <b>status에 200 OK</b>가, <b>data에 파일 내용</b>이 반환됩니다." +
-                        "<br> - directoryId는 <b>1 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
-                        "<br> - directoryId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
-                        "<br> - type에는 <b>success, fail, keyword, search</b>만 가능합니다. 이외의 값은 <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - connectedFileId는 <b>0 이상 값</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - 특히, 연동된 파일이 없다면 connectedFileId에 <b>0</b>을 입력해 주세요. 그렇지 않으면, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - connectedFileId에 해당하는 디렉토리가 <b>폴더인 경우</b>, <b>400 Bad Request</b>가 반환됩니다." +
+                        "<br> - type에는 <b>success, fail, keyword, search, sourcecode</b>만 가능합니다. 이외의 값은 <b>400 Bad Request</b>가 반환됩니다." +
                         "<br> - <b>header에 JWT accessToken</b>을 입력하지 않으면, <b>401 Unauthorized</b>가 반환됩니다." +
-                        "<br> - directoryId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
-                        "<br> - directoryId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
-                        "<br> - directoryId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
+                        "<br> - connectedFileId에 해당하는 폴더/파일에 <b>접근 권한이 없을 경우</b>, <b>403 Forbidden</b>이 반환됩니다." +
+                        "<br> - connectedFileId에 해당하는 폴더/파일를 <b>찾을 수 없을 경우</b>, <b>404 Not Found</b>가 반환됩니다." +
+                        "<br> - connectedFileId에 해당하는 폴더/파일이 이미 삭제(휴지통, 영구삭제) 되었다면, <b>404 Not Found</b>가 반환됩니다.",
                         "플러그인 파일 저장", CommonDocument.AccessTokenHeader,
                         FileDocument.addRequestFields, FileDocument.fileResponseFields));
     }
