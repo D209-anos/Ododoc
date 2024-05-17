@@ -17,6 +17,7 @@ dependencies {
   implementation("org.java-websocket:Java-WebSocket:1.5.2")
   implementation("org.springframework:spring-webflux:5.3.9")
   implementation("io.projectreactor.netty:reactor-netty:1.0.17")
+  implementation("org.jetbrains:annotations:23.0.0")
 }
 
 javafx {

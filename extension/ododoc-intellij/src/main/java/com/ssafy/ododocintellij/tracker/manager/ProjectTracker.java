@@ -12,10 +12,7 @@ import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ProjectTracker {
 
@@ -39,7 +36,6 @@ public class ProjectTracker {
         ApplicationManager.getApplication().runReadAction(() ->{
             String fileHash = "";
             getProjectFileList(project);
-            beforeProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
                 String sourceCode = file.getText();
@@ -56,7 +52,6 @@ public class ProjectTracker {
         ApplicationManager.getApplication().runReadAction(() -> {
             String fileHash = "";
             getProjectFileList(project);
-            currentProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
                 String sourceCode = file.getText();
@@ -122,5 +117,13 @@ public class ProjectTracker {
 
     public void setBeforeProjectStatus(Map<String, ProjectInfo> beforeProjectStatus) {
         this.beforeProjectStatus = beforeProjectStatus;
+    }
+
+    public void setAllBeforeProjectStatus(String allBeforeProjectStatus) {
+        this.allBeforeProjectStatus = allBeforeProjectStatus;
+    }
+
+    public void setAllCurrentProjectStatus(String allCurrentProjectStatus) {
+        this.allCurrentProjectStatus = allCurrentProjectStatus;
     }
 }
