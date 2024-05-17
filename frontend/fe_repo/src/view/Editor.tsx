@@ -6,9 +6,11 @@ import Mypage from '../components/editor/mypage/Mypage';
 import Editor1 from '../components/editor/editor/Editor1';
 import { useDarkMode } from '../contexts/DarkModeContext'
 
+
 function Editor() {
     const [sidebarWidth, setSidebarWidth] = useState(300);
     const { isDarkMode, setDarkMode } = useDarkMode();
+
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>): void => {
         e.preventDefault();  // 기본 이벤트 방지
@@ -40,9 +42,9 @@ function Editor() {
             </div>
             <div className={`${EditorStyle.editorWrapper} ${isDarkMode ? 'darkMode' : ''}`}>
                 <Routes>
-                    {/* <Route index element={<Mypage/>} /> */}
+                    {/* <Route index element={<Mypage/>}/> */}
                     <Route path=":id" element={<Editor1 />} />
-                    <Route path="profile" element={<Mypage />} />
+                    <Route path="profile" element={<Mypage/>} />
                 </Routes>
             </div>
         </div>

@@ -1,0 +1,183 @@
+.container {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.stats {
+    width: 100%;
+    height: 200vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title {
+    font-size: 3rem;
+}
+
+.totalCount {
+    font-size: 10rem;
+    color: orange;
+}
+
+.counts {
+    display: flex;
+    justify-content: space-between;
+    /* count1은 왼쪽, count2는 오른쪽 */
+    flex-direction: column;
+    width: 90%;
+    height: 45%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.count {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    font-size: 5rem;
+    position: relative;
+    /* 툴팁을 위한 상대 위치 설정 */
+    animation: slideIn 3s linear infinite;
+    /* 슬라이드 애니메이션 */
+}
+
+.count1 {
+    animation: slideLeftRight 5s linear infinite;
+    /* 슬라이드 애니메이션 */
+    align-self: flex-start;
+    /* 왼쪽 정렬 */
+}
+
+.count2 {
+    animation: slideRightLeft 5s linear infinite;
+    /* 슬라이드 애니메이션 */
+    align-self: flex-end;
+    /* 오른쪽 정렬 */
+}
+
+@keyframes slideLeftRight {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(50vw);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideRightLeft {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-60vw);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.tooltip {
+    visibility: hidden;
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
+    background-color: #ff914d;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
+    border-radius: 20px;
+}
+
+.count1:hover + .tooltip,
+.count2:hover + .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip:hover{
+    visibility: visible;
+    opacity: 1;
+}
+
+.number {
+    font-size: 8rem;
+    margin: 0;
+    font-weight: bold;
+    color: #ff914d;
+}
+
+.totalContainer{
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profileTitle {
+    margin-top: 5%;
+}
+
+.nickname {
+    color: #ff914d;
+}
+
+.profileContent {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 70%;
+    width: 85%;
+    margin-top: 5%;
+}
+
+.profileImage {
+    width: 50%;
+    height: 100%;
+}
+
+.quoteContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45%;
+    height: 100%;
+    font-size: 1.5rem;
+
+}
+
+.quote {
+    white-space: pre-wrap;
+    text-align: left;
+    font-weight: bold;
+}

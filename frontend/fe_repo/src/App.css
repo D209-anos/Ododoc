@@ -38,6 +38,9 @@ a:hover{
   font-family: 'GAMTANFont', sans-serif;
   color: white;
 }
+.yoo-toolbar-z-1000{
+  z-index: 1000000000000;
+}
 /* .cm-gutterElement{
   line-height: 30px;
 

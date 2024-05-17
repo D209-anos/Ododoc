@@ -20,6 +20,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useFileContext } from '../../../contexts/FileContext';
 import { useTrash } from '../../../contexts/TrashContext';
 import { useDirectory } from '../../../contexts/DirectoryContext';
+import { useEditorContext } from '../../../contexts/EditorContext';
 
 // 디렉토리 타입
 interface MyDirectoryItem {
@@ -69,6 +70,9 @@ const SideBar: React.FC = () => {
     const { directoryData, setDirectoryData } = useDirectory();                         // directory data 저장
     // const [ directoryData, setDirectoryData ] = useState<MyDirectoryItem | null>(null);    // directory data 저장
 
+    const { currentDirectoryId, editorData, saveToServer, setCurrentId } = useEditorContext();
+
+
     // 디렉토리 조회 (로그인 시 title 매핑)
     const loadDirectory = async () => {
         if (accessToken && rootId) {
@@ -107,9 +111,15 @@ const SideBar: React.FC = () => {
     };
 
     // file 클릭    
-    const fileItemClick = (id: number): void => {
-        navigate(`/editor/${id}`, {state: id})          // 파일 클릭 시 해당 id의 route로 이동
-    }
+    const fileItemClick = async (id : any) => {
+        // 현재 파일 저장
+        if (currentDirectoryId && editorData[currentDirectoryId]) {
+          await saveToServer(currentDirectoryId);
+        }
+        // 새로운 파일로 이동
+        setCurrentId(id);
+        navigate(`/editor/${id}`, { state: id });
+      };
 
     // folder 클릭
     const folderItemClick = (id: number): void => {
