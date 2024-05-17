@@ -1,6 +1,8 @@
 package com.ssafy.ododoc.file.service;
 
 import com.ssafy.ododoc.common.util.S3Util;
+import com.ssafy.ododoc.directory.entity.DirectoryClosure;
+import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
 import com.ssafy.ododoc.file.dto.Block;
 import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
@@ -37,6 +39,7 @@ public class FileService {
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
     private final RedisFileRepository redisFileRepository;
+    private final DirectoryClosureRepository directoryClosureRepository;
     private final S3Util s3Util;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
@@ -117,13 +120,17 @@ public class FileService {
                             .member(member)
                             .build()));
 
-            directory = directoryRepository.findById(addRequest.getConnectedFileId())
-                    .orElseGet(() -> directoryRepository.save(Directory.builder()
-                            .name(LocalDate.now().toString())
-                            .type(DirectoryType.FILE)
-                            .member(member)
-                            .parent(root)
-                            .build()));
+            directory = directoryRepository.save(Directory.builder()
+                    .name(LocalDate.now().toString())
+                    .type(DirectoryType.FILE)
+                    .member(member)
+                    .parent(root)
+                    .build());
+
+            directoryClosureRepository.save(DirectoryClosure.builder()
+                    .ancestor(directory)
+                    .descendant(directory)
+                    .build());
         }
         else {
             log.info("connectedFileId가 {} 입니다.", addRequest.getConnectedFileId());

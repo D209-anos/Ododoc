@@ -1,5 +1,6 @@
 package com.ssafy.ododoc.file.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ssafy.ododoc.file.dto.Block;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,5 +21,7 @@ public class RedisFile implements Serializable {
     private Long id;
 
     private Integer lastOrder;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private LinkedHashMap<String, Block> content;
 }
