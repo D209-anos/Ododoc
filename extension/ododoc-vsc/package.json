@@ -2,7 +2,7 @@
   "name": "ododoc-vsc",
   "displayName": "ododoc_vsc",
   "description": "ododoc extension for vsc",
-  "version": "0.0.1",
+  "version": "0.9.1",
   "publisher": "anos",
   "engines": {
     "vscode": "^1.88.0"

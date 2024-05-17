@@ -20,7 +20,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ProcessHandler {
+public class VscodeProcessHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final GptService gptService;
     private final CurrentStatusRepository currentStatusRepository;

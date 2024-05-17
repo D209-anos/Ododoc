@@ -5,7 +5,6 @@ import com.ssafy.ododoc.process.common.entity.CurrentStatus;
 import com.ssafy.ododoc.process.common.entity.MessageRecord;
 import com.ssafy.ododoc.process.common.repository.CurrentStatusRepository;
 import com.ssafy.ododoc.process.common.repository.MessageRecordRepository;
-import com.ssafy.ododoc.process.common.service.SendBlockService;
 import com.ssafy.ododoc.process.common.type.DataType;
 import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import com.ssafy.ododoc.process.common.type.StatusType;
@@ -18,7 +17,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class VscodeMessageProcessingService {
     private final MessageRecordRepository messageRecordRepository;
     private final CurrentStatusRepository currentStatusRepository;
-    private final ProcessHandler processHandler;
+    private final VscodeProcessHandler vscodeProcessHandler;
 
     public void handle(MessageDto messageDto, WebSocketSession session) {
         MessageRecord message = messageRecordRepository.save(new MessageRecord(messageDto));
@@ -26,7 +25,7 @@ public class VscodeMessageProcessingService {
         DataType dataType = message.getDataType();
         StatusType status = extractStatus(message);
 
-        processHandler.handle(status, dataType, message, session);
+        vscodeProcessHandler.handle(status, dataType, message, session);
 
     }
 
