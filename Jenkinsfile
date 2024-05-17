@@ -24,6 +24,10 @@ pipeline {
                             // sed 명령을 사용해 jasypt.key 값을 파일에 삽입
                             sh "sed -i 's/jasypt.key = .*/jasypt.key = ${JASYPT_KEY}/' jasypt.properties"
                         }
+                        dir('./backend/process/src/main/resources') {
+                            // sed 명령을 사용해 jasypt.key 값을 파일에 삽입
+                            sh "sed -i 's/jasypt.key = .*/jasypt.key = ${JASYPT_KEY}/' jasypt.properties"
+                        }
                     }
                 }
             }
@@ -59,6 +63,7 @@ pipeline {
 
         stage("Build Process Docker Image") {
             steps {
+                
                 echo '처리 서버 도커 이미지 빌드 시작!'
                 dir("./backend/process") {  // Dockerfile이 있는 백엔드 프로젝트 위치
                     sh 'chmod +x ./gradlew'
@@ -66,7 +71,7 @@ pipeline {
                     sh "docker build -t d209-pro ."
                 }
                 echo '처리 서버 도커 이미지 빌드 완료!'
-                
+            
             }
         }
 
