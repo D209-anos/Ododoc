@@ -303,7 +303,7 @@ const SideBar: React.FC = () => {
     // make-file-button 클릭 시 폴더 생성되는 함수
     const handleCreateFolder = () => {
         setIsCreatingFolder(true);
-        setNewFolderName('')
+        setNewFolderName('');  
         setCreateFolderParentId(rootId);        // 최상위 폴더에 생성
     }
 
@@ -347,41 +347,50 @@ const SideBar: React.FC = () => {
 
     // 새로운 파일 저장
     const saveNewFile = async (objectId: number, newName: string) => {
-        const newFile: IContentItemCreate = {
-            id: Date.now(),
-            parentId: createFileParentId,
-            type: 'FILE',
-            name: newFileName,
-            children: ''
-        };
-
-        await createDirectory(objectId, newName, 'FILE')
+    try {
+        const response = await createDirectory(objectId, newName, 'FILE');
+        const newFileId = response.data.id; // 백엔드에서 반환된 파일 ID 사용
 
         setContents((prevContents) => {
             const updateContents = [...prevContents];
             const parentIndex = updateContents.findIndex(item => item.id === createFileParentId);
 
             if (parentIndex !== -1 && Array.isArray(updateContents[parentIndex].children)) {
-                (updateContents[parentIndex].children as MyDirectoryItem[]).push(newFile);
+                (updateContents[parentIndex].children as MyDirectoryItem[]).push({
+                    id: newFileId,
+                    type: 'FILE',
+                    name: newName,
+                    children: ''
+                });
             } else {
-                newFile.name = newFileName;
-                updateContents.push(newFile);
+                updateContents.push({
+                    id: newFileId,
+                    type: 'FILE',
+                    name: newName,
+                    children: ''
+                });
             }
             return updateContents;
-        })
+        });
 
-        // directoryData 갱신
         const updatedDirectoryData = await fetchDirectory(rootId);
         setDirectoryData(updatedDirectoryData);
 
-        setContents(updatedDirectoryData?.children as MyDirectoryItem[])
+        setContents(updatedDirectoryData?.children as MyDirectoryItem[]);
 
         setOpenFolders(prev => ({ ...prev, [createFileParentId!]: true }));
 
         setIsCreatingFile(false);
         setNewFileName('');
         setCreateFileParentId(null);
+
+        // 파일 생성 후 해당 경로로 이동
+        setSelectedId(newFileId);
+        navigate(`/editor/${newFileId}`, { state: newFileId });
+    } catch (error) {
+        console.error('파일 생성 에러:', error);
     }
+};
 
     // 부모를 찾는 함수
     const findParent = (
