@@ -185,7 +185,7 @@ export default class OdodocTreeProvider
           this.connectedFileItem.setSelected(false);
           this.connectedFileItem = null;
           this._onDidChangeTreeData.fire(selectedItem);
-          this.context.secrets.store("connectedFileId", "");
+          this.context.secrets.store("connectedFileId", "0");
         }
 
         return;
