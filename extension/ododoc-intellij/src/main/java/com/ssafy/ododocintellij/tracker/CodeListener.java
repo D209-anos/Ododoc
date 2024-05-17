@@ -16,12 +16,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
 import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
-import com.ssafy.ododocintellij.tracker.dto.*;
+import com.ssafy.ododocintellij.tracker.dto.BuildResultInfo;
+import com.ssafy.ododocintellij.tracker.dto.ErrorFileInfo;
+import com.ssafy.ododocintellij.tracker.dto.ModifiedFileInfo;
+import com.ssafy.ododocintellij.tracker.dto.RequestDto;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
 import javafx.application.Platform;
@@ -43,7 +45,6 @@ public class CodeListener implements ExecutionListener {
     private Map<String, ProjectInfo> currentProjectInfo = new HashMap<>();
     private boolean capturingError;
     private boolean errorFlag;
-    private boolean connectFlag;
 
     public CodeListener(Project project) {
         this.project = project;
@@ -55,8 +56,7 @@ public class CodeListener implements ExecutionListener {
                 .thenRun(this::initializeProjectTracker)
                 .thenRun(() -> {
                     // 파일 연동이 되어있다면
-                    if (ConnectedFileManager.getInstance().getDirectoryId() != -1L) {
-                        connectFlag = true;
+                    if (ConnectedFileManager.getInstance().getDirectoryId() != 0L) {
                         startSignal();
                     } else {
                         Platform.runLater(() -> {
@@ -64,7 +64,7 @@ public class CodeListener implements ExecutionListener {
                                     Alert.AlertType.WARNING,
                                     " Ododoc",
                                     "파일 연동 오류",
-                                    "파일이 연동되지 않았습니다.\n파일을 연동해주세요.",
+                                    "파일이 연동되지 않았습니다.\n해당 결과는 새로 생성된 파일에 기록됩니다.",
                                     "/image/button/icon.png"
                             );
                             alert.showAndWait();
@@ -228,46 +228,43 @@ public class CodeListener implements ExecutionListener {
 
         @Override
         public void processTerminated(@NotNull ProcessEvent event) {
-            if (connectFlag) {
-                RequestDto requestDto = new RequestDto();
-                BuildResultInfo buildResultInfo = new BuildResultInfo();
+            RequestDto requestDto = new RequestDto();
+            BuildResultInfo buildResultInfo = new BuildResultInfo();
 
-                requestDto.setSourceApplication("INTELLIJ");
-                requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
-                requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
-                requestDto.setTimestamp(LocalDateTime.now());
+            requestDto.setSourceApplication("INTELLIJ");
+            requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
+            requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
+            requestDto.setTimestamp(LocalDateTime.now());
 
-                if (errorFlag) {
-                    buildResultInfo.setDetails(errorLog.toString());
-                    if (errorFiles.size() > 1) {
-                        buildResultInfo.setErrorFile(errorFiles.get(0));
-                    }
-                    buildResultInfo.setModifiedFiles(getModifiedFiles());
-
-                    requestDto.setDataType("ERROR");
-                    requestDto.setContent(buildResultInfo);
-                } else {
-                    buildResultInfo.setDetails(stdOutLog.toString());
-                    buildResultInfo.setModifiedFiles(getModifiedFiles());
-
-                    requestDto.setDataType("OUTPUT");
-                    requestDto.setContent(buildResultInfo);
+            if (errorFlag) {
+                buildResultInfo.setDetails(errorLog.toString());
+                if (errorFiles.size() > 1) {
+                    buildResultInfo.setErrorFile(errorFiles.get(0));
                 }
+                buildResultInfo.setModifiedFiles(getModifiedFiles());
 
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    String output = objectMapper.writeValueAsString(requestDto);
-//                    System.out.println(output);
-                    BuildResultSender.sendMessage(output);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                requestDto.setDataType("ERROR");
+                requestDto.setContent(buildResultInfo);
+            } else {
+                buildResultInfo.setDetails(stdOutLog.toString());
+                buildResultInfo.setModifiedFiles(getModifiedFiles());
 
-                allOutputLog.setLength(0);
-                errorLog.setLength(0);
-                stdOutLog.setLength(0);
-                errorFiles = new ArrayList<>();
+                requestDto.setDataType("OUTPUT");
+                requestDto.setContent(buildResultInfo);
             }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                String output = objectMapper.writeValueAsString(requestDto);
+                BuildResultSender.sendMessage(output);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            allOutputLog.setLength(0);
+            errorLog.setLength(0);
+            stdOutLog.setLength(0);
+            errorFiles = new ArrayList<>();
         }
 
         @Override

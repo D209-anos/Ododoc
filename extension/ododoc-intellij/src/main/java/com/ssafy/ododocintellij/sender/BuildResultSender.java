@@ -8,8 +8,13 @@ import javafx.scene.control.ButtonType;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
 public class BuildResultSender {
@@ -19,7 +24,7 @@ public class BuildResultSender {
 
     // 객체의 락을 위해 사용.
     private static final Object lock = new Object();
-    private static final String WEBSOCKET_URI = "ws://localhost:18080/process/ws";
+    private static final String WEBSOCKET_URI = "wss://k10d209.p.ssafy.io/process/ws";
     private static boolean enableWhenPushBtn = false;
     private static int count = 0;
     private BuildResultSender() {}
@@ -31,6 +36,7 @@ public class BuildResultSender {
             synchronized (lock) {
                 if(INSTANCE == null){
                     try {
+
                         INSTANCE = new WebSocketClient(new URI(WEBSOCKET_URI)) {
                             @Override
                             public void onOpen(ServerHandshake serverHandshake) {
@@ -69,6 +75,7 @@ public class BuildResultSender {
 
                             @Override
                             public void onError(Exception e) {
+                                System.out.println(e.getMessage());
                                 if(enableWhenPushBtn){
                                     Platform.runLater(() -> {
                                         Alert alert = AlertHelper.makeAlert(
@@ -85,6 +92,7 @@ public class BuildResultSender {
                                 }
                             }
                         };
+
                         INSTANCE.connect();
                     }catch (URISyntaxException e) {
                         e.printStackTrace();
