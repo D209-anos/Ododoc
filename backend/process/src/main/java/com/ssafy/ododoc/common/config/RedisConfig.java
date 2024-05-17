@@ -17,6 +17,8 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
+    @Value("${spring.data.redis.password}")
+    private String password;
     /**
      * Lettuce 라이브러리를 사용하여 레디스 연결 설정
      */
@@ -25,6 +27,9 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
         redisConfiguration.setHostName(host);
         redisConfiguration.setPort(port);
+        if (password != null && !password.isBlank()) {
+            redisConfiguration.setPassword(password);
+        }
         return new LettuceConnectionFactory(redisConfiguration);
     }
 
