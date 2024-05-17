@@ -89,6 +89,16 @@
     transition: transform 0.1s ease;
 }
 
+.selectedItem {
+    background-color: gray;
+    color: white;
+    /* border-radius: 8px; */
+    /* height: 15px */
+    /* box-sizing: border-box;
+    display: flex; */
+    /* justify-content: center */
+}
+
 .pencil:hover {
     transform: scale(1.2);
 }
@@ -342,9 +352,24 @@
 
 .item {
     width: 100%;
+    cursor: pointer;
+    /* transition: background-color 0.3s ease; */
+    /* padding: 10px; */
+    /* margin-bottom: 5px; */
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
+
 .itemIndent {
     margin-left: 3vh;
+}
+
+.item:hover {
+    /* background-color: #f0f0f0; */
+    /* Hover 색상 */
 }
 
 .handle {
