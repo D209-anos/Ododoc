@@ -116,6 +116,7 @@ const SideBar: React.FC = () => {
           await saveToServer(currentDirectoryId);
         }
         // 새로운 파일로 이동
+        setSelectedId(id);
         setCurrentId(id);
         navigate(`/editor/${id}`, { state: id });
       };
