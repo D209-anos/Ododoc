@@ -135,6 +135,11 @@ public class FileService {
                     .ancestor(directory)
                     .descendant(directory)
                     .build());
+
+            directoryClosureRepository.save(DirectoryClosure.builder()
+                    .ancestor(root)
+                    .descendant(directory)
+                    .build());
         }
         else {
             log.info("connectedFileId가 {} 입니다.", addRequest.getConnectedFileId());
