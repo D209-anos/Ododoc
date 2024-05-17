@@ -21,7 +21,5 @@ public class RedisFile implements Serializable {
     private Long id;
 
     private Integer lastOrder;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private LinkedHashMap<String, Block> content;
 }
