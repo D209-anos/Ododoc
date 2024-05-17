@@ -3,7 +3,7 @@ package com.ssafy.ododoc.file.service;
 import com.ssafy.ododoc.common.util.S3Util;
 import com.ssafy.ododoc.directory.entity.DirectoryClosure;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
-import com.ssafy.ododoc.file.dto.Block;
+import com.ssafy.ododoc.file.dto.*;
 import com.ssafy.ododoc.file.dto.request.AddRequest;
 import com.ssafy.ododoc.file.dto.request.FileRequest;
 import com.ssafy.ododoc.file.dto.response.FileResponse;
@@ -60,11 +60,13 @@ public class FileService {
 
         checkDirectory(directory, member);
 
+        LinkedHashMap<String, Block> defaultContent = makeDefaultContent();
+
         RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(directoryId)
                         .lastOrder(-1)
-                        .content(new LinkedHashMap<>())
+                        .content(defaultContent)
                         .build()));
 
         return FileResponse.builder()
@@ -80,11 +82,13 @@ public class FileService {
 
         checkDirectory(directory, member);
 
+        LinkedHashMap<String, Block> defaultContent = makeDefaultContent();
+
         RedisFile redisFile = redisFileRepository.findById(fileRequest.getDirectoryId())
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(fileRequest.getDirectoryId())
                         .lastOrder(-1)
-                        .content(new LinkedHashMap<>())
+                        .content(defaultContent)
                         .build()));
 
         int lastOrder = redisFile.getLastOrder();
@@ -145,11 +149,13 @@ public class FileService {
         log.info("directory.getId : {}", directory.getId());
         log.info("directoryId : {}", directoryId);
 
+        LinkedHashMap<String, Block> defaultContent = makeDefaultContent();
+
         RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(directoryId)
                         .lastOrder(-1)
-                        .content(new LinkedHashMap<>())
+                        .content(defaultContent)
                         .build()));
 
         log.info("redisFile : {}", redisFile);
@@ -227,5 +233,32 @@ public class FileService {
         if(!directory.getMember().equals(member)) {
             throw new DirectoryAccessDeniedException("접근 권한이 없습니다.");
         }
+    }
+
+    private LinkedHashMap<String, Block> makeDefaultContent() {
+        LinkedHashMap<String, Block> defaultContent = new LinkedHashMap<>();
+
+        Block defaultBlock = Block.builder()
+                .id(UUID.randomUUID().toString())
+                .value(List.of(Value.builder()
+                        .id(UUID.randomUUID().toString())
+                        .type("paragraph")
+                        .children(List.of(Content.builder()
+                                .text("")
+                                .build()))
+                        .props(Props.builder()
+                                .nodeType("block")
+                                .build())
+                        .build()))
+                .type("Paragraph")
+                .meta(Meta.builder()
+                        .order(0)
+                        .depth(0)
+                        .build())
+                .build();
+
+        defaultContent.put(defaultBlock.getId(), defaultBlock);
+
+        return defaultContent;
     }
 }
