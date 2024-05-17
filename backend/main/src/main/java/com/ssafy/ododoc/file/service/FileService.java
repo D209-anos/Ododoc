@@ -19,6 +19,7 @@ import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
     private final DirectoryRepository directoryRepository;
@@ -130,12 +132,17 @@ public class FileService {
 
         Long directoryId = directory.getId();
 
+        log.info("directory.getId : {}", directory.getId());
+        log.info("directoryId : {}", directoryId);
+
         RedisFile redisFile = redisFileRepository.findById(directoryId)
                 .orElseGet(() -> redisFileRepository.save(RedisFile.builder()
                         .id(directoryId)
                         .lastOrder(-1)
                         .content(new LinkedHashMap<>())
                         .build()));
+
+        log.info("redisFile : {}", redisFile);
 
         AddType type = AddType.valueOf(addRequest.getType().toUpperCase());
         Member editMember = directory.getMember();
