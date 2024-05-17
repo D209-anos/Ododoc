@@ -12,7 +12,10 @@ import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ProjectTracker {
 
@@ -36,11 +39,11 @@ public class ProjectTracker {
         ApplicationManager.getApplication().runReadAction(() ->{
             String fileHash = "";
             getProjectFileList(project);
+            beforeProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
-                String sourceCode = file.getText();
                 String codeHash = getEncrypt(file.getText());
-                beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, sourceCode));
+                beforeProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, file.getText()));
                 fileHash += getEncrypt(file.getName());
             }
             allBeforeProjectStatus = getEncrypt(fileHash);
@@ -52,11 +55,11 @@ public class ProjectTracker {
         ApplicationManager.getApplication().runReadAction(() -> {
             String fileHash = "";
             getProjectFileList(project);
+            currentProjectStatus.clear();
 
             for(PsiFile file : psiFiles){
-                String sourceCode = file.getText();
                 String codeHash = getEncrypt(file.getText());
-                currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, sourceCode));
+                currentProjectStatus.put(file.getName(), new ProjectInfo(file, codeHash, file.getText()));
                 fileHash += getEncrypt(file.getName());
             }
             allCurrentProjectStatus = getEncrypt(fileHash);
@@ -117,13 +120,5 @@ public class ProjectTracker {
 
     public void setBeforeProjectStatus(Map<String, ProjectInfo> beforeProjectStatus) {
         this.beforeProjectStatus = beforeProjectStatus;
-    }
-
-    public void setAllBeforeProjectStatus(String allBeforeProjectStatus) {
-        this.allBeforeProjectStatus = allBeforeProjectStatus;
-    }
-
-    public void setAllCurrentProjectStatus(String allCurrentProjectStatus) {
-        this.allCurrentProjectStatus = allCurrentProjectStatus;
     }
 }

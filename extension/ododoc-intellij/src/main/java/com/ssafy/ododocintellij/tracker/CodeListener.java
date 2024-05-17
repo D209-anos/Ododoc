@@ -97,18 +97,6 @@ public class CodeListener implements ExecutionListener {
     private void initializeProjectTracker() {
         ProjectTracker projectTracker = ProjectTracker.getInstance();
         projectTracker.currentHashStatus(project);
-
-        // Ensuring project status is updated
-        projectTracker.setBeforeProjectStatus(
-                projectTracker.getCurrentProjectStatus().entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
-                            try {
-                                return (ProjectInfo) e.getValue().clone();
-                            } catch (CloneNotSupportedException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }))
-        );
     }
 
     private void startSignal() {
@@ -130,75 +118,94 @@ public class CodeListener implements ExecutionListener {
 
     private List<ModifiedFileInfo> getModifiedFiles() {
         ProjectTracker projectTracker = ProjectTracker.getInstance();
-        projectTracker.currentHashStatus(project);
 
         Map<String, ProjectInfo> beforeProjectStatus = projectTracker.getBeforeProjectStatus();
         Map<String, ProjectInfo> currentProjectStatus = projectTracker.getCurrentProjectStatus();
         String allBeforeProjectStatus = projectTracker.getAllBeforeProjectStatus();
         String allCurrentProjectStatus = projectTracker.getAllCurrentProjectStatus();
 
-        String before, current = "";
-        boolean isChange = false;
+        String before, current= "";
+        boolean isChange = false; // 변경된 파일이 있는지 확인
         List<ModifiedFileInfo> modifiedFileInfoList = new ArrayList<>();
 
         // 파일을 추가하거나 삭제하지 않은 경우
-        if (allBeforeProjectStatus.equals(allCurrentProjectStatus)) {
-            for (Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()) {
+        if(allBeforeProjectStatus.equals(allCurrentProjectStatus)){
+            for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
                 before = entry.getValue().getHash();
-                current = Optional.ofNullable(currentProjectStatus.get(entry.getKey()))
-                        .map(ProjectInfo::getHash).orElse("");
-
+                current = currentProjectStatus.get(entry.getKey()).getHash();
                 // 바뀐 파일이라면 해당 파일
-                if (!before.equals(current)) {
+                if(!before.equals(current)){
                     isChange = true;
                     PsiFile modifiedFile = currentProjectStatus.get(entry.getKey()).getPsiFile();
                     addModifiedFile(modifiedFileInfoList, modifiedFile);
                 }
             }
-        } else {
+        }
+
+        // 파일을 추가하거나 삭제한 경우
+        else{
             int beforeSize = beforeProjectStatus.size();
             int currentSize = currentProjectStatus.size();
 
-            if (beforeSize <= currentSize) {
-                for (Map.Entry<String, ProjectInfo> entry : currentProjectStatus.entrySet()) {
-                    if (beforeProjectStatus.containsKey(entry.getKey())) {
+            // 추가한 경우
+            if(beforeSize <= currentSize){
+                for(Map.Entry<String, ProjectInfo> entry : currentProjectStatus.entrySet()){
+
+                    // 추가된 파일이 아닐 경우
+                    if(beforeProjectStatus.containsKey(entry.getKey())){
                         before = beforeProjectStatus.get(entry.getKey()).getHash();
                         current = entry.getValue().getHash();
 
-                        if (!before.equals(current)) {
+                        // 바뀐 파일이라면 해당 파일 저장
+                        if(!before.equals(current)){
                             isChange = true;
                             PsiFile modifiedFile = entry.getValue().getPsiFile();
                             addModifiedFile(modifiedFileInfoList, modifiedFile);
                         }
-                    } else {
+                    }
+
+                    // 추가된 파일일 경우
+                    else{
                         isChange = true;
                         PsiFile modifiedFile = entry.getValue().getPsiFile();
                         addModifiedFile(modifiedFileInfoList, modifiedFile);
                     }
+
                 }
-            } else if (beforeSize > currentSize) {
-                for (Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()) {
-                    if (currentProjectStatus.containsKey(entry.getKey())) {
+            }
+            // 삭제한 경우
+            else if(beforeSize > currentSize){
+                for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
+
+                    // 삭제된 파일이 아닐 경우
+                    if(currentProjectStatus.containsKey(entry.getKey())){
                         before = entry.getValue().getHash();
                         current = currentProjectStatus.get(entry.getKey()).getHash();
 
-                        if (!before.equals(current)) {
+                        // 바뀐 파일이라면 해당 파일 저장
+                        if(!before.equals(current)){
                             isChange = true;
                             PsiFile modifiedFile = currentProjectStatus.get(entry.getKey()).getPsiFile();
                             addModifiedFile(modifiedFileInfoList, modifiedFile);
                         }
-                    } else {
+                    }
+
+                    // 삭제된 파일일 경우
+                    else{
                         isChange = true;
                     }
+
                 }
             }
         }
 
-        if (isChange) {
+        // 변경된 파일이 있을 경우 현재 상태를 전 상태로 돌리기 (깊은 복사 )
+        if (isChange){
             deepCopy(currentProjectStatus);
         }
 
         return modifiedFileInfoList;
+
     }
 
     private void addModifiedFile(List<ModifiedFileInfo> modifiedFileInfoList, PsiFile modifiedFile) {
@@ -247,7 +254,9 @@ public class CodeListener implements ExecutionListener {
                 requestDto.setContent(buildResultInfo);
             } else {
                 buildResultInfo.setDetails(stdOutLog.toString());
-                buildResultInfo.setModifiedFiles(getModifiedFiles());
+
+                List<ModifiedFileInfo> temp = getModifiedFiles();
+                buildResultInfo.setModifiedFiles(temp);
 
                 requestDto.setDataType("OUTPUT");
                 requestDto.setContent(buildResultInfo);

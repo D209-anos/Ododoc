@@ -89,8 +89,8 @@ public class DisposableService implements Disposable {
             allBeforeProjectStatus = getEncrypt(allBeforeProjectStatus);
             allCurrentProjectStatus = getEncrypt(allCurrentProjectStatus);
 
-            projectTracker.setAllBeforeProjectStatus(allBeforeProjectStatus);
-            projectTracker.setAllCurrentProjectStatus(allCurrentProjectStatus);
+//            projectTracker.setAllBeforeProjectStatus(allBeforeProjectStatus);
+//            projectTracker.setAllCurrentProjectStatus(allCurrentProjectStatus);
         });
     }
 
