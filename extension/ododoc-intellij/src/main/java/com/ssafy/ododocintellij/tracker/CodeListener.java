@@ -274,6 +274,8 @@ public class CodeListener implements ExecutionListener {
             errorLog.setLength(0);
             stdOutLog.setLength(0);
             errorFiles = new ArrayList<>();
+            errorFlag = false;
+            capturingError = false;
         }
 
         @Override
@@ -287,10 +289,12 @@ public class CodeListener implements ExecutionListener {
                     errorFlag = true;
                     errorLog.append(text);
                     capturingError = true;
-                } else if (capturingError) {
+                }
+                else if (capturingError) {
                     if (text.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{2}:\\d{2} .*")) {
                         capturingError = false;
-                    } else {
+                    }
+                    else {
                         Pattern pattern = Pattern.compile("\\(([^)]+):(\\d+)\\)");
                         Matcher matcher = pattern.matcher(text);
                         if (matcher.find()) {
@@ -304,7 +308,8 @@ public class CodeListener implements ExecutionListener {
                         }
                         errorLog.append(text);
                     }
-                } else {
+                }
+                else {
                     stdOutLog.append(text);
                 }
             }
