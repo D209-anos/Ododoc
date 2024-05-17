@@ -4,7 +4,7 @@ import { MessageData } from "./types";
 import { getLoggedInSession } from "../authentication/AuthService";
 import FileWatcher from "../source-code-management/FileWatcher";
 
-const URL = "ws://localhost:18080/process/ws";
+const URL = "wss://k10d209.p.ssafy.io/process/ws";
 
 export default class WebSocketClient {
   private socket: WebSocket | null = null;
