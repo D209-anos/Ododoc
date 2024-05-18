@@ -21,7 +21,7 @@ public class GptService {
     public GptResponseDto chat(String model, String prompt, String endpointCharged) {
         List<GptMessage> prompts = List.of(
                 new GptMessage("user", prompt));
-        GptRequestDto request = new GptRequestDto(model, prompts, 1, 256, 1, 0, 0);
+        GptRequestDto request = new GptRequestDto(model, prompts, 1, 1024, 1, 0, 0);
 
         // OpenAI server로 restTemplate을 통해 request를 보내고 response를 받는다.
         GptResponseDto gptResponse = restTemplate

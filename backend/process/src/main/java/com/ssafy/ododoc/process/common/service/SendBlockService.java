@@ -61,7 +61,7 @@ public class SendBlockService {
             case ERROR -> type = "fail";
             case KEYWORD -> type = "keyword";
             case SEARCH -> type = "search";
-            case SOURCECODE -> type = "success";
+            case SOURCECODE -> type = "sourcecode";
         }
 
         LinkedHashMap<String, Object> requestBody = new LinkedHashMap<>();
