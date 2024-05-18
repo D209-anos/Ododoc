@@ -3,11 +3,13 @@ package com.ssafy.ododoc.process.common.dto.receive;
 import com.ssafy.ododoc.process.common.type.DataType;
 import com.ssafy.ododoc.process.common.type.SourceApplicationType;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @ToString
 public class MessageDto {
     private SourceApplicationType sourceApplication;
