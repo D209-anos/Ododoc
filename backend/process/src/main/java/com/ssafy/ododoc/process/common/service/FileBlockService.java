@@ -264,7 +264,7 @@ public class FileBlockService {
      * @param text GPT 요약된 문장
      * @return 메인 서버로 보낼 Map
      */
-    public LinkedHashMap<String, FileBlockDto> makeGPTBlock(LinkedHashMap<String, FileBlockDto> contentMap, String text) {
+    public LinkedHashMap<String, FileBlockDto> makeGPTBlock(LinkedHashMap<String, FileBlockDto> contentMap, String text, int depth) {
         FileBlockDto gptBlock = FileBlockDto.builder()
                 .id(UUID.randomUUID().toString())
                 .value(List.of(ValueDto.builder()
@@ -283,11 +283,59 @@ public class FileBlockService {
                 .type("Blockquote")
                 .meta(MetaDto.builder()
                         .order(0)
-                        .depth(0)
+                        .depth(depth)
                         .build())
                 .build();
 
         contentMap.putLast(gptBlock.getId(), gptBlock);
+        return contentMap;
+    }
+
+    /**
+     * 링크 블럭 만들기
+     *
+     * @param contentMap 메인 서버로 보낼 Map
+     * @param url 방문한 url
+     * @return 메인 서버로 보낼 Map
+     */
+    public LinkedHashMap<String, FileBlockDto> makeLinkBlock(LinkedHashMap<String, FileBlockDto> contentMap, String url) {
+        FileBlockDto linkBlock = FileBlockDto.builder()
+                .id(UUID.randomUUID().toString())
+                .value(List.of(ValueDto.builder()
+                        .id(UUID.randomUUID().toString())
+                        .type("bulleted-list")
+                        .children(List.of(
+                                ContentDto.builder()
+                                        .text("")
+                                        .build(),
+                                ContentDto.builder()
+                                        .type("link")
+                                        .children(List.of(ContentDto.builder()
+                                                .text(url)
+                                                .build()))
+                                        .props(PropsDto.builder()
+                                                .nodeType("inline")
+                                                .target("_blank")
+                                                .rel("noreferrer")
+                                                .url(url)
+                                                .title(url)
+                                                .build())
+                                        .build(),
+                                ContentDto.builder()
+                                        .text("")
+                                        .build()))
+                        .props(PropsDto.builder()
+                                .nodeType("block")
+                                .build())
+                        .build()))
+                .type("BulletedList")
+                .meta(MetaDto.builder()
+                        .order(0)
+                        .depth(1)
+                        .build())
+                .build();
+
+        contentMap.putLast(linkBlock.getId(), linkBlock);
         return contentMap;
     }
 }
