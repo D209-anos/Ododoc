@@ -75,6 +75,94 @@ public class FileBlockService {
     }
 
     /**
+     * GPT 요약과 코드 블럭 만들기
+     *
+     * @param contentMap 메인 서버로 보낼 Map
+     * @param modifiedFileList 변경된 코드 리스트
+     * @return 메인 서버로 보낼 Map
+     */
+    public LinkedHashMap<String, FileBlockDto> makeCodeBlockWithGPT (LinkedHashMap<String, FileBlockDto> contentMap, List<ModifiedFileDto> modifiedFileList, List<String> modifyFileSummarize) {
+        int count = 0;
+        for(ModifiedFileDto modifiedFile : modifiedFileList) {
+            System.out.println("modified file name?? " + modifiedFile.getFileName());
+            // 파일 이름 블럭
+            FileBlockDto fileNameBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("bulleted-list")
+                            .children(List.of(ContentDto.builder()
+                                    .text(modifiedFile.getFileName())
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("BulletedList")
+                    .meta(MetaDto.builder()
+                            .order(0)
+                            .depth(1)
+                            .build())
+                    .build();
+
+            // 변경된 코드 내용이 담긴 코드 블럭
+            FileBlockDto codeBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(
+                                    ValueDto.builder()
+                                            .id(UUID.randomUUID().toString())
+                                            .type("code")
+                                            .children(List.of(ContentDto.builder()
+                                                    .text(modifiedFile.getSourceCode())
+                                                    .build()))
+                                            .props(PropsDto.builder()
+                                                    .nodeType("void")
+                                                    .language("java")
+                                                    .theme("GithubLight")
+                                                    .build())
+                                            .build()
+                            )
+                    )
+                    .type("Code")
+                    .meta(MetaDto.builder()
+                            .order(0)
+                            .depth(1)
+                            .build())
+                    .build();
+
+            // GPT 요약이 담긴 블럭
+            FileBlockDto gptBlock = FileBlockDto.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(List.of(ValueDto.builder()
+                            .id(UUID.randomUUID().toString())
+                            .type("blockquote")
+                            .children(List.of(ContentDto.builder()
+                                    .text("GPT 요약")
+                                    .bold(true)
+                                    .build(), ContentDto.builder()
+                                    .text("\n" + modifyFileSummarize.get(count))
+                                    .build()))
+                            .props(PropsDto.builder()
+                                    .nodeType("block")
+                                    .build())
+                            .build()))
+                    .type("Blockquote")
+                    .meta(MetaDto.builder()
+                            .order(0)
+                            .depth(1)
+                            .build())
+                    .build();
+
+            contentMap.putLast(fileNameBlock.getId(), fileNameBlock);
+            contentMap.putLast(codeBlock.getId(), codeBlock);
+            contentMap.putLast(gptBlock.getId(), gptBlock);
+            count++;
+        }
+
+        return contentMap;
+    }
+
+    /**
      * 에러 코드 블럭 만들기
      *
      * @param contentMap 메인 서버로 보낼 Map
