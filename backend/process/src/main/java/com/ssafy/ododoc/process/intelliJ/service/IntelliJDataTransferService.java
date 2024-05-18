@@ -34,7 +34,7 @@ public class IntelliJDataTransferService {
         if(!modifiedFileList.isEmpty()) {
             content = fileBlockService.makeHeadingThreeBlock(content, "변경된 코드");
             content = fileBlockService.makeCodeBlock(content, modifiedFileList);
-            content = fileBlockService.makeTextBlock(content, " ");
+            content = fileBlockService.makeTextBlock(content, "");
         }
 
         /**
@@ -43,7 +43,7 @@ public class IntelliJDataTransferService {
         if(ideContentDto.getErrorFile() != null) {
             content = fileBlockService.makeHeadingThreeBlock(content, "에러 발생 코드");
             content = fileBlockService.makeErrorBlock(content, ideContentDto.getErrorFile());
-            content = fileBlockService.makeTextBlock(content, " ");
+            content = fileBlockService.makeTextBlock(content, "");
         }
 
         /**
@@ -52,7 +52,7 @@ public class IntelliJDataTransferService {
         if(ideContentDto.getDetails() != null) {
             content = fileBlockService.makeHeadingThreeBlock(content, "터미널 로그");
             content = fileBlockService.makeTerminalBlock(content, ideContentDto.getDetails());
-            content = fileBlockService.makeTextBlock(content, " ");
+            content = fileBlockService.makeTextBlock(content, "");
         }
 
         return content;

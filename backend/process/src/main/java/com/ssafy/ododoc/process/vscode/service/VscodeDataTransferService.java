@@ -24,7 +24,7 @@ public class VscodeDataTransferService {
         if(ideContentDto.getDetails() != null) {
             content = fileBlockService.makeHeadingThreeBlock(content, "터미널 로그");
             content = fileBlockService.makeTerminalBlock(content, ideContentDto.getDetails());
-            content = fileBlockService.makeTextBlock(content, " ");
+            content = fileBlockService.makeTextBlock(content, "");
         }
 
         return content;
@@ -38,7 +38,7 @@ public class VscodeDataTransferService {
         if(!modifiedFileList.isEmpty()) {
             content = fileBlockService.makeHeadingThreeBlock(content, "변경된 코드");
             content = fileBlockService.makeCodeBlock(content, modifiedFileList);
-            content = fileBlockService.makeTextBlock(content, " ");
+            content = fileBlockService.makeTextBlock(content, "");
         }
 
         return content;
@@ -47,8 +47,8 @@ public class VscodeDataTransferService {
     public LinkedHashMap<String, FileBlockDto> makeSummaryBlocks(String summary) {
         LinkedHashMap<String, FileBlockDto> content = new LinkedHashMap<>();
 
-        content = fileBlockService.makeGPTBlock(content, summary);
-        content = fileBlockService.makeTextBlock(content, " ");
+        content = fileBlockService.makeGPTBlock(content, summary, 0);
+        content = fileBlockService.makeTextBlock(content, "");
 
         return content;
     }
