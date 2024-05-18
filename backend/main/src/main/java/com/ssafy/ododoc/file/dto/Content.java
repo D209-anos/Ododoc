@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 public class Content {
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = Content.NonEmptyTextFilter.class)
     private String text;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -39,7 +40,6 @@ public class Content {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Props props;
 
-    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = Content.NonEmptyTextFilter.class)
     static class NonEmptyTextFilter {
         @Override
         public boolean equals(Object obj) {
@@ -50,6 +50,11 @@ public class Content {
                 return false;
             }
             Content content = (Content) obj;
+
+            if("link".equals(content.type)) {
+                return true;
+            }
+
             return content.text != null && !content.text.isEmpty();
         }
     }
