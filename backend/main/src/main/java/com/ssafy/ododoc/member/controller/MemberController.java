@@ -38,7 +38,6 @@ public class MemberController {
      */
     @PostMapping(value = "/authorization/{provider}")
     public LoginResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
-        log.info("login 실행 : {}", loginRequest);
         Directory directory = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
 
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());

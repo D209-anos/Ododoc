@@ -1,7 +1,5 @@
 package com.ssafy.ododoc.file.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.common.util.S3Util;
 import com.ssafy.ododoc.directory.entity.DirectoryClosure;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
@@ -23,7 +21,6 @@ import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class FileService {
 
     private final DirectoryRepository directoryRepository;
@@ -114,11 +110,9 @@ public class FileService {
 
     @Transactional
     public FileResponse addFile(AddRequest addRequest, Member member) {
-        log.info("addFile 시작!!!!");
         Directory directory;
 
         if(addRequest.getConnectedFileId() == 0L) {
-            log.info("connectedFileId가 0 입니다.");
             Directory root = directoryRepository.findByMemberAndParentIsNull(member)
                     .orElseGet(() -> directoryRepository.save(Directory.builder()
                             .name(member.getNickname() + "님의 정리공간")
@@ -144,7 +138,6 @@ public class FileService {
                     .build());
         }
         else {
-            log.info("connectedFileId가 {} 입니다.", addRequest.getConnectedFileId());
             directory = directoryRepository.findById(addRequest.getConnectedFileId())
                     .orElseThrow(() -> new DirectoryNotFoundException("해당하는 폴더/파일을 찾을 수 없습니다."));
         }
@@ -152,9 +145,6 @@ public class FileService {
         checkDirectory(directory, member);
 
         Long directoryId = directory.getId();
-
-        log.info("directory.getId : {}", directory.getId());
-        log.info("directoryId : {}", directoryId);
 
         LinkedHashMap<String, Block> defaultContent = makeDefaultContent();
 
@@ -164,8 +154,6 @@ public class FileService {
                         .lastOrder(-1)
                         .content(defaultContent)
                         .build()));
-
-        log.info("redisFile : {}", redisFile);
 
         AddType type = AddType.valueOf(addRequest.getType().toUpperCase());
         Member editMember = directory.getMember();
@@ -186,23 +174,9 @@ public class FileService {
 
         LinkedHashMap<String, Block> content = redisFile.getContent();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            log.info("content : {}", objectMapper.writeValueAsString(content));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
         for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
             entry.getValue().getMeta().setOrder(lastOrder++);
             content.put(entry.getKey(), entry.getValue());
-        }
-
-        try {
-            log.info("바뀐 content : {}", objectMapper.writeValueAsString(content));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         }
 
         redisFile.setLastOrder(lastOrder - 1);

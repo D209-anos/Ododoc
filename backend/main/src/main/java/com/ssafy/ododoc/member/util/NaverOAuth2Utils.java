@@ -5,7 +5,6 @@ import com.ssafy.ododoc.member.dto.response.NaverTokenResponse;
 import com.ssafy.ododoc.member.exception.OAuthDeniedException;
 import com.ssafy.ododoc.member.exception.OAuthInfoNullException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 @PropertySource("classpath:oauth.properties")
 public class NaverOAuth2Utils {
 
