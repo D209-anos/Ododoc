@@ -1,5 +1,6 @@
 package com.ssafy.ododoc.process.intelliJ.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.gpt.GptService;
 import com.ssafy.ododoc.gpt.dto.GptResponseDto;
@@ -11,6 +12,7 @@ import com.ssafy.ododoc.process.common.dto.save.GPTSummarizeDto;
 import com.ssafy.ododoc.process.common.service.SendBlockService;
 import com.ssafy.ododoc.process.common.type.DataType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IntelliJMessageProcessingService {
 
     private final IntelliJDataTransferService dataTransferService;
@@ -40,6 +43,12 @@ public class IntelliJMessageProcessingService {
         GPTSummarizeDto gptSummarizeDto = new GPTSummarizeDto();
         IDEContentDto ideContentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
 
+        try {
+            log.info("processOutput 호출 : {}", objectMapper.writeValueAsString(ideContentDto));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         String result = classificationByGpt(List.of("SERVER", "ALGORITHM"), ideContentDto.getDetails());
         if(result.equals("SERVER")){
             ideContentDto.setDetails(null);
@@ -61,6 +70,12 @@ public class IntelliJMessageProcessingService {
     private void processError(MessageDto messageDto){
         GPTSummarizeDto gptSummarizeDto = new GPTSummarizeDto();
         IDEContentDto ideContentDto = objectMapper.convertValue(messageDto.getContent(), IDEContentDto.class);
+
+        try {
+            log.info("processError 호출 : {}", objectMapper.writeValueAsString(ideContentDto));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         if(!ideContentDto.getModifiedFiles().isEmpty()){
             List<ModifiedFileDto> modifiedFileList = ideContentDto.getModifiedFiles();
