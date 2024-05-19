@@ -1,10 +1,14 @@
 import React, { useRef, useEffect } from 'react';
-import Intellij from '../../css/components/startPage/intellij.module.css';
+import chrome from '../../css/components/startPage/chrome.module.css';
 import { ReactComponent as Explain1 } from '../../assets/svg/Explain1.svg';
 import { ReactComponent as Explain2 } from '../../assets/svg/Explain2.svg';
 import { ReactComponent as Explain3 } from '../../assets/svg/Explain3.svg';
 import { ReactComponent as Explain4 } from '../../assets/svg/Explain4.svg';
 import { ReactComponent as Explain5 } from '../../assets/svg/Explain5.svg';
+import ChromeExplain0 from '../../assets/images/startPageImage/chromeExplain0.png';
+import ChromeExplain1 from '../../assets/images/startPageImage/chromeExplain1.png';
+import ChromeExplain2 from '../../assets/images/startPageImage/chromeExplain2.png';
+import ChromeExplain3 from '../../assets/images/startPageImage/chromeExplain3.png';
 
 const IntelliJ: React.FC = () => {
     const pathRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -15,7 +19,7 @@ const IntelliJ: React.FC = () => {
                 if (path) {
                     path.style.strokeDasharray = `${path.getTotalLength()}`;
                     path.style.strokeDashoffset = `${path.getTotalLength()}`;
-                    path.classList.remove(Intellij.draw);
+                    path.classList.remove(chrome.draw);
                 }
             });
         }
@@ -24,10 +28,10 @@ const IntelliJ: React.FC = () => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     const pathElement = entry.target as SVGPathElement;
-                    pathElement.classList.add(Intellij.draw);
+                    pathElement.classList.add(chrome.draw);
                     pathElement.addEventListener('animationend', () => {
                         pathElement.style.strokeDashoffset = '0';
-                        pathElement.classList.remove(Intellij.draw);
+                        pathElement.classList.remove(chrome.draw);
                     }, { once: true });
                 }
             });
@@ -59,26 +63,55 @@ const IntelliJ: React.FC = () => {
     }, []);
 
     return (
-        <div className={Intellij.vscodeGuide}>
-            <div className={Intellij.guideTitle}>
-                <p className={Intellij.guide}>Chrome 확장 프로그램 설치 및 활용 가이드</p>
+        <div className={chrome.vscodeGuide}>
+            <div className={chrome.guideTitle}>
+                <p className={chrome.guide}>Chrome 확장 프로그램 설치 및 활용 가이드</p>
             </div>
-            <div className={Intellij.header}>
-                <Explain1 ref={(el) => (pathRefs.current[0] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path1}`}/>
+
+            {/* HEADER */}
+            <div className={chrome.header}>
+                <Explain1 ref={(el) => (pathRefs.current[0] = el?.querySelector('path') || null)} className={`${chrome.path} ${chrome.path1}`}/>
+                <div className={chrome.imageContainer0}>
+                    <p className={chrome.ExplainContent0}>1. 크롬 익스텐션에 로그인 하세요.</p>
+                    <img src={ChromeExplain0} alt="chrome-explain-0" className={chrome.ChromeExplainImage0} />
+                </div>
             </div>
-            <div className={Intellij.content1}>
-                <Explain2 ref={(el) => (pathRefs.current[1] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path2}`}/>
+
+            {/* CONTENT 1 */}
+            <div className={chrome.content1}>
+                <Explain2 ref={(el) => (pathRefs.current[1] = el?.querySelector('path') || null)} className={`${chrome.path} ${chrome.path2}`}/>
+                <div className={chrome.imageContainer1}>
+                    <p className={chrome.ExplainContent1}>2. 검색한 내용을 기록할 파일 선택 후 시작 버튼을 누르세요.</p>
+                    <img src={ChromeExplain1} alt="chrome-explain-1" className={chrome.ChromeExplainImage1} />
+                </div>
             </div>
-            <div className={Intellij.content2}>
-                <Explain3 ref={(el) => (pathRefs.current[2] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path3}`}/>
+
+            {/* CONTENT 2 */}
+            <div className={chrome.content2}>
+                <Explain3 ref={(el) => (pathRefs.current[2] = el?.querySelector('path') || null)} className={`${chrome.path} ${chrome.path3}`}/>
+                <div className={chrome.imageContainer2}>
+                    <p className={chrome.ExplainContent2}>3. 찾아볼 내용을 검색하세요.</p>
+                    <img src={ChromeExplain2} alt="chrome-explain-2" className={chrome.ChromeExplainImage2} />
+                </div>
+                <div className={chrome.imageContainer3}>
+                    <p className={chrome.ExplainContent3}>4. 검색을 마치면 중지를 누르고 종료하세요.</p>
+                    <img src={ChromeExplain3} alt="chrome-explain-3" className={chrome.ChromeExplainImage3} />
+                </div>
             </div>
-            <div className={Intellij.content3}>
-                <Explain4 ref={(el) => (pathRefs.current[3] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path4}`}/>
+
+            {/* CONTENT 3 */}
+            <div className={chrome.content3}>
+                <Explain4 ref={(el) => (pathRefs.current[3] = el?.querySelector('path') || null)} className={`${chrome.path} ${chrome.path4}`}/>
             </div>
-            <div className={Intellij.content4}>
-                <Explain5 ref={(el) => (pathRefs.current[4] = el?.querySelector('path') || null)} className={`${Intellij.path} ${Intellij.path5}`}/>
+
+            {/* CONTENT 4 */}
+            <div className={chrome.content4}>
+                <Explain5 ref={(el) => (pathRefs.current[4] = el?.querySelector('path') || null)} className={`${chrome.path} ${chrome.path5}`}/>
+                <div className={chrome.imageContainer5}>
+                    <p className={chrome.ExplainContent5}>5. ododoc을 자유롭게 즐기세요.</p>
+                </div>
             </div>
-            <div className={Intellij.footer}></div>
+            <div className={chrome.footer}></div>
         </div>
     )
 }
