@@ -14,4 +14,8 @@ public class ModifiedFileInfo {
         this.sourceCode = sourceCode;
     }
 
+    @Override
+    public String toString() {
+        return fileName + " " + sourceCode;
+    }
 }

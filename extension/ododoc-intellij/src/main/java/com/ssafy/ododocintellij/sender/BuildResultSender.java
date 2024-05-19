@@ -5,8 +5,6 @@ import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -21,17 +19,19 @@ public class BuildResultSender {
 
     // 객체의 락을 위해 사용.
     private static final Object lock = new Object();
-    private static final String WEBSOCKET_URI = "ws://localhost:18080/process/ws";
+    private static final String WEBSOCKET_URI = "wss://k10d209.p.ssafy.io/process/ws";
     private static boolean enableWhenPushBtn = false;
     private static int count = 0;
     private BuildResultSender() {}
 
     public static WebSocketClient getINSTANCE() {
+
         if(INSTANCE == null) {
             // 두 번째로 null 체크를 한 후 다중 스레드 환경에서 동시에 여러 인스턴스가 생성되는 것을 방지
             synchronized (lock) {
                 if(INSTANCE == null){
                     try {
+
                         INSTANCE = new WebSocketClient(new URI(WEBSOCKET_URI)) {
                             @Override
                             public void onOpen(ServerHandshake serverHandshake) {
@@ -70,6 +70,7 @@ public class BuildResultSender {
 
                             @Override
                             public void onError(Exception e) {
+                                System.out.println(e.getMessage());
                                 if(enableWhenPushBtn){
                                     Platform.runLater(() -> {
                                         Alert alert = AlertHelper.makeAlert(
@@ -86,6 +87,7 @@ public class BuildResultSender {
                                 }
                             }
                         };
+
                         INSTANCE.connect();
                     }catch (URISyntaxException e) {
                         e.printStackTrace();
