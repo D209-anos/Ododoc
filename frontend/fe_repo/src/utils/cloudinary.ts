@@ -26,9 +26,6 @@ export const uploadToCloudinary = async (file: File, type = 'image'): Promise<Me
   formData.append('upload_preset', CLOUDINARY.PRESET);
 
   try {
-    console.log("file : " + {file})
-    console.log("type : " + {type})
-    console.log("api: " + {CLOUDINARY})
     const call = await fetch(`${CLOUDINARY.API}/${type}/upload`, { method: 'POST', body: formData });
     const response = await call.json();
 

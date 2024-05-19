@@ -28,13 +28,12 @@ function Mypage() {
 
     useEffect(() => {
         fetchProfile().then(data => {
-            console.log('Directory data:', data);
             setErrorCount(data.errorCount);
             setBuilds(data.buildCount);
             setKeywordSearches(data.searchCount);
             setWebsiteVisits(data.visitCount);
         }).catch(error => {
-            console.error('Error fetching directory:', error);
+
         });
     }, []);
 

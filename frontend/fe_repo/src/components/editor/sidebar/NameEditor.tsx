@@ -35,7 +35,7 @@ const NameEditor: React.FC<NameEditorProps> = ({
             await saveName(objectId, inputName);
             setName(inputName)
         } catch (error) {
-            console.log('닉넴 저장 중 오류 발생:', error);
+
         }
     };
 
@@ -47,7 +47,7 @@ const NameEditor: React.FC<NameEditorProps> = ({
             await saveName(objectId, inputName);
             setName(inputName);
         } catch (error) {
-            console.log('닉넴 저장 중 오류 발생:', error);
+
         }
     };
 

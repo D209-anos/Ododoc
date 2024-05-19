@@ -33,7 +33,6 @@ export const fetchFile = async (directoryId: string): Promise<any> => {
     const data = response.data.data;
     return data
   } catch (error: any) {
-    console.error('Failed to fetch File:', error.response?.data || error.message);
     return null;
   }
 }
@@ -46,7 +45,6 @@ export const saveFile = async (directoryId: string, content: any): Promise<any> 
     })
     return response.data;
   } catch (error: any) {
-    console.error('Failed to save File:', error.response?.data || error.message);
     return null;
   }
 }

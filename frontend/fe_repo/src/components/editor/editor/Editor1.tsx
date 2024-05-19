@@ -161,7 +161,6 @@ function Editor1() {
       setDocumentData(convertedData);
       setIsDataLoaded(true); // 데이터 로드 완료 설정
     } catch (error) {
-      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +180,6 @@ function Editor1() {
     if (directoryId && newTitle !== title) {
       try {
         await editDirectoryItem(directoryId, newTitle);
-        console.log('Title updated successfully');
 
         if (directoryData) {
           const updatedData = updateDirectoryItemTitle(directoryData, directoryId, newTitle);
@@ -189,7 +187,7 @@ function Editor1() {
         }
 
       } catch (error) {
-        console.error('Failed to update title:', error);
+        
       }
     }
   }, [directoryId, title]);
