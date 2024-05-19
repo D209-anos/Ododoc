@@ -19,7 +19,18 @@
 <br>
 
 #### ✔ 시연 영상
+- 에디터 기능
+![img](./readme/gif/editor.gif)
+<br>
+- Chrome Extension
 
+- VS Code Extension Setting
+![img](./readme/gif/vscodeinstall.gif)
+<br>
+- VS Code Extension Setting
+![img](./readme/gif/vscodeuse.gif)
+<br>
+- Intelli J Plugin
 <br>
 
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" alt="💫" width="32" height="32"> 서비스 아키텍처
