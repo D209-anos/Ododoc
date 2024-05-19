@@ -1,9 +1,9 @@
-function Profile() {
-    return(
+function Profile () {
+    return (
         <div>
 
         </div>
     )
 }
 
-export default Profile
+export default Profile;
