@@ -11,7 +11,6 @@ export const fetchProfile = async (): Promise<any> => {
         const response = await api.get<Response>(`/directory`, {
         });
         const data = response.data.data;
-        console.log('프로필 조회 결과 값 : ' + data)
         return data;
     } catch (error: any) {
         console.error('Failed to fetch directory:', error.response?.data || error.message);

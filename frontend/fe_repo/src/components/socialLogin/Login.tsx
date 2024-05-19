@@ -51,7 +51,6 @@ const Login: React.FC<LoginProps> = ({ isOpen, onClose }) => {
 
     // 로그인 성공 시 editor 화면으로 이동
     useEffect(() => {
-        console.log(accessToken)
         if (accessToken && !hasNavigated) {
             navigate('/editor'); 
             setHasNavigated(true);

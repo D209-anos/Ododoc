@@ -34,7 +34,8 @@ interface MyDirectoryItem {
     children?: MyDirectoryItem[] | string;
 }
 
-const convertApiResponseToEditorFormat = (apiResponse: any): YooptaContentValue => {
+
+const convertApiResponseToEditorFormat = (apiResponse : any): YooptaContentValue => {
   const content = apiResponse.content;
   const result: YooptaContentValue = {};
 
@@ -43,16 +44,33 @@ const convertApiResponseToEditorFormat = (apiResponse: any): YooptaContentValue 
     result[item.id] = {
       id: item.id,
       type: item.type,
-      value: item.value.map((valueItem: any) => ({
-        ...valueItem,
-        children: valueItem.children.map((child: any) => ({
-          ...child,
-          text: child.text || '',
-        })),
-        props: {
-          ...valueItem.props,
-        },
-      })),
+      value: item.value.map((valueItem : any) => {
+        return {
+          ...valueItem,
+          children: valueItem.children.map((child : any) => {
+            if (child.type === 'link') {
+              return {
+                ...child,
+                children: child.children.map((linkChild : any) => ({
+                  ...linkChild,
+                  text: linkChild.text || '',
+                })),
+                props: {
+                  ...child.props,
+                },
+              };
+            } else {
+              return {
+                ...child,
+                text: child.text || '',
+              };
+            }
+          }),
+          props: {
+            ...valueItem.props,
+          },
+        };
+      }),
       meta: {
         ...item.meta,
         order: item.meta?.order ?? 0,
@@ -191,6 +209,7 @@ function Editor1() {
     if (isLoading) return; // 로딩 중에는 변경 사항을 무시
     if (editor.selection) {
       const block = editor.getEditorValue(); // 에디터의 현재 값 가져오기
+      setDocumentData(block);
       updateEditorData(directoryId, block); // 전역 상태 업데이트
     }
   }, [editor, directoryId, isLoading, updateEditorData]);
