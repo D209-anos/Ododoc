@@ -10,6 +10,7 @@ import VscodeExplain1 from '../../assets/images/startPageImage/vscodeExplain1.pn
 import VscodeExplain2 from '../../assets/images/startPageImage/vscodeExplain2.png';
 import VscodeExplain3 from '../../assets/images/startPageImage/vscodeExplain3.png';
 import VscodeExplain4 from '../../assets/images/startPageImage/vscodeExplain4.png';
+import Check from '../../assets/images/icon/redCheckIcon.png';
 
 const VSCode: React.FC = () => {
     const pathRefs = useRef<(SVGPathElement | null)[]>([]);
@@ -93,10 +94,12 @@ const VSCode: React.FC = () => {
                 <div className={Vscode.imageContainer2}>
                     <p className={Vscode.ExplainContent2}>3. Activity Bar에서 "ododoc"을 클릭해 로그인하세요.</p>
                     <img src={VscodeExplain2} alt="vscode-explain-2" className={Vscode.VscodeExplainImage2} />
+                    <img src={Check} alt="check-icon" className={Vscode.check2} />
                 </div>
                 <div className={Vscode.imageContainer3}>
                     <p className={Vscode.ExplainContent3}>4. ododoc에 대한 권한을 주세요.</p>
                     <img src={VscodeExplain3} alt="vscode-explain-3" className={Vscode.VscodeExplainImage3}/>
+                    <img src={Check} alt="check-icon" className={Vscode.check3} />
                 </div>
             </div>
 
@@ -106,6 +109,8 @@ const VSCode: React.FC = () => {
                 <div className={Vscode.imageContainer4}>
                     <p className={Vscode.ExplainContent4}>5. 연동할 파일을 클릭하고 알림창에서 확인 버튼을 누르세요.</p>
                     <img src={VscodeExplain4} alt="vscode-explain-4" className={Vscode.VscodeExplainImage4} />
+                    <img src={Check} alt="check-icon" className={Vscode.check4} />
+                    <img src={Check} alt="check-icon" className={Vscode.check5} />
                 </div>
             </div>
 

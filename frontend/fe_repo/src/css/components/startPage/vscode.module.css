@@ -48,7 +48,7 @@
 .ExplainContent0 {
     position: absolute;
     right: 38vh;
-    top: 19vh;
+    top: 12vh;
     font-family: 'hanbitFont';
     font-size: 20px;
 }
@@ -56,7 +56,7 @@
 .VscodeExplainImage0 {
     position: absolute;
     right: 10vh;
-    top: 28vh;
+    top: 21vh;
     width: 800px;
     height: auto;
     border-radius: 10px;
@@ -126,6 +126,13 @@
     border-radius: 10px;
 }
 
+.check2 {
+    width: 30px;
+    position: absolute;
+    left: 13.5vh;
+    top: 55vh;
+}
+
 /* -------------------------------------- */
 
 .imageContainer3 {
@@ -150,6 +157,13 @@
     border-radius: 10px;
 }
 
+.check3 {
+    width: 30px;
+    position: absolute;
+    right: 112vh;
+    top: 173vh;
+}
+
 
 /* CONTENT 3 */
 .imageContainer4 {
@@ -172,6 +186,20 @@
     width: 800px;
     height: auto;
     border-radius: 10px;
+}
+
+.check4 {
+    width: 30px;
+    position: absolute;
+    left: 25vh;
+    bottom: 237vh;
+}
+
+.check5 {
+    width: 30px;
+    position: absolute;
+    right: 67vh;
+    bottom: 194vh;
 }
 
 /* CONTENT 4 */

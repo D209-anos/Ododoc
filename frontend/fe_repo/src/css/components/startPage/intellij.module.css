@@ -1,10 +1,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;500&family=Pacifico&display=swap");
 
-.container {
+/* .container {
     height: 1000vh;
     overflow-y: auto;
+} */
+
+.vscodeGuide {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
+.guideTitle {
+    background-color: #fdedd5;
+    margin: 130px 0px 0px 150px;
+}
+
+.guide {
+    color: black;
+    font-family: 'hanbitFont';
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/* HEADER */
 .header {
     padding-top: 110px;
     background-color: #fdedd5;
@@ -12,10 +33,308 @@
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
     position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
+
+.imageContainer0 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent0 {
+    position: absolute;
+    right: 30vh;
+    top: 9.5vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.IntelliJExplainImage0 {
+    position: absolute;
+    right: 10vh;
+    top: 17.5vh;
+    width: 800px;
+    height: auto;
+    border-radius: 10px;
+    border: 0.1px solid gray;
+}
+
+
+/* CONTENT 1 */
+.content1 {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.imageContainer1 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent1 {
+    position: absolute;
+    left: 15vh;
+    top: 45vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.IntelliJExplainImage1 {
+    position: absolute;
+    left: 13vh;
+    top: 54vh;
+    width: 250px;
+    height: auto;
+    border-radius: 10px;
+    border: 0.1px solid gray;
+}
+
+.IntelliJExplainImage2 {
+    position: absolute;
+    left: 50vh;
+    top: 54vh;
+    width: 273px;
+    height: auto;
+    border-radius: 5px;
+}
+
+
+/* CONTENT 2 */
+.content2 {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.imageContainer2 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent2 {
+    position: absolute;
+    left: 15vh;
+    top: 1vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.IntelliJExplainImage3 {
+    position: absolute;
+    left: 18vh;
+    top: 10vh;
+    width: 290px;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* -------------------------------------- */
+
+.imageContainer3 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent3 {
+    position: absolute;
+    right: 45vh;
+    top: 95vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ExplainContent4 {
+    position: absolute;
+    right: 31vh;
+    top: 101vh;
+    font-family: 'hanbitFont';
+    font-size: 15px;
+}
+
+.ExplainContent5 {
+    position: absolute;
+    right: 25vh;
+    top: 104.5vh;
+    font-family: 'hanbitFont';
+    font-size: 15px;
+}
+
+.IntelliJExplainImage4 {
+    position: absolute;
+    right: 50vh;
+    top: 111vh;
+    width: 270px;
+    height: auto;
+}
+
+.home {
+    position: absolute;
+    width: 27px;
+    height: 21px;
+    background-color: rgba(0, 0, 0, 0.2);
+    right: 82vh;
+    top: 171.7vh;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.link {
+    position: absolute;
+    width: 27px;
+    height: 21px;
+    background-color: rgba(0, 0, 0, 0.2);
+    right: 77.7vh;
+    top: 171.7vh;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.restart {
+    position: absolute;
+    width: 27px;
+    height: 21px;
+    background-color: rgba(0, 0, 0, 0.2);
+    right: 73.2vh;
+    top: 171.7vh;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.home:hover .hoverBox {
+    display: block;
+}
+
+.link:hover .hoverBox2 {
+    display: block;
+}
+
+.restart:hover .hoverBox3 {
+    display: block;
+}
+
+.hoverBox {
+    display: none;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 150px;
+    padding-left: 14px;
+    padding-top: 3px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    font-family: hanbitFont;
+    color: white;
+}
+
+.hoverBox2 {
+    display: none;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 60px;
+    padding-left: 14px;
+    padding-top: 3px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    font-family: hanbitFont;
+    color: white;
+}
+
+.hoverBox3 {
+    display: none;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 60px;
+    padding-left: 14px;
+    padding-top: 3px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    font-family: hanbitFont;
+    color: white;
+}
+
+.IntelliJExplainImage5 {
+    position: absolute;
+    right: 12vh;
+    top: 111vh;
+    width: 272px;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* ------------------------------------ */
+
+
+/* CONTENT 3 */
+.imageContainer4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent6 {
+    position: absolute;
+    left: 15vh;
+    bottom: 255vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ExplainContent7 {
+    position: absolute;
+    left: 15vh;
+    bottom: 251vh;
+    font-family: 'hanbitFont';
+    font-size: 14px;
+}
+
+.IntelliJExplainImage6 {
+    position: absolute;
+    left: 17vh;
+    bottom: 185vh;
+    width: 272px;
+    height: auto;
+    border-radius: 5px;
+}
+
+
+/* CONTENT 4 */
+.imageContainer5 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent8 {
+    position: absolute;
+    right: 28vh;
+    bottom: 80vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+
+/* PATH */
 
 .path {
     fill: none;
@@ -26,11 +345,39 @@
     animation: draw 10s ease forwards;
 }
 
-.path1, .path2, .path3, .path4 {
+.path1,
+.path2,
+.path3,
+.path4 {
     stroke-dasharray: 0;
     stroke-dashoffset: 0;
 }
 
+.path1 {
+    animation: draw1 4s ease forwards;
+    animation: drawPath1 1s linear, floating 2.2s linear infinite;
+}
+
+.path2 {
+    stroke: black;
+    z-index: 2000;
+    animation: draw2 40s ease forwards;
+}
+
+.path3 {
+    animation: draw3 10s ease forwards;
+}
+
+.path4 {
+    animation: draw4 12s ease forwards;
+}
+
+.path5 {
+    animation: draw5 14s ease forwards;
+}
+
+
+/* DRAW */
 .draw {
     animation: drawPath 4s forwards;
 }
@@ -97,12 +444,13 @@
     }
 }
 
-.path1 {
-    animation: draw1 4s ease forwards;
-    animation: drawPath1 1s linear, floating 2.2s linear infinite;
-}
 
-.content1, .content2, .content3, .content4 {
+/* CONTENT */
+
+.content1,
+.content2,
+.content3,
+.content4 {
     background-color: #fdedd5;
     min-height: 500px;
     display: flex;
@@ -110,7 +458,8 @@
     align-items: center;
 }
 
-.content1, .content2 {
+.content1,
+.content2 {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -125,56 +474,18 @@
     bottom: 0;
 }
 
-.path2 {
-    stroke: black;
-    z-index: 2000;
-    animation: draw2 40s ease forwards;
-}
-
 .footer {
     height: 30vh;
     background-color: #fdedd5;
 }
 
-.vscodeGuide {
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
 
-.guideTitle {
-    background-color: #fdedd5;
-    margin: 130px 0px 0px 150px;
-}
-
-.guide {
-    color: black;
-    font-family: 'hanbitFont';
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.Explain1, .Explain2, .Explain3, .Explain4 {
+.Explain1,
+.Explain2,
+.Explain3,
+.Explain4 {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-
-.path3 {
-    animation: draw3 10s ease forwards;
-    /* Explain3 애니메이션 10초 */
-}
-
-.path4 {
-    animation: draw4 12s ease forwards;
-    /* Explain4 애니메이션 12초 */
-}
-
-.path5 {
-    animation: draw5 14s ease forwards;
-    /* Explain5 애니메이션 14초 */
-}
-
