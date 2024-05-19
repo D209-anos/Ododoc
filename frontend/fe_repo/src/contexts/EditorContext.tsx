@@ -30,7 +30,7 @@ interface EditorContextProps {
           try {
             await saveFile(id, editorData[id]);
           } catch (error) {
-            console.error('서버 저장 실패', error);
+
           }
         }
       }, [editorData]);

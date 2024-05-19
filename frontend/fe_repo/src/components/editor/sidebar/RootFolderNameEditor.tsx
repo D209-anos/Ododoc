@@ -37,11 +37,10 @@ const RootFolderNameEditor: React.FC<RootFolderNameEditorProps> = ({
         event.preventDefault();
         try {
             const response = await createDirectory(objectId, inputName, 'FOLDER');
-            console.log('폴더 생성 response:', response);
             setName(inputName);
             saveNewFolder();
         } catch (error) {
-            console.log('폴더 생성 에러:', error);
+
         }
     };
 

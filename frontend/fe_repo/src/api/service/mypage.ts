@@ -13,7 +13,6 @@ export const fetchProfile = async (): Promise<any> => {
         const data = response.data.data;
         return data;
     } catch (error: any) {
-        console.error('Failed to fetch directory:', error.response?.data || error.message);
         return null;
     }
 };

@@ -33,6 +33,7 @@ export const uploadToCloudinary = async (
       method: "POST",
       body: formData,
     });
+
     const response = await call.json();
 
     return {

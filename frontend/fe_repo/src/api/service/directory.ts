@@ -20,7 +20,6 @@ export const fetchDirectory = async (rootId: number | null): Promise<IContentIte
         // localStorage.setItem('directoryData', JSON.stringify(data));
         return data;
     } catch (error: any) {
-        console.error('Failed to fetch directory:', error.response?.data || error.message);
         return null;
     }
 };
@@ -35,7 +34,6 @@ export const createDirectory = async (parentId: number, name: string, type: stri
         })
         return response.data;
     } catch (error) {
-        console.error('디렉토리 생성 에러', error);
         throw error;
     }
 }
@@ -48,7 +46,6 @@ export const deleteDirectoryItem = async (option: string, directoryId: number) =
 
         return data;
     } catch (error) {
-        console.error('폴더 및 파일 삭제 에러:', error);
         throw error;
     }
 }
@@ -63,7 +60,6 @@ export const editDirectoryItem = async (id: number, name: string) => {
         const data = response.data.data
         return data
     } catch (error) {
-        console.log('디렉토리 수정 에러:', error)
         throw error;
     }
 }
@@ -78,7 +74,6 @@ export const moveDirectoryItem = async (id: number, parentId: number) => {
         const data = response.data.data;
         return data;
     } catch (error) {
-        console.error('디렉토리 이동 에러:', error);
         throw error;
     }
 };
@@ -90,7 +85,6 @@ export const fetchTrashbin = async () => {
         const data = response.data.data
         return data
     } catch (error) {
-        console.error('휴지통 조회 에러:', error)
         throw error;
     }
 }
@@ -103,7 +97,6 @@ export const restoreDirectoryItem = async (directoryId: number): Promise<IConten
 
         return data;
     } catch (error: any) {
-        console.error('휴지통 복원 에러:', error);
         throw error;
     }
 }

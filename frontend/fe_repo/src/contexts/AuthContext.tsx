@@ -37,7 +37,7 @@ const loadStateFromLocalStorage = (): AuthState => {
         }
         return JSON.parse(serializedState);
     } catch (error) {
-        console.error("로컬 스토리지에서 불러오는게 잘못됐다", error)
+
         return initialState;
     }
 }
@@ -48,7 +48,7 @@ const saveStateToLocalStorage = (state: AuthState) => {
         const serializedState = JSON.stringify(state);
         localStorage.setItem('authDetails', serializedState);
     } catch (error) {
-        console.log("로컬스토리지에 저장안됐어..", error)
+
     }
 }
 
