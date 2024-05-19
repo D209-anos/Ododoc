@@ -1,8 +1,9 @@
 .container{
     max-width: 100%;
     padding-left: 10%;
-    margin-right: 15%;
-    margin-top: 3%;
+    /* margin-right: 15%; */
+    /* margin-top: 3%; */
+    /* min-height: 100%; */
 }
 
 .editableTitle {
@@ -10,13 +11,21 @@
     outline: none;
     padding: 0;
     background: none;
-    font-size: 2em; /* 제목 크기 조정 */
+    font-size: 2em;
     font-weight: bold;
-    color: #333; /* 글자 색상 조정 */
-    }
+    color: #333;
+}
+
+.titleLine {
+  margin-right: 9%;
+}
   
   .editableTitle:focus {
-    outline: none; /* 편집 시 아웃라인 제거 */
+    outline: none;
+  }
+
+  .yooptaEditor {
+    margin-right: 8.5%;
   }
 
   .title {
