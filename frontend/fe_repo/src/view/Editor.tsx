@@ -30,7 +30,7 @@ function Editor() {
 
     return (
         <div className={`${EditorStyle.editorContainer} ${isDarkMode ? 'darkMode' : ''}`}>
-            <div 
+            <div
                 className={EditorStyle.sidebarWrapper}
                 style={{ width: `${sidebarWidth}px` }}
             >
@@ -42,9 +42,9 @@ function Editor() {
             </div>
             <div className={`${EditorStyle.editorWrapper} ${isDarkMode ? 'darkMode' : ''}`}>
                 <Routes>
-                    {/* <Route index element={<Mypage/>}/> */}
+                    <Route index element={<Mypage/>}/>
                     <Route path=":id" element={<Editor1 />} />
-                    <Route path="profile" element={<Mypage/>} />
+                    <Route path="profile" element={<Mypage />} />
                 </Routes>
             </div>
         </div>
