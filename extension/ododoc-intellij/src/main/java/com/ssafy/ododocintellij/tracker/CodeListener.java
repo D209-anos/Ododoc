@@ -265,6 +265,7 @@ public class CodeListener implements ExecutionListener {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
                 String output = objectMapper.writeValueAsString(requestDto);
+                System.out.println(output);
                 BuildResultSender.sendMessage(output);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -284,8 +285,9 @@ public class CodeListener implements ExecutionListener {
             if (outputType.equals(ProcessOutputTypes.STDERR)) {
                 errorFlag = true;
                 errorLog.append(text);
-            } else if (outputType.equals(ProcessOutputTypes.STDOUT)) {
-                if (text.contains("ERROR")) {
+            }
+            else{
+                if (text.contains("ERROR") || text.contains(" ERROR")) {
                     errorFlag = true;
                     errorLog.append(text);
                     capturingError = true;

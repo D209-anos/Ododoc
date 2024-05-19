@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.ssafy"
-version = "1.0-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
 
 repositories {
   mavenCentral()
@@ -29,7 +29,7 @@ javafx {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
   version.set("2023.3.4")
-  type.set("IC") // Target IDE Platform
+  type.set("IU") // Target IDE Platform
 
   plugins.set(listOf("com.intellij.java"))
 }
@@ -39,6 +39,7 @@ tasks {
   withType<JavaCompile> {
     sourceCompatibility = "17"
     targetCompatibility = "17"
+    options.encoding = "UTF-8"
   }
 
   patchPluginXml {

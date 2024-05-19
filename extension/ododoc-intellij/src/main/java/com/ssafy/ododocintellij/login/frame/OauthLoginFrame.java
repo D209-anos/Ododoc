@@ -135,6 +135,8 @@ public class OauthLoginFrame extends Stage {
                 alert.showAndWait();
                 close();
                 cookieManager.getCookieStore().removeAll();
+                webEngine.executeScript("localStorage.clear();");
+                webEngine.load("about:blank");
             });
         };
 
@@ -210,6 +212,8 @@ public class OauthLoginFrame extends Stage {
                             alert.showAndWait();
                             close();
                             cookieManager.getCookieStore().removeAll();
+                            webEngine.executeScript("localStorage.clear();");
+                            webEngine.load("about:blank");
                         });
 
                         return;
