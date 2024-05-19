@@ -1,10 +1,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;500&family=Pacifico&display=swap");
 
-.container {
+/* .container {
     height: 1000vh;
     overflow-y: auto;
+} */
+
+.vscodeGuide {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
+.guideTitle {
+    background-color: #fdedd5;
+    margin: 130px 0px 0px 150px;
+}
+
+.guide {
+    color: black;
+    font-family: 'hanbitFont';
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/* HEADER */
 .header {
     padding-top: 110px;
     background-color: #fdedd5;
@@ -12,10 +33,166 @@
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    justify-content: center;
     position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
+
+.imageContainer0 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent0 {
+    position: absolute;
+    right: 58vh;
+    top: 26vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ChromeExplainImage0 {
+    position: absolute;
+    right: 38vh;
+    top: 35vh;
+    width: 450px;
+    height: auto;
+    border-radius: 10px;
+    border: 0.1px solid gray;
+}
+
+
+/* CONTENT 1 */
+.content1 {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.imageContainer1 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent1 {
+    position: absolute;
+    left: 15vh;
+    top: 45vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ChromeExplainImage1 {
+    position: absolute;
+    left: 15vh;
+    top: 54vh;
+    width: 500px;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+/* CONTENT 2 */
+.content2 {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.imageContainer2 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent2 {
+    position: absolute;
+    left: 15vh;
+    top: 14vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ChromeExplainImage2 {
+    position: absolute;
+    left: 13vh;
+    top: 23vh;
+    width: 700px;
+    height: auto;
+    border-radius: 10px;
+    /* border: 1px solid gray; */
+}
+
+/* -------------------------------------- */
+
+.imageContainer3 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent3 {
+    position: absolute;
+    right: 35vh;
+    top: 116vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.ChromeExplainImage3 {
+    position: absolute;
+    right: 20vh;
+    top: 125vh;
+    width: 500px;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+/* CONTENT 3 */
+.imageContainer4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent4 {
+    position: absolute;
+    left: 15vh;
+    bottom: 248vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+.VscodeExplainImage4 {
+    position: absolute;
+    left: 12vh;
+    bottom: 190vh;
+    width: 800px;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+/* CONTENT 4 */
+.imageContainer5 {
+    display: flex;
+    flex-direction: column;
+}
+
+.ExplainContent5 {
+    position: absolute;
+    right: 25vh;
+    bottom: 90vh;
+    font-family: 'hanbitFont';
+    font-size: 20px;
+}
+
+
+/* PATH */
 
 .path {
     fill: none;
@@ -34,6 +211,31 @@
     stroke-dashoffset: 0;
 }
 
+.path1 {
+    animation: draw1 4s ease forwards;
+    animation: drawPath1 1s linear, floating 2.2s linear infinite;
+}
+
+.path2 {
+    stroke: black;
+    z-index: 2000;
+    animation: draw2 40s ease forwards;
+}
+
+.path3 {
+    animation: draw3 10s ease forwards;
+}
+
+.path4 {
+    animation: draw4 12s ease forwards;
+}
+
+.path5 {
+    animation: draw5 14s ease forwards;
+}
+
+
+/* DRAW */
 .draw {
     animation: drawPath 4s forwards;
 }
@@ -100,10 +302,8 @@
     }
 }
 
-.path1 {
-    animation: draw1 4s ease forwards;
-    animation: drawPath1 1s linear, floating 2.2s linear infinite;
-}
+
+/* CONTENT */
 
 .content1,
 .content2,
@@ -132,36 +332,11 @@
     bottom: 0;
 }
 
-.path2 {
-    stroke: black;
-    z-index: 2000;
-    animation: draw2 40s ease forwards;
-}
-
 .footer {
     height: 30vh;
     background-color: #fdedd5;
 }
 
-.vscodeGuide {
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
-
-.guideTitle {
-    background-color: #fdedd5;
-    margin: 130px 0px 0px 150px;
-}
-
-.guide {
-    color: black;
-    font-family: 'hanbitFont';
-    font-size: 30px;
-    font-weight: bold;
-}
 
 .Explain1,
 .Explain2,
@@ -171,19 +346,4 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.path3 {
-    animation: draw3 10s ease forwards;
-    /* Explain3 애니메이션 10초 */
-}
-
-.path4 {
-    animation: draw4 12s ease forwards;
-    /* Explain4 애니메이션 12초 */
-}
-
-.path5 {
-    animation: draw5 14s ease forwards;
-    /* Explain5 애니메이션 14초 */
 }

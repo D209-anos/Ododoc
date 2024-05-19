@@ -32,7 +32,7 @@ function Editor() {
         <div className={`${EditorStyle.editorContainer} ${isDarkMode ? 'darkMode' : ''}`}>
             <div
                 className={EditorStyle.sidebarWrapper}
-                style={{ width: `${sidebarWidth}px` }}
+                style={{ width: `${sidebarWidth}px`, zIndex: 10 }}
             >
                 <SideBar />
                 <div

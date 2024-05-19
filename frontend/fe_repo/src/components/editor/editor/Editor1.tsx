@@ -282,21 +282,23 @@ function Editor1() {
         <h1 contentEditable="true" onBlur={handleTitleChange} suppressContentEditableWarning={true} onKeyDown={handleKeyDown} className={EditorDetailStyle.editableTitle}>
           {title}
         </h1>
-        <hr />
-        {isDataLoaded && (
-          <YooptaEditor
-            key={directoryId}
-            editor={editor}
-            //@ts-ignore
-            plugins={plugins}
-            tools={TOOLS}
-            marks={MARKS}
-            selectionBoxRoot={selectionRef}
-            //@ts-ignore
-            value={documentData}
-            autoFocus
-          />
-        )}
+        <hr className={EditorDetailStyle.titleLine}/>
+        <div className={EditorDetailStyle.yooptaEditor}>
+          {isDataLoaded && (
+            <YooptaEditor
+              key={directoryId}
+              editor={editor}
+              //@ts-ignore
+              plugins={plugins}
+              tools={TOOLS}
+              marks={MARKS}
+              selectionBoxRoot={selectionRef}
+              //@ts-ignore
+              value={documentData}
+              autoFocus
+            />
+          )}
+        </div>
       </div>
     </>
   );
