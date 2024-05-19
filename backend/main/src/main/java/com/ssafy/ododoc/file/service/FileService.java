@@ -182,12 +182,15 @@ public class FileService {
 
         lastOrder++;
 
+        LinkedHashMap<String, Block> content = redisFile.getContent();
+
         for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
             entry.getValue().getMeta().setOrder(lastOrder++);
-            redisFile.getContent().put(entry.getKey(), entry.getValue());
+            content.put(entry.getKey(), entry.getValue());
         }
 
         redisFile.setLastOrder(lastOrder - 1);
+        redisFile.setContent(content);
         redisFileRepository.save(redisFile);
 
         return FileResponse.builder()
