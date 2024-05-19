@@ -21,15 +21,19 @@
 #### ✔ 시연 영상
 - 에디터 기능
 ![img](./readme/gif/editor.gif)
+
 <br>
+
 - Chrome Extension
 
 - VS Code Extension Setting
 ![img](./readme/gif/vscodeinstall.gif)
 <br>
+
 - VS Code Extension Setting
 ![img](./readme/gif/vscodeuse.gif)
 <br>
+
 - Intelli J Plugin
 <br>
 
