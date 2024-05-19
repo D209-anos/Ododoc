@@ -41,7 +41,7 @@ public class ChromeDataTransferService {
 
     private String summarizeByGpt(String content) {
         String prompt = content + "\n위 URL의 내용을 한국어 5줄로 요약 정리해줘.";
-        GptResponseDto chat = gptService.chat("gpt-4-turbo", prompt, "http://localhost:8080/api");
+        GptResponseDto chat = gptService.chat("gpt-4", prompt, "http://localhost:8080/api");
 
         return chat.getChoices().get(0).getMessage().getContent();
     }
