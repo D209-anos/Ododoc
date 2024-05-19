@@ -1,5 +1,7 @@
 package com.ssafy.ododoc.file.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.common.util.S3Util;
 import com.ssafy.ododoc.directory.entity.DirectoryClosure;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
@@ -184,9 +186,23 @@ public class FileService {
 
         LinkedHashMap<String, Block> content = redisFile.getContent();
 
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            log.info("content : {}", objectMapper.writeValueAsString(content));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
             entry.getValue().getMeta().setOrder(lastOrder++);
             content.put(entry.getKey(), entry.getValue());
+        }
+
+        try {
+            log.info("바뀐 content : {}", objectMapper.writeValueAsString(content));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
         redisFile.setLastOrder(lastOrder - 1);
