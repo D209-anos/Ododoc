@@ -8,88 +8,116 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.ssafy.ododocintellij.directory.manager.ConnectedFileManager;
+import com.ssafy.ododocintellij.login.alert.AlertHelper;
 import com.ssafy.ododocintellij.login.manager.TokenManager;
 import com.ssafy.ododocintellij.sender.BuildResultSender;
 import com.ssafy.ododocintellij.tracker.dto.BuildResultInfo;
+import com.ssafy.ododocintellij.tracker.dto.ErrorFileInfo;
 import com.ssafy.ododocintellij.tracker.dto.ModifiedFileInfo;
 import com.ssafy.ododocintellij.tracker.dto.RequestDto;
 import com.ssafy.ododocintellij.tracker.entity.ProjectInfo;
 import com.ssafy.ododocintellij.tracker.manager.ProjectTracker;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CodeListener implements ExecutionListener {
 
     private final Project project;
+    private List<PsiFile> psiFiles;
+    private List<ErrorFileInfo> errorFiles = new ArrayList<>();
+    private Map<String, ProjectInfo> currentProjectInfo = new HashMap<>();
+    private boolean capturingError;
+    private boolean errorFlag;
 
     public CodeListener(Project project) {
         this.project = project;
     }
 
-
     @Override
     public void processStarted(@NotNull String executorId, @NotNull ExecutionEnvironment env, @NotNull ProcessHandler handler) {
-        handler.addProcessListener(new ProcessListener() {
+        CompletableFuture.runAsync(() -> getCurrentProject())
+                .thenRun(this::initializeProjectTracker)
+                .thenRun(() -> {
+                    // 파일 연동이 되어있다면
+                    if (ConnectedFileManager.getInstance().getDirectoryId() != 0L) {
+                        startSignal();
+                    } else {
+                        Platform.runLater(() -> {
+                            Alert alert = AlertHelper.makeAlert(
+                                    Alert.AlertType.WARNING,
+                                    " Ododoc",
+                                    "파일 연동 오류",
+                                    "파일이 연동되지 않았습니다.\n해당 결과는 새로 생성된 파일에 기록됩니다.",
+                                    "/image/button/icon.png"
+                            );
+                            alert.showAndWait();
+                        });
+                    }
 
-            StringBuilder outputLog = new StringBuilder();
+                    handler.addProcessListener(new OdodocProcessListener());
+                });
+    }
 
-            // 빌드가 끝이 났을 경우
-            @Override
-            public void processTerminated(@NotNull ProcessEvent event) {
-                RequestDto requestDto = new RequestDto();
-                BuildResultInfo buildResultInfo = new BuildResultInfo();
+    private void getCurrentProject() {
+        psiFiles = new ArrayList<>();
+        currentProjectInfo.clear();
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            ApplicationManager.getApplication().runReadAction(() -> {
+                GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+                Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, "java", scope);
 
-                requestDto.setSourceApplication("IntelliJ");
-                requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
-                // Todo: 연동된 파일 ID 넣기
-                requestDto.setConnectedFileId(5);
-                requestDto.setTimeStamp(LocalDateTime.now().toString());
+                PsiManager psiManager = PsiManager.getInstance(project);
+                psiFiles = files.stream()
+                        .map(psiManager::findFile)
+                        .collect(Collectors.toList());
 
-                // 빌드 성공 유무
-                if(event.getExitCode() == 0){
-                    requestDto.setDataType("OUTPUT");
-                    buildResultInfo.setDetails("빌드 성공");
-                }
-                // 실패했을 경우 에러 내용 담기
-                else{
-                    requestDto.setDataType("ERROR");
-                    buildResultInfo.setDetails(outputLog.toString());
-                }
-                buildResultInfo.setModifiedFiles(getModifiedFiles());
-                requestDto.setContent(buildResultInfo);
-                outputLog.setLength(0);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    String output = objectMapper.writeValueAsString(requestDto);
-                    BuildResultSender.sendMessage(output);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-
-            // 터미널 파싱
-            @Override
-            public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
-                if(outputType.equals(ProcessOutputTypes.STDERR)) {
-                    outputLog.append(event.getText());
-                }
-            }
+                psiFiles.forEach(file ->
+                        currentProjectInfo.put(file.getName(), new ProjectInfo(file, "", file.getText())));
+            });
         });
+    }
+
+    private void initializeProjectTracker() {
+        ProjectTracker projectTracker = ProjectTracker.getInstance();
+        projectTracker.currentHashStatus(project);
+    }
+
+    private void startSignal() {
+        RequestDto requestDto = new RequestDto();
+        requestDto.setSourceApplication("INTELLIJ");
+        requestDto.setDataType("SIGNAL");
+        requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
+        requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
+        requestDto.setTimestamp(LocalDateTime.now());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String output = objectMapper.writeValueAsString(requestDto);
+            BuildResultSender.sendMessage(output);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<ModifiedFileInfo> getModifiedFiles() {
         ProjectTracker projectTracker = ProjectTracker.getInstance();
-        projectTracker.currentHashStatus(project);
 
         Map<String, ProjectInfo> beforeProjectStatus = projectTracker.getBeforeProjectStatus();
         Map<String, ProjectInfo> currentProjectStatus = projectTracker.getCurrentProjectStatus();
@@ -105,7 +133,6 @@ public class CodeListener implements ExecutionListener {
             for(Map.Entry<String, ProjectInfo> entry : beforeProjectStatus.entrySet()){
                 before = entry.getValue().getHash();
                 current = currentProjectStatus.get(entry.getKey()).getHash();
-
                 // 바뀐 파일이라면 해당 파일
                 if(!before.equals(current)){
                     isChange = true;
@@ -178,20 +205,20 @@ public class CodeListener implements ExecutionListener {
         }
 
         return modifiedFileInfoList;
+
     }
 
-    private void addModifiedFile(List<ModifiedFileInfo> modifiedFileInfoList, PsiFile modifiedFile){
+    private void addModifiedFile(List<ModifiedFileInfo> modifiedFileInfoList, PsiFile modifiedFile) {
         String fileName = modifiedFile.getName();
         String sourceCode = modifiedFile.getText();
-
         modifiedFileInfoList.add(new ModifiedFileInfo(fileName, sourceCode));
     }
 
-    private void deepCopy(Map<String, ProjectInfo> currentProjectStatus){
+    private void deepCopy(Map<String, ProjectInfo> currentProjectStatus) {
         ProjectTracker projectTracker = ProjectTracker.getInstance();
         projectTracker.setBeforeProjectStatus(
                 currentProjectStatus.entrySet().stream()
-                        .collect(Collectors.toMap(e -> e.getKey(), e-> {
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> {
                             try {
                                 return (ProjectInfo) e.getValue().clone();
                             } catch (CloneNotSupportedException ex) {
@@ -200,5 +227,95 @@ public class CodeListener implements ExecutionListener {
                         }))
         );
     }
-    
+
+    private class OdodocProcessListener implements ProcessListener {
+        StringBuilder allOutputLog = new StringBuilder();
+        StringBuilder errorLog = new StringBuilder();
+        StringBuilder stdOutLog = new StringBuilder();
+
+        @Override
+        public void processTerminated(@NotNull ProcessEvent event) {
+            RequestDto requestDto = new RequestDto();
+            BuildResultInfo buildResultInfo = new BuildResultInfo();
+
+            requestDto.setSourceApplication("INTELLIJ");
+            requestDto.setAccessToken(TokenManager.getInstance().getAccessToken());
+            requestDto.setConnectedFileId(ConnectedFileManager.getInstance().getDirectoryId());
+            requestDto.setTimestamp(LocalDateTime.now());
+
+            if (errorFlag) {
+                buildResultInfo.setDetails(errorLog.toString());
+                if (errorFiles.size() > 1) {
+                    buildResultInfo.setErrorFile(errorFiles.get(0));
+                }
+                buildResultInfo.setModifiedFiles(getModifiedFiles());
+
+                requestDto.setDataType("ERROR");
+                requestDto.setContent(buildResultInfo);
+            } else {
+                buildResultInfo.setDetails(stdOutLog.toString());
+
+                List<ModifiedFileInfo> temp = getModifiedFiles();
+                buildResultInfo.setModifiedFiles(temp);
+
+                requestDto.setDataType("OUTPUT");
+                requestDto.setContent(buildResultInfo);
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                String output = objectMapper.writeValueAsString(requestDto);
+                System.out.println(output);
+                BuildResultSender.sendMessage(output);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            allOutputLog.setLength(0);
+            errorLog.setLength(0);
+            stdOutLog.setLength(0);
+            errorFiles = new ArrayList<>();
+            errorFlag = false;
+            capturingError = false;
+        }
+
+        @Override
+        public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
+            String text = event.getText();
+            if (outputType.equals(ProcessOutputTypes.STDERR)) {
+                errorFlag = true;
+                errorLog.append(text);
+            }
+            else{
+                if (text.contains("ERROR") || text.contains(" ERROR")) {
+                    errorFlag = true;
+                    errorLog.append(text);
+                    capturingError = true;
+                }
+                else if (capturingError) {
+                    if (text.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}\\+\\d{2}:\\d{2} .*")) {
+                        capturingError = false;
+                    }
+                    else {
+                        Pattern pattern = Pattern.compile("\\(([^)]+):(\\d+)\\)");
+                        Matcher matcher = pattern.matcher(text);
+                        if (matcher.find()) {
+                            if (currentProjectInfo.containsKey(matcher.group(1))) {
+                                ProjectInfo projectInfo = currentProjectInfo.get(matcher.group(1));
+                                String fileName = projectInfo.getPsiFile().getName();
+                                String sourceCode = projectInfo.getSourceCode();
+                                int line = Integer.parseInt(matcher.group(2));
+                                errorFiles.add(new ErrorFileInfo(fileName, sourceCode, line));
+                            }
+                        }
+                        errorLog.append(text);
+                    }
+                }
+                else {
+                    stdOutLog.append(text);
+                }
+            }
+            allOutputLog.append(text);
+        }
+    }
 }
