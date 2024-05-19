@@ -14,8 +14,6 @@ export const useSendCodeToBackend = () => {
                 code: code,
                 url: url
             });
-            console.log('Login Info:', response.data);
-
             const { accessToken, refreshToken, rootId, title, type } = response.data.data;
             // 상태 업데이트
             dispatch({ type: 'SET_AUTH_DETAILS', payload: { accessToken, refreshToken, rootId, title, type } });

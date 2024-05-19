@@ -28,7 +28,6 @@ function Mypage() {
 
     useEffect(() => {
         fetchProfile().then(data => {
-            console.log('Directory data:', data);
             setErrorCount(data.errorCount);
             setBuilds(data.buildCount);
             setKeywordSearches(data.searchCount);

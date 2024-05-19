@@ -87,7 +87,6 @@ const SideBar: React.FC = () => {
     // 디렉토리 조회 (디렉토리 생성 후 조회)
     useEffect(() => {
         if (directoryData){
-            console.log(directoryData)
             setContents(directoryData.children as MyDirectoryItem[])    // diretoryData 정보 넣음
             setUserName(directoryData.name);                            // 사용자 이름 넣음
         } else {
@@ -251,7 +250,6 @@ const SideBar: React.FC = () => {
 
     // 우클릭 한 해당 항목의 정보를 setSelectedItem에 상태관리하는 함수
     const handleEdit = (id: number) => {
-        console.log(`${id}`)
         const itemToEdit = findItemById(contents, id);
         if (itemToEdit) {
             setSelectedItem(itemToEdit);
@@ -496,7 +494,6 @@ const SideBar: React.FC = () => {
 
         // 디렉토리 이동 API 호출
         try {
-            console.log(`ID: ${draggedId} parent ID: ${parentId}`);
             await moveDirectoryItem(draggedId, parentId!);
             const updatedDirectoryData = await fetchDirectory(rootId);
             setDirectoryData(updatedDirectoryData)
