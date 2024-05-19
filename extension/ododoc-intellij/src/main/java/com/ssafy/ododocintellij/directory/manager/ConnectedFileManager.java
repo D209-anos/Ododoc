@@ -2,7 +2,7 @@ package com.ssafy.ododocintellij.directory.manager;
 
 public class ConnectedFileManager {
 
-    private Long directoryId = -1L;
+    private Long directoryId = 0L;
 
     private ConnectedFileManager() {}
 

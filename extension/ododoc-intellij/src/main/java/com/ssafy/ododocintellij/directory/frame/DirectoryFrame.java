@@ -15,6 +15,8 @@ import com.ssafy.ododocintellij.sender.alert.WebSocketReConnectAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,6 +26,10 @@ import javafx.stage.Stage;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,12 +42,6 @@ public class DirectoryFrame extends Application {
     private ContextMenu folderContextMenu = new ContextMenu();
     private ContextMenu fileContextMenu = new ContextMenu();
     private Stage stage;
-
-    @Override
-    public void init() throws Exception {
-        super.init();
-        Platform.setImplicitExit(false);
-    }
 
     @Override
     public void start(Stage initStage) {
@@ -106,8 +106,14 @@ public class DirectoryFrame extends Application {
         connectButton.setTooltip(new Tooltip("서버 연결"));
         connectButton.setOnAction(e -> connectWebSocket());
 
+        Button homeButton = new Button();
+        ImageView homeIcon = new ImageView(new Image(getClass().getResourceAsStream("/image/button/home.png")));
+        homeButton.setGraphic(homeIcon);
+        homeButton.setTooltip(new Tooltip("Ododoc 홈페이지로 이동"));
+        homeButton.setOnAction(e -> openWebPage());
+
         ToolBar toolBar = new ToolBar();
-        toolBar.getItems().addAll(refreshButton, connectButton);
+        toolBar.getItems().addAll(homeButton, connectButton, refreshButton);
         BorderPane root = new BorderPane();
         root.setBottom(toolBar);
         root.setCenter(treeView);
@@ -143,10 +149,10 @@ public class DirectoryFrame extends Application {
                     }
                     else{
                         result.setData(new DirectoryDto());
-                        showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING,"조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요.");
                     }
                 })
-                .doOnError(error -> showAlert("조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요."));
+                .doOnError(error -> showAlert(Alert.AlertType.WARNING,"조회 실패", "디렉토리 조회에 실패했습니다.\n 새로고침 버튼은 눌러 다시 시도해주세요."));
     }
 
     private TreeItem<FileInfo> LoadDirectory(List<DirectoryDto> children, TreeItem<FileInfo> invisibleRoot) {
@@ -194,6 +200,13 @@ public class DirectoryFrame extends Application {
     private void connectFile() {
         ConnectedFileManager connectedFileManager = ConnectedFileManager.getInstance();
         connectedFileManager.setDirectoryId(currentDirectoryId);
+
+        if(connectedFileManager.getDirectoryId() != -1){
+            showAlert(Alert.AlertType.INFORMATION, "연동 성공", "파일과 연동에 성공하였습니다.");
+        }
+        else{
+            showAlert(Alert.AlertType.WARNING, "연동 실패", "파일과의 연동에 실패하였습니다.");
+        }
     }
 
     private void createFolderOrFile(String type){
@@ -215,15 +228,15 @@ public class DirectoryFrame extends Application {
                     }
                     else if (result.getStatus() == 401) {
                         refreshAccessToken();
-                        showAlert("생성 실패", "다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING, "생성 실패", "다시 시도해주세요.");
                         refreshDirectoryView();
                     }
                     else {
-                        showAlert("생성 실패", "다시 시도해주세요.");
+                        showAlert(Alert.AlertType.WARNING,"생성 실패", "다시 시도해주세요.");
                         refreshDirectoryView();
                     }
                 }, error -> {
-                    showAlert("생성 실패", "다시 시도해주세요.");
+                    showAlert(Alert.AlertType.WARNING,"생성 실패", "다시 시도해주세요.");
                     refreshDirectoryView();
                 });
     }
@@ -240,10 +253,10 @@ public class DirectoryFrame extends Application {
         });
     }
 
-    private void showAlert(String header, String content){
+    private void showAlert(Alert.AlertType type, String header, String content){
         Platform.runLater(() ->{
             Alert alert = AlertHelper.makeAlert(
-                    Alert.AlertType.WARNING,
+                    type,
                     " Ododoc",
                     header,
                     content,
@@ -312,6 +325,19 @@ public class DirectoryFrame extends Application {
             });
         }
 
+    }
+
+    private void openWebPage(){
+        Platform.runLater(() -> {
+            try{
+                if(Desktop.isDesktopSupported()){
+                    Desktop desktop = Desktop.getDesktop();
+                    desktop.browse(new URI("https://k10d209.p.ssafy.io/"));
+                }
+            } catch (IOException | URISyntaxException e){
+                e.printStackTrace();
+            }
+        });
     }
 
 }

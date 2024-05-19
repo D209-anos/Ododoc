@@ -18,49 +18,53 @@ import org.jetbrains.annotations.Nullable;
 public class StartUpActivity implements ProjectActivity {
     private static boolean javafxInitialized = false;
 
+
     @Nullable
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         TokenManager tokenManager = TokenManager.getInstance();
         ProjectProvider projectProvider = ProjectProvider.getInstance();
         projectProvider.getProjects().offer(project);
-
-        // JavaFX 플랫폼 초기화 상태 체크 및 조건부 초기화
-        if(!javafxInitialized) {
-            // JavaFX 플랫폼
-            Platform.startup(() -> {
-                javafxInitialized = true;
-                runActivity(tokenManager, projectProvider);
-            });
-
-        }
-        // JavaFX 플랫폼이 초기화 되어 있다면
-        else {
-            if(tokenManager.getAccessToken() == null || tokenManager.getRefreshToken() == null) {
-                Platform.runLater(() -> {
-                    Alert alert = AlertHelper.makeAlert(
-                            Alert.AlertType.WARNING,
-                            "Ododoc IntelliJ Plugin",
-                            "로그인 필요",
-                            "자동 정리 기능을 사용하려면 로그인이 필요합니다.",
-                            "/image/button/icon.png"
-                    );
-                });
-            } else{
-                addCodeListener(projectProvider);
-            }
-        }
+//        project.getService(DisposableService.class);
+        initializeJavaFXPlatform();
+        checkAndAddCodeListener(tokenManager, projectProvider);
 
         return null;
     }
 
-    // 로그인되어 있지 않으면 로그인 창 띄우기
-    private void runActivity(TokenManager tokenManager, ProjectProvider projectProvider){
+
+
+    private synchronized void initializeJavaFXPlatform() {
+        // JavaFX 플랫폼 초기화 상태 체크 및 조건부 초기화
+        if(!javafxInitialized){
+            Platform.startup(() -> {
+                javafxInitialized = true;
+                Platform.setImplicitExit(false);
+                new MainLoginFrame();
+            });
+        }
+    }
+
+    private void checkAndAddCodeListener(TokenManager tokenManager, ProjectProvider projectProvider) {
         if(tokenManager.getAccessToken() == null || tokenManager.getRefreshToken() == null){
-            new MainLoginFrame();
-        } else {
+//            showLoginAlert();
+        }
+        else{
             addCodeListener(projectProvider);
         }
+    }
+
+    private void showLoginAlert() {
+        Platform.runLater(() -> {
+            Alert alert = AlertHelper.makeAlert(
+                    Alert.AlertType.WARNING,
+                    "Ododoc IntelliJ Plugin",
+                    "로그인 필요",
+                    "자동 정리 기능을 사용하려면 로그인이 필요합니다.",
+                    "/image/button/icon.png"
+            );
+            alert.showAndWait();
+        });
     }
 
     // Queue에 있는 project 객체에 codeListener 추가해주기.
@@ -69,7 +73,9 @@ public class StartUpActivity implements ProjectActivity {
         Project tempProject = null;
         for(int i = 0; i < size; i++){
             tempProject = projectProvider.getProjects().poll();
-            tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+            if(tempProject.isOpen()){
+                tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+            }
         }
     }
 
