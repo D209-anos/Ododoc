@@ -36,7 +36,7 @@ export const TrashProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 const data = await fetchTrashbin();
                 setTrashbinData(data);
             } catch (error) {
-                console.error('휴지통 조회 에러:', error);
+
             }
         }
     };

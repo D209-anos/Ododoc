@@ -33,7 +33,7 @@ function Mypage() {
             setKeywordSearches(data.searchCount);
             setWebsiteVisits(data.visitCount);
         }).catch(error => {
-            console.error('Error fetching directory:', error);
+
         });
     }, []);
 

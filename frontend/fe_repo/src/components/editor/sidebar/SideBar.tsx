@@ -90,7 +90,7 @@ const SideBar: React.FC = () => {
             setContents(directoryData.children as MyDirectoryItem[])    // diretoryData 정보 넣음
             setUserName(directoryData.name);                            // 사용자 이름 넣음
         } else {
-            console.log("디렉토리 찾을 수 없음.")
+
         }
     }, [directoryData])
 
@@ -134,7 +134,6 @@ const SideBar: React.FC = () => {
     const saveName = async (id: number, newName: string) => {
         try {
             const data = await editDirectoryItem(id, newName);
-            console.log('폴더명/파일명 수정 완료:', data);
 
             setContents((prevContents) => {
                 const updatedContents = [...prevContents];
@@ -147,7 +146,7 @@ const SideBar: React.FC = () => {
 
             setIsContentEditing(false);
         } catch (error) {
-            console.error('폴더명/파일명 수정 실패:', error);
+
         }
     };
 
@@ -155,11 +154,10 @@ const SideBar: React.FC = () => {
     const saveUserName = async (objectId: number, newName: string) => {
         try {
             const data = await editDirectoryItem(objectId, newName);
-            console.log('닉넴 수정 완료:', data);
             dispatch({ type: 'SET_AUTH_DETAILS', payload: { ...state, title: newName } })
             setUserName(newName)
         } catch (error) {
-            console.error('닉넴 수정 에러:', error)
+
         } finally {
             setIsUsernameEditing(false);
         }
@@ -256,16 +254,14 @@ const SideBar: React.FC = () => {
             setIsContentEditing(true);
             hideMenu();
         } else {
-            console.error('Item not found.')
+
         }
     }
 
     // 폴더 또는 파일 삭제 버튼
     const handleDelete = async (id: number) => {
         try {
-            console.log(`delete id: ${id}`)
             const data = await deleteDirectoryItem('trashbin', id)
-            console.log('삭제 성공:', data)
 
             // 삭제로 디렉토리 목록 갱신
             const updatedContents = removeItemFromDirectory(contents, id);
@@ -276,7 +272,7 @@ const SideBar: React.FC = () => {
 
             loadTrashbin();
         } catch (error) {
-            console.log('directory delete error:', error)
+
         }
 
         hideMenu();
@@ -387,7 +383,7 @@ const SideBar: React.FC = () => {
         setSelectedId(newFileId);
         navigate(`/editor/${newFileId}`, { state: newFileId });
     } catch (error) {
-        console.error('파일 생성 에러:', error);
+
     }
 };
 
@@ -498,7 +494,7 @@ const SideBar: React.FC = () => {
             const updatedDirectoryData = await fetchDirectory(rootId);
             setDirectoryData(updatedDirectoryData)
         } catch (error) {
-            console.error('디렉토리 이동 에러:', error)
+
         }
     };
 

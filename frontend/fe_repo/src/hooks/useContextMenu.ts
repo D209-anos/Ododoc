@@ -11,7 +11,6 @@ const useContextMenu = () => {
     const [menuState, setMenuState] = useState<ContextWMenuState>({ visible: false, x:0, y:0, id:0});
 
     const showMenu = (x: number, y: number, id: number) => {
-        // console.log(id)
         setMenuState({
             visible: true,
             x,

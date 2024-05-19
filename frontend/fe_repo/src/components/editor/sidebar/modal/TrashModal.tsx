@@ -57,7 +57,6 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
                     loadTrashbin();
                 } catch (error) {
-                    console.error('영구 삭제 에러:', error);
                     Swal.fire({
                         html: '<h2 style="font-family: hanbitFont, sans-serif;">영구 삭제에 실패했습니다.</h2>',
                         icon: 'error',
@@ -66,23 +65,6 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
             }
         });
     };
-
-    //휴지통 조회
-    // useEffect(() => {
-    //     const loadTrashbin = async () => {
-    //         if (accessToken) {
-    //             try {
-    //                 console.log("휴지통에 데이터 잘 들어옴")
-    //                 console.log(trashbinData)
-    //                 const data = await fetchTrashbin();
-    //                 setTrashbinData(data);
-    //             } catch (error) {
-    //                 console.error('휴지통 조회 에러:', error)
-    //             }
-    //         } 
-    //     };
-    //     loadTrashbin();
-    // }, [accessToken])
 
     // 휴지통 복원 모달
     const handleRestore = async (item: IContentItem) => {
@@ -102,7 +84,6 @@ const TrashModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
                     loadTrashbin();
                 } catch (error) {
-                    console.error('휴지통 복원 에러:', error);
                     Swal.fire({
                         html: '<h2 style="font-family: hanbitFont, sans-serif;">복원에 실패했습니다.</h2>',
                         icon: 'error',

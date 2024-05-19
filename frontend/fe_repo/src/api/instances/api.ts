@@ -34,7 +34,6 @@ api.interceptors.request.use(
                 config.headers["Authorization"] = `${accessToken}`;
             }
         }
-        // console.log(config.headers);
         return config;
     },
     // 토큰 없을 때: 에러 띄우기
@@ -47,7 +46,6 @@ api.interceptors.request.use(
 axios.interceptors.response.use(
     response => response,
     error => {
-        console.error("Global Axios Error Handler:", error);
         return Promise.reject(error);
     }
 );
@@ -56,28 +54,21 @@ axios.interceptors.response.use(
 api.interceptors.response.use(
     response => response,
     async (error) => {
-        console.log("Response Interceptor error:", error)
         const originalRequest = error.config;
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
-            console.log("Response Interceptor: Token expired, attempting to refresh");
             originalRequest._retry = true;
 
             // 쿠키에서 리프레시 토큰 가져오기
             const refreshToken = Cookies.get('refreshToken');
-            console.log("Response Interceptor: refreshToken from Cookies", refreshToken);
             if (refreshToken) {
                 try {
                     const response = await axios.post(`${process.env.REACT_APP_PUBLIC_BASE_URL}/oauth2/issue/access-token`, {
                         refreshToken: refreshToken,
                     });
 
-                    console.log("Response Interceptor: refresh token response", response);
-
                     // 리프레시 토큰 요청 성공 시 (200)
                     if (response.status === 200) {
                         const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-                        console.log("Response Interceptor: new access token", accessToken);
-                        console.log("Response Interceptor: new refresh token", newRefreshToken);
 
                         localStorage.setItem("authDetails", JSON.stringify({
                             ...JSON.parse(localStorage.getItem("authDetails") || '{}'),
@@ -89,16 +80,13 @@ api.interceptors.response.use(
                         originalRequest.headers['Authorization'] = `${accessToken}`;
                         return api(originalRequest);
                     } else {
-                        console.warn("Response Interceptor: Refresh token request did not return 200", response);
                         alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
                         logout();
                     }
                 } catch (refreshError) {
-                    console.error('Error refreshing token:', refreshError)
                     logout();
                 }
             } else {
-                console.warn("Response Interceptor: No refresh token available");
                 logout();
             }
         }

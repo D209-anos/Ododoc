@@ -1,5 +1,4 @@
 import api from '../instances/api';
-import Cookies from 'js-cookie';
 import { useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -14,13 +13,12 @@ export const useSendCodeToBackend = () => {
                 code: code,
                 url: url
             });
+
             const { accessToken, refreshToken, rootId, title, type } = response.data.data;
             // 상태 업데이트
             dispatch({ type: 'SET_AUTH_DETAILS', payload: { accessToken, refreshToken, rootId, title, type } });
             localStorage.setItem('authDetails', JSON.stringify({ accessToken, refreshToken, rootId, title, type }))
-            // Cookies.set('refreshToken', refreshToken, { secure: true, sameSite: 'strict' });
         } catch (error) {
-            console.error('Error sending authorization code:', error);
         }
     }, [dispatch]);
 
@@ -38,7 +36,7 @@ export const useLogout = () => {
             localStorage.removeItem('authDetails');
             localStorage.removeItem('directoryData')
         } catch (error) {
-            console.error('Error during logout:', error);
+            
         }
     }, [dispatch]);
 
