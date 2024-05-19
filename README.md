@@ -36,17 +36,17 @@
 
 - IntelliJ Plugin
 
-  |로그인|폴더 생성|
-  |---|---|
-  |![img](./readme/gif/IntelliJ_GIF/로그인.gif)|![img](./readme/gif/IntelliJ_GIF/폴더_생성.gif)|
+  | 로그인                                                        | 폴더 생성                                                        |
+  |------------------------------------------------------------|--------------------------------------------------------------|
+  | <img src="./readme/gif/IntelliJ_GIF/로그인.gif" height="350"> | <img src="./readme/gif/IntelliJ_GIF/폴더_생성.gif" height="350"> |
 
   |파일 생성|폴더 및 파일 이름 수정|
   |---|---|
-  |![img](./readme/gif/IntelliJ_GIF/파일_생성.gif)|![img](./readme/gif/IntelliJ_GIF/폴더_및_파일_이름_수정.gif)|
+  |<img src="./readme/gif/IntelliJ_GIF/파일_생성.gif" height="350">|<img src="./readme/gif/IntelliJ_GIF/폴더_및_파일_이름_수정.gif" height="350">|
 
   |파일 연동|                                   |
   |---|-----------------------------------|
-  |![img](./readme/gif/IntelliJ_GIF/파일_연동.gif)| <div style="width: 368px;"></div> |
+  |<img src="./readme/gif/IntelliJ_GIF/파일_연동.gif" height="350">| <div style="width: 151px;"></div> |
 
   |홈 버튼|
   |---|
