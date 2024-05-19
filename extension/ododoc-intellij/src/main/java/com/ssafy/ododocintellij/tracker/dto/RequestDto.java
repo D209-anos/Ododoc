@@ -2,6 +2,9 @@ package com.ssafy.ododocintellij.tracker.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class RequestDto {
     @JsonProperty
     private String sourceApplication;
@@ -10,11 +13,13 @@ public class RequestDto {
     @JsonProperty
     private String dataType;
     @JsonProperty
-    private long connectedFileId;
+    private Long connectedFileId;
     @JsonProperty
-    private String timeStamp;
+    private String timestamp;
     @JsonProperty
     private Object content;
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     public void setSourceApplication(String sourceApplication) {
         this.sourceApplication = sourceApplication;
@@ -28,15 +33,17 @@ public class RequestDto {
         this.dataType = dataType;
     }
 
-    public void setConnectedFileId(int connectedFileId) {
+    public void setConnectedFileId(Long connectedFileId) {
         this.connectedFileId = connectedFileId;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
-    }
 
     public void setContent(Object content) {
         this.content = content;
     }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp.format(formatter);
+    }
+
 }
