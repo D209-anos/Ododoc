@@ -25,6 +25,19 @@
 <br>
 
 - Chrome Extension
+  |로그인|
+  |---|
+  |![img](./readme/gif/chrome/chrome_login.gif)|
+
+  |파일 선택|
+  |---|
+  |![img](./readme/gif/chrome/chrome_link.gif)|
+
+  |시작 & 중지|
+  |---|
+  |![img](./readme/gif/chrome/chrome_start.gif)|
+
+
 
 - VS Code Extension Setting
 ![img](./readme/gif/vscodeinstall.gif)
