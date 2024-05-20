@@ -15,6 +15,7 @@
 <br>
 
 #### ✔ UCC 영상
+- https://www.youtube.com/watch?v=qScnZKmp0eU
 
 <br>
 
@@ -43,7 +44,7 @@
 ![img](./readme/gif/vscodeinstall.gif)
 <br>
 
-- VS Code Extension Setting
+- VS Code Extension Use
 ![img](./readme/gif/vscodeuse.gif)
 <br>
 
@@ -334,7 +335,7 @@ EXT/vscode_feature/fruite_create**
 
 ### <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Memo.png" alt="Memo" width="15" height="15" /> 기능명세서
 
-![img](./readme/FunctionStatement.png)
+![img](./readme/FunctionStatement.PNG)
 
 ### 🎨 ERD
 
