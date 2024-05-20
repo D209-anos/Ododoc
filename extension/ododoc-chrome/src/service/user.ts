@@ -29,7 +29,8 @@ export const useSendCodeToBackend = () => {
 // 로그아웃
 export const logout = async() => {
     try {
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = chrome.storage.local.get('accessToken');
+        console.log(accessToken)
         if (!accessToken) {
             throw new Error('엑세스 토큰을 찾을 수 없네욤..');
         }
@@ -39,7 +40,12 @@ export const logout = async() => {
 
         // 로그아웃 후 local storage 토큰 제거
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('provider')
+        localStorage.removeItem('provider');
+        localStorage.removeItem('rootId');
+        localStorage.removeItem('title');
+        chrome.storage.local.clear(() => {
+            console.log('Chrome storage cleared');
+        });
     } catch (error) {
         console.error('로그아웃 도중 문제 발생!!!', error);
     }

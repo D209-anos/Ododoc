@@ -18,6 +18,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_sidebar_Sidebar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/sidebar/Sidebar */ "./src/components/sidebar/Sidebar.tsx");
 /* harmony import */ var _css_directory_directory_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./css/directory/directory.css */ "./src/css/directory/directory.css");
 /* harmony import */ var _service_user__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./service/user */ "./src/service/user.ts");
+/* harmony import */ var _contexts_AuthContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./contexts/AuthContext */ "./src/contexts/AuthContext.tsx");
+/* harmony import */ var _contexts_FileContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./contexts/FileContext */ "./src/contexts/FileContext.tsx");
+/* harmony import */ var _images_icon_ododocLogo_gif__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./images/icon/ododocLogo.gif */ "./src/images/icon/ododocLogo.gif");
+
+
+
 
 
 
@@ -37,13 +43,11 @@ const App = () => {
     const token = localStorage.getItem('accessToken');
     const root = localStorage.getItem('rootId');
     const storeName = localStorage.getItem('title');
-    console.log("타이틀 디코딩 직전", title);
     if (title) {
       const decodedTitle = decodeURIComponent(title);
       setFolderTitle(decodedTitle);
       console.log('Decoded Title:', folderTitle);
     }
-    console.log("타이틀 디코딩 끝?");
     if (accessToken && provider && rootId && title) {
       setAccessToken(accessToken); // 상태 업데이트
       setRootId(rootId);
@@ -71,6 +75,7 @@ const App = () => {
       google: "599323777848-68aq3cu9p98np6eml1m77mfc1ethpkrp.apps.googleusercontent.com",
       naver: "DRnVNgGzq_x_6Q4apfhJ"
     };
+    const extensionId = chrome.runtime.id;
     const redirectUri = {
       kakao: "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/kakao",
       google: "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/google",
@@ -95,13 +100,15 @@ const App = () => {
     localStorage.removeItem('rootId');
     localStorage.removeItem('title');
   };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, !accessToken ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_AuthContext__WEBPACK_IMPORTED_MODULE_5__.AuthProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, !accessToken ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "loginContent"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "loginTitleWrapper"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", {
-    className: "loginTitle"
-  }, "Login")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+    src: _images_icon_ododocLogo_gif__WEBPACK_IMPORTED_MODULE_7__,
+    className: "loginimage",
+    alt: ""
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "socialLoginBtnWrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "naverBtn socialLoginBtn",
@@ -112,91 +119,21 @@ const App = () => {
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "kakaoBtn socialLoginBtn",
     onClick: () => handleSocialLogin('kakao')
-  }))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_sidebar_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  }))) : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_FileContext__WEBPACK_IMPORTED_MODULE_6__.FileProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_sidebar_Sidebar__WEBPACK_IMPORTED_MODULE_2__["default"], {
     accessToken: accessToken,
-    rootId: rootId,
-    title: folderTitle
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "buttons-container",
-    onClick: handleLogout
-  }, "Logout")));
+    rootId: Number(rootId),
+    title: folderTitle,
+    onLogout: handleLogout
+  })))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
 /***/ }),
 
-/***/ "./src/components/sidebar/FileItem.tsx":
-/*!*********************************************!*\
-  !*** ./src/components/sidebar/FileItem.tsx ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _css_directory_directory_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css/directory/directory.css */ "./src/css/directory/directory.css");
-/* harmony import */ var _images_icon_file_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../images/icon/file.png */ "./src/images/icon/file.png");
-
-
-
-const FileItem = _ref => {
-  let {
-    item,
-    parentId,
-    selected,
-    handleItemClick,
-    selectedItem,
-    isContentEditing,
-    setIsContentEditing,
-    saveName
-  } = _ref;
-  const [isHovered, setIsHovered] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-
-  // 파일 배경색
-  const getBackgroundColor = () => {
-    if (selected) return '#ff914d';
-    if (isHovered) return 'gray';
-    return 'transparent';
-  };
-
-  // 파일 글자 색상
-  const color = () => {
-    if (selected) return 'white';
-    if (isHovered) return 'white';
-    return 'black';
-  };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    style: {
-      backgroundColor: getBackgroundColor(),
-      color: color(),
-      borderRadius: '8px'
-    },
-    className: "fileSpace",
-    onClick: () => handleItemClick(item.id),
-    onMouseEnter: () => setIsHovered(true),
-    onMouseLeave: () => setIsHovered(false)
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    src: _images_icon_file_png__WEBPACK_IMPORTED_MODULE_2__,
-    alt: "file-icon",
-    className: "fileImage"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    style: {
-      fontFamily: 'hanbitFont'
-    },
-    className: "folderName"
-  }, item.name));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FileItem);
-
-/***/ }),
-
-/***/ "./src/components/sidebar/FolderItem.tsx":
-/*!***********************************************!*\
-  !*** ./src/components/sidebar/FolderItem.tsx ***!
-  \***********************************************/
+/***/ "./src/components/sidebar/Item.tsx":
+/*!*****************************************!*\
+  !*** ./src/components/sidebar/Item.tsx ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -207,29 +144,91 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _css_directory_directory_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css/directory/directory.css */ "./src/css/directory/directory.css");
 /* harmony import */ var _images_icon_forder_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../images/icon/forder.png */ "./src/images/icon/forder.png");
+/* harmony import */ var _images_icon_file_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../images/icon/file.png */ "./src/images/icon/file.png");
+/* harmony import */ var _contexts_FileContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../contexts/FileContext */ "./src/contexts/FileContext.tsx");
 
 
 
-const FolderItem = _ref => {
+
+
+const Item = _ref => {
   let {
     item,
     parentId,
-    toggleModal,
-    modalActive,
+    // toggleModal, 
+    // folderAddModal,
     renderContents,
+    // handleContextMenu,
     handleItemClick,
     selectedItem,
-    isContentEditing,
-    setIsContentEditing,
-    saveName
+    // isContentEditing, 
+    // setIsContentEditing, 
+    // saveName, 
+    // setCreateFolderParentId,
+    // setAddingFolderId,
+    // addingFolderId,
+    // saveNewFolder,
+    // saveNewFile,
+    isFolderOpen,
+    toggleFolder
+    // moveItem,
+    // onDragOver,
+    // onDragLeave,
+    // dragOver
   } = _ref;
-  const [isFolderOpen, setIsFolderOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isDragOver, setIsDragOver] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 드래그
+  const [isAddingSubFolder, setIsAddingSubFolder] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false); // 폴더 추가 상태
+  const [newFolderName, setNewFolderName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(''); // 폴더 이름 상태
+  const [newFileName, setNewFileName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
+  const {
+    addingFileId,
+    isAddingSubFile,
+    setAddingFileId,
+    setIsAddingSubFile
+  } = (0,_contexts_FileContext__WEBPACK_IMPORTED_MODULE_4__.useFileContext)();
+  const ref = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
 
-  // 폴더 하위 요소 여닫는 함수
-  const toggleFolder = () => {
-    setIsFolderOpen(!isFolderOpen);
-    handleItemClick(item.id);
+  // const [{ isDragging }, drag] = useDrag({
+  //     type: 'ITEM',
+  //     item: { id: item.id, type: item.type, parentId },
+  //     collect: (monitor) => ({
+  //         isDragging: monitor.isDragging(),
+  //     }),
+  // });
+
+  // const [, drop] = useDrop({
+  //     accept: 'ITEM',
+  //     drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+  //         moveItem(draggedItem.id, item.id, item.type === 'FOLDER' ? item.id : parentId);
+  //         setIsDragOver(false);
+  //     },
+  //     hover: () => setIsDragOver(true),
+  //     collect: (monitor) => ({
+  //         isOver: monitor.isOver(),
+  //     }),
+  // });
+
+  // const [, dropAfter] = useDrop({
+  //     accept: 'ITEM',
+  //     drop: (draggedItem: { id: number, type: string, parentId: number | null }) => {
+  //         moveItem(draggedItem.id, null, null);  // newParentId를 null로 설정하여 최상위로 이동
+  //         setIsDragOver(false);
+  //     },
+  //     hover: () => setIsDragOver(true),
+  //     collect: (monitor) => ({
+  //         isOver: monitor.isOver(),
+  //     }),
+  // });
+
+  // drag(drop(ref));
+
+  // const opacity = isDragging ? 0.5 : 1;
+
+  const handleItemClickWrapper = () => {
+    handleItemClick(item.id, item.name);
   };
+
+  // 부모 ID를 찾는 함수
   const findParentId = function (contents, id) {
     let parentId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     if (!contents || typeof contents === 'string') return undefined;
@@ -245,23 +244,68 @@ const FolderItem = _ref => {
     return undefined;
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: ref,
     key: item.id,
-    className: "forderSpace"
+    className: "\"folderSpace\" ".concat(isDragOver ? "dragOver" : '')
+    // onContextMenu={(e) => handleContextMenu(e, item.id)}
+    ,
+    onDragLeave: () => setIsDragOver(false),
+    draggable: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "folderWrapper",
-    onClick: toggleFolder
+    onClick: item.type === 'FOLDER' ? toggleFolder : () => handleItemClick(item.id, item.name)
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
-    src: _images_icon_forder_png__WEBPACK_IMPORTED_MODULE_2__,
-    alt: "",
+    src: item.type === 'FOLDER' ? _images_icon_forder_png__WEBPACK_IMPORTED_MODULE_2__ : _images_icon_file_png__WEBPACK_IMPORTED_MODULE_3__,
+    alt: "".concat(item.type.toLowerCase(), "-image"),
     className: "forderImage"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     style: {
       fontFamily: 'hanbitFont'
     },
     className: "folderName"
-  }, item.name)), isFolderOpen && item.contents && Array.isArray(item.contents) && renderContents(item.contents));
+  }, item.name)));
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FolderItem);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Item);
+
+/***/ }),
+
+/***/ "./src/components/sidebar/Modal.tsx":
+/*!******************************************!*\
+  !*** ./src/components/sidebar/Modal.tsx ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _css_directory_modal_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css/directory/modal.css */ "./src/css/directory/modal.css");
+
+
+const Modal = _ref => {
+  let {
+    isOpen,
+    onClose,
+    name
+  } = _ref;
+  if (!isOpen) return null;
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "modal-overlay"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "modal-content",
+    style: {
+      fontFamily: 'hanbitFont, sans-serif'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h2", null, "\uC120\uD0DD\uB41C \uD30C\uC77C\uBA85"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", null, name), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    onClick: onClose,
+    style: {
+      fontFamily: 'hanbitFont, sans-serif'
+    }
+  }, "\uB2EB\uAE30")));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Modal);
 
 /***/ }),
 
@@ -279,9 +323,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _css_directory_directory_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../css/directory/directory.css */ "./src/css/directory/directory.css");
 /* harmony import */ var _images_icon_line_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../images/icon/line.png */ "./src/images/icon/line.png");
-/* harmony import */ var _FolderItem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FolderItem */ "./src/components/sidebar/FolderItem.tsx");
-/* harmony import */ var _FileItem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FileItem */ "./src/components/sidebar/FileItem.tsx");
-/* harmony import */ var _service_directory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../service/directory */ "./src/service/directory.ts");
+/* harmony import */ var _Item__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Item */ "./src/components/sidebar/Item.tsx");
+/* harmony import */ var _images_icon_logout_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../images/icon/logout.png */ "./src/images/icon/logout.png");
+/* harmony import */ var _images_icon_start_png__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../images/icon/start.png */ "./src/images/icon/start.png");
+/* harmony import */ var _images_icon_stop_png__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../images/icon/stop.png */ "./src/images/icon/stop.png");
+/* harmony import */ var _images_icon_sitehome_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../images/icon/sitehome.png */ "./src/images/icon/sitehome.png");
+/* harmony import */ var _Modal__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Modal */ "./src/components/sidebar/Modal.tsx");
+/* harmony import */ var _service_directory__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../service/directory */ "./src/service/directory.ts");
 
 
 
@@ -289,45 +337,54 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-// Props 타입 정의
+
+
+
 
 // 디렉토리 타입
 
-const adress = "ws://localhost:18080/process/ws";
+// Props 타입 정의
+
 const SideBar = _ref => {
   let {
     accessToken,
     rootId,
-    title
+    title,
+    onLogout
   } = _ref;
-  console.log(accessToken, rootId, title);
-  const [monitoring, setMonitoring] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const [contents, setContents] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
-  const [modalActive, setModalActive] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}); // 파일, 폴더 생성 모달창 열림, 닫힘 여부
-  const [isContentEditing, setIsContentEditing] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  // const [userName, setUserName] = useState<string>('');                  // 사용자 이름 수정
-  const [userName, setUserName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(title || ''); // 사용자 이름 수정
-  const [selectedId, setSelectedId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // 선택된 id
-  const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  // const { state } = useAuth();
+  // const { accessToken, rootId, title } = state;
+
+  const [contents, setContents] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]); // 디렉토리 내용 (id, name, type, children)
+  const [selectedId, setSelectedId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // 선택된 파일 또는 폴더의 id
+  const [selectedName, setSelectedName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // 선택된 파일 또는 폴더의 id
+  const [selectedItem, setSelectedItem] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // 선택된 파일 또는 폴더의 구조
+  const [openFolders, setOpenFolders] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}); // 폴더 열림 닫힘 상태
+  const [sidebarWidth, setSidebarWidth] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(250); // 초기 사이드바 너비 설정
+  const contextMenuRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  const [userName, setUserName] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(title || '');
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [isStart, setIsStart] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [directoryData, setDirectoryData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null); // directory data 저장
 
   // 디렉토리 조회 (로그인 시 title 매핑)
+  const loadDirectory = async () => {
+    console.log("디렉토리 조회할게요");
+    if (accessToken && rootId) {
+      const data = await (0,_service_directory__WEBPACK_IMPORTED_MODULE_9__.fetchDirectory)(rootId, accessToken);
+      setDirectoryData(data);
+    } else {
+      console.log("토큰이나 루트ID가 없어요.");
+    }
+  };
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    const loadDirectory = async () => {
-      if (accessToken && rootId) {
-        console.log(accessToken, rootId);
-        const rootIdNumber = Number(rootId);
-        const data = await (0,_service_directory__WEBPACK_IMPORTED_MODULE_5__.fetchDirectory)(rootIdNumber, accessToken);
-        setDirectoryData(data);
-      }
-    };
+    console.log("loadDirectory 실행");
     loadDirectory();
   }, [accessToken, rootId]);
 
   // 디렉토리 조회 (디렉토리 생성 후 조회)
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (directoryData) {
-      console.log(directoryData);
       setContents(directoryData.children); // diretoryData 정보 넣음
       setUserName(directoryData.name); // 사용자 이름 넣음
     } else {
@@ -341,24 +398,49 @@ const SideBar = _ref => {
       setUserName(title);
     }
   }, [title]);
-  const toggleModal = id => {
-    setModalActive(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
+
+  // file 클릭    
+  const fileItemClick = (id, name) => {
+    setSelectedId(id);
+    setSelectedName(name);
+    localStorage.setItem('selectedFileId', id.toString());
+    console.log("file Id : ", selectedId);
+    console.log("file name : ", selectedName);
+    setIsModalOpen(true);
   };
 
-  // file 클릭
-  const fileItemClick = id => {
-    // navigate(`/editor/${id}`, {state: id})
-    setSelectedId(id);
-    console.log(selectedId);
-  };
+  // selectedId가 변경될 때마다 background.ts로 메시지 전송
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if (selectedId !== null) {
+      console.log("file Id : ", selectedId);
+      chrome.runtime.sendMessage({
+        command: 'fileSelected',
+        fileId: selectedId
+      });
+    }
+  }, [selectedId]);
+
+  // 컴포넌트가 마운트될 때 로컬 스토리지에서 파일 ID를 로드
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    const storedFileId = localStorage.getItem('selectedFileId');
+    console.log(storedFileId);
+    if (storedFileId) {
+      setSelectedId(Number(storedFileId));
+    }
+  }, []);
 
   // folder 클릭
   const folderItemClick = id => {
     // setSelectedId(id);
-    // console.log(id)
+    console.log("folder ID : ", id);
+  };
+
+  // 폴더 열기/닫기 상태 관리
+  const toggleFolder = id => {
+    setOpenFolders(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
   // 폴더 및 파일 하위 구조
@@ -366,39 +448,23 @@ const SideBar = _ref => {
     let indentLevel = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     if (!children) return [];
     return children.map(item => {
-      const className = "item ".concat(indentLevel > 0 ? 'itemIndent' : ''); // 하위 요소 들여쓰기
-      if (item.type === 'FOLDER') {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-          key: item.id,
-          className: className
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_FolderItem__WEBPACK_IMPORTED_MODULE_3__["default"], {
-          item: item,
-          parentId: parentId,
-          toggleModal: toggleModal,
-          modalActive: modalActive,
-          renderContents: () => renderContents(item.children, item.id, indentLevel + 1),
-          handleItemClick: folderItemClick,
-          selectedItem: selectedItem,
-          isContentEditing: isContentEditing,
-          setIsContentEditing: setIsContentEditing,
-          saveName: saveName
-        }));
-      } else {
-        return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-          key: item.id,
-          className: className
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_FileItem__WEBPACK_IMPORTED_MODULE_4__["default"], {
-          item: item,
-          parentId: item.id,
-          selected: item.id === selectedId,
-          handleItemClick: fileItemClick,
-          selectedItem: selectedItem,
-          isContentEditing: isContentEditing,
-          setIsContentEditing: setIsContentEditing,
-          saveName: saveName
-        }));
-      }
-    });
+      const isSelected = item.id === selectedId;
+      const className = "item ".concat(indentLevel > 0 ? 'itemIndent' : '', " ").concat(isSelected ? 'selected' : '');
+      // console.log(`폴더: ${item.name} (ID: ${item.id}) - Parent ID: ${parentId}`);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+        key: item.id,
+        className: className
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Item__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        item: item,
+        parentId: parentId,
+        renderContents: contents => renderContents(contents, item.id, indentLevel + 1),
+        handleItemClick: item.type === 'FOLDER' ? folderItemClick : fileItemClick,
+        selectedItem: selectedItem,
+        isFolderOpen: openFolders[item.id] || false // 폴더 열림 상태 전달
+        ,
+        toggleFolder: () => toggleFolder(item.id) // 폴더 열고 닫기 함수 전달
+      }), item.type === 'FOLDER' && openFolders[item.id] && item.children && Array.isArray(item.children) && renderContents(item.children, item.id, indentLevel + 1));
+    }).filter(Boolean);
   };
 
   // 선택된 항목 ID 찾기 함수
@@ -416,139 +482,71 @@ const SideBar = _ref => {
     return undefined;
   };
 
-  // 이름 저장
-  const saveName = newName => {
-    if (selectedItem) {
-      selectedItem.name = newName;
-      setIsContentEditing(false);
-    } else {
-      console.error('No item selected.');
-    }
+  // directory에서 아이템 제거
+  const removeItemFromDirectory = (directory, id) => {
+    return directory.reduce((acc, item) => {
+      if (item.id === id) {
+        return acc;
+      }
+      if (item.children && Array.isArray(item.children)) {
+        const updatedChildren = removeItemFromDirectory(item.children, id);
+        if (updatedChildren.length !== item.children.length) {
+          return [...acc, {
+            ...item,
+            children: updatedChildren
+          }];
+        }
+      }
+      return [...acc, item];
+    }, []);
   };
 
-  /**  웹소켓 코드 */
-  // const socket = useRef<WebSocket | null>(null);
-
-  // useEffect(() => {
-  //     console.log(monitoring);
-  //     socket.current = new WebSocket(adress);
-  //     console.log("WebSocketClient created");
-
-  //     socket.current.onopen = () => {
-  //         console.log("Connection established");
-  //         // socket.current?.send("Hello Server!");
-  //         const messageData = {
-  //             sourceApplication: "Chrome",
-  //             accessToken: accessToken,
-  //             connectedFileId: 1,
-  //             dataType: "SIGNAL",
-  //             content: "Test message from React",
-  //             timestamp: new Date()
-  //         };
-
-  //         const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-  //         if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
-  //             socket.current.send(messageJson); // JSON 문자열을 보냄
-  //         } else {
-  //             console.error("WebSocket connection is not established.");
-  //         }
-
-  //     };
-
-  //     socket.current.onmessage = (event) => {
-  //         console.log("Message from server:", event.data);
-  //     };
-
-  //     socket.current.onerror = (error) => {
-  //         console.error("WebSocket 에러:", error);
-  //     };
-
-  //     socket.current.onclose = () => {
-  //         console.log("소켓 닫혔어요");
-  //     };
-
-  //     const handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-  //         console.log(monitoring, ", 변화 :", changeInfo.status, ", url : ", tab.url)
-  //         if (monitoring && changeInfo.status === 'complete' && tab.url) {
-  //             chrome.scripting.executeScript({
-  //                 target: { tabId: tabId },
-  //                 func: getHtml
-  //             }, (results) => {
-  //                 if (results[0]) {
-  //                     const pageHtml = results[0].result;
-  //                     let message = '';
-
-  //                     if (tab.url && tab.url.startsWith('https://www.google.com/search')) {
-  //                         const urlParams = new URLSearchParams(new URL(tab.url).search);
-  //                         const searchQuery = urlParams.get('q') || 'Unknown Search'; // 검색어 추출
-  //                         message = JSON.stringify({
-  //                             type: 'search',
-  //                             query: searchQuery
-  //                         });
-  //                     } else {
-  //                         message = JSON.stringify({
-  //                             type: 'page',
-  //                             url: tab.url,
-  //                             html: pageHtml
-  //                         });
-  //                     }
-
-  //                     const messageData = {
-  //                         sourceApplication: "Chrome",
-  //                         accessToken: accessToken,
-  //                         connectedFileId: 1,
-  //                         dataType: "SIGNAL",
-  //                         content: message,
-  //                         timestamp: new Date()
-  //                     };
-  //                     const messageJson = JSON.stringify(messageData); // 객체를 JSON 문자열로 변환
-  //                     if (socket.current) { // socket.current가 null이 아닐 때만 send 호출
-  //                         socket.current.send(messageJson); // JSON 문자열을 보냄
-  //                     } else {
-  //                         console.error("WebSocket connection is not established.");
-  //                     }
-  //                 }
-  //             });
-  //         }
-  //     };
-
-  //     const getHtml = () => document.documentElement.outerHTML;
-
-  //     chrome.tabs.onUpdated.addListener(handleTabUpdate);
-
-  //     // Cleanup on component unmount
-  //     return () => {
-  //         socket.current?.close();
-  //         chrome.tabs.onUpdated.removeListener(handleTabUpdate);
-  //     };
-  // }, [monitoring]);
-
+  // 부모를 찾는 함수
+  const findParent = (items, childId) => {
+    for (let item of items) {
+      if (item.type === 'FOLDER' && Array.isArray(item.children)) {
+        if (item.children.some(child => child.id === childId)) {
+          return item;
+        }
+        const foundParent = findParent(item.children, childId);
+        if (foundParent) {
+          return foundParent;
+        }
+      }
+    }
+    return null;
+  };
+  const handleMouseDown = e => {
+    e.preventDefault();
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+  const handleMouseMove = e => {
+    setSidebarWidth(e.clientX);
+  };
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
   const handleStartMonitoring = () => {
     console.log("기록 시작할게요");
-    setMonitoring(true);
+    setIsStart(true);
     chrome.runtime.sendMessage({
       command: "start"
     });
   };
   const handleStopMonitoring = () => {
     console.log("기록 중지할게요");
-    setMonitoring(false);
+    setIsStart(false);
     chrome.runtime.sendMessage({
       command: "stop"
     });
   };
-
-  // const sendMessage = (message: string) => {
-  //     const messageObject = { text: message };
-
-  //     if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-  //         socket.current.send(messageObject);
-  //     } else {
-  //         console.log("Connection not ready.");
-  //     }
-  // };
-  /***********************  웹소켓 코드 *********************************/
-
+  const openHomepage = () => {
+    chrome.tabs.create({
+      url: 'https://k10d209.p.ssafy.io'
+    });
+  };
   return (
     /*#__PURE__*/
     // 사이드바
@@ -565,13 +563,33 @@ const SideBar = _ref => {
       src: _images_icon_line_png__WEBPACK_IMPORTED_MODULE_2__,
       alt: "line",
       className: "line"
-    }), renderContents(contents, null)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-      className: "buttons-container"
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    }), renderContents(contents, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+      className: "sideButtonWrapper"
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      src: _images_icon_sitehome_png__WEBPACK_IMPORTED_MODULE_7__,
+      alt: "Hoem-button",
+      className: "makeFileButton",
+      onClick: openHomepage
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      src: _images_icon_start_png__WEBPACK_IMPORTED_MODULE_5__,
+      alt: "start-button",
+      className: "makeFileButton",
       onClick: handleStartMonitoring
-    }, "\uAE30\uB85D \uC2DC\uC791"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      src: _images_icon_stop_png__WEBPACK_IMPORTED_MODULE_6__,
+      alt: "stop-button",
+      className: "makeFileButton",
       onClick: handleStopMonitoring
-    }, "\uAE30\uB85D \uC911\uC9C0")))
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", {
+      src: _images_icon_logout_png__WEBPACK_IMPORTED_MODULE_4__,
+      alt: "logout-button",
+      className: "makeFileButton",
+      onClick: onLogout
+    }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Modal__WEBPACK_IMPORTED_MODULE_8__["default"], {
+      isOpen: isModalOpen,
+      onClose: () => setIsModalOpen(false),
+      name: selectedName
+    }))
   );
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SideBar);
@@ -668,6 +686,47 @@ const useAuth = () => {
 
 /***/ }),
 
+/***/ "./src/contexts/FileContext.tsx":
+/*!**************************************!*\
+  !*** ./src/contexts/FileContext.tsx ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   FileProvider: () => (/* binding */ FileProvider),
+/* harmony export */   useFileContext: () => (/* binding */ useFileContext)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+// src/contexts/FileContext.tsx
+
+const FileContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(undefined);
+const FileProvider = _ref => {
+  let {
+    children
+  } = _ref;
+  const [addingFileId, setAddingFileId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [isAddingSubFile, setIsAddingSubFile] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(FileContext.Provider, {
+    value: {
+      addingFileId,
+      isAddingSubFile,
+      setAddingFileId,
+      setIsAddingSubFile
+    }
+  }, children);
+};
+const useFileContext = () => {
+  const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(FileContext);
+  if (!context) {
+    throw new Error('useFileContext must be used within a FileProvider');
+  }
+  return context;
+};
+
+/***/ }),
+
 /***/ "./src/reportWebVitals.ts":
 /*!********************************!*\
   !*** ./src/reportWebVitals.ts ***!
@@ -732,9 +791,9 @@ function (config) {
     } = JSON.parse(authDetails);
     if (accessToken) {
       config.headers["Authorization"] = "".concat(accessToken);
+      console.log(config.headers);
     }
   }
-  console.log(config.headers);
   return config;
 },
 // 토큰 없을 때: 에러 띄우기
@@ -760,15 +819,12 @@ __webpack_require__.r(__webpack_exports__);
 // directory 조회
 const fetchDirectory = async (rootId, token) => {
   try {
-    console.log(rootId);
     const response = await _api__WEBPACK_IMPORTED_MODULE_0__["default"].get("/directory/".concat(rootId), {
       headers: {
         Authorization: token
       }
     });
-    console.log(response);
     const data = response.data.data;
-    console.log(data);
 
     // localStorage.setItem('directoryData', JSON.stringify(data));
     return data;
@@ -844,7 +900,8 @@ const useSendCodeToBackend = () => {
 // 로그아웃
 const logout = async () => {
   try {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = chrome.storage.local.get('accessToken');
+    console.log(accessToken);
     if (!accessToken) {
       throw new Error('엑세스 토큰을 찾을 수 없네욤..');
     }
@@ -854,6 +911,11 @@ const logout = async () => {
     // 로그아웃 후 local storage 토큰 제거
     localStorage.removeItem('accessToken');
     localStorage.removeItem('provider');
+    localStorage.removeItem('rootId');
+    localStorage.removeItem('title');
+    chrome.storage.local.clear(() => {
+      console.log('Chrome storage cleared');
+    });
   } catch (error) {
     console.error('로그아웃 도중 문제 발생!!!', error);
   }
@@ -914,6 +976,19 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
     border-top: 1px solid #ccc; /* 상단에 경계선 추가 */
 }
 
+.buttons-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 20%;
+    padding: 1px;
+    box-sizing: border-box; /* 패딩을 너비에 포함 */
+    display: flex;
+    justify-content: space-evenly; /* 버튼을 공간에 균등하게 배치 */
+    background-color: #fff; /* 배경색 추가 */
+    border-top: 1px solid #ccc; /* 상단에 경계선 추가 */
+}
+
 .bmjuaFont {
     font-family: 'BMJUAFont', sans-serif;
 }
@@ -926,7 +1001,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
 }
 
 .sidebar {
-    position: fixed;
+    /* position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -939,7 +1014,19 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
     padding-top: 2vh;
     overflow-x: auto;
     overflow-y: auto;
+    white-space: nowrap; */
+    height: 85vh;
+    background-color: rgb(197, 192, 192);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    padding-top: 2vh;
     white-space: nowrap;
+    overflow-x: auto;
+    padding-bottom: 60px;
+    padding-right: 20px;
+    padding-left: 20px;
+    position: relative;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -996,7 +1083,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
 }
 
 .line {
-    width: 88%;
+    width: 100%;
     height: 20px;
     margin-bottom: 3vh;
     /* pointer-events: none;
@@ -1077,12 +1164,22 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
 }
 
 .sideButtonWrapper {
-    display: flex;
+    /* flex-shrink: 0; */
+    width: 420px;
     flex-direction: row;
-    position: fixed;
-    bottom: 5vh;
+    /* bottom: 5vh; */
+    border-radius: 15px 15px 0px 0px;
     /* pointer-events: none; */
     /* user-select: none; */
+    background-color: #979797;
+        /* 배경색 설정 */
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }
 
 .profileImage {
@@ -1218,7 +1315,65 @@ ___CSS_LOADER_EXPORT___.push([module.id, `@font-face {
 }
 .itemIndent {
     margin-left: 3vh;
-}`, "",{"version":3,"sources":["webpack://./src/css/directory/directory.css"],"names":[],"mappings":"AAAA;IACI,wBAAwB;IACxB,4CAAqC;IACrC,mBAAmB;IACnB,kBAAkB;AACtB;;AAEA;IACI,yBAAyB;IACzB,+DAAyD;IACzD,mBAAmB;IACnB,kBAAkB;AACtB;;AAEA;IACI,eAAe;IACf,SAAS;IACT,OAAO;IACP,WAAW;IACX,YAAY;IACZ,sBAAsB,EAAE,eAAe;IACvC,aAAa;IACb,6BAA6B,EAAE,oBAAoB;IACnD,sBAAsB,EAAE,WAAW;IACnC,0BAA0B,EAAE,eAAe;AAC/C;;AAEA;IACI,oCAAoC;AACxC;;AAEA;IACI,qCAAqC;IACrC,mBAAmB;IACnB,iBAAiB;IACjB,iBAAiB;AACrB;;AAEA;IACI,eAAe;IACf,MAAM;IACN,OAAO;IACP,WAAW;IACX,YAAY;IACZ,oCAAoC;IACpC,wCAAwC;IACxC,aAAa;IACb,sBAAsB;IACtB,mBAAmB;IACnB,gBAAgB;IAChB,gBAAgB;IAChB,gBAAgB;IAChB,mBAAmB;AACvB;;AAEA;IACI,WAAW,EAAE,eAAe;IAC5B,YAAY,EAAE,eAAe;IAC7B,yBAAyB;AAC7B;;AAEA;IACI,yBAAyB,EAAE,eAAe;IAC1C,mBAAmB;IACnB,yBAAyB;AAC7B;;AAEA;IACI,yBAAyB,EAAE,eAAe;IAC1C,mBAAmB;IACnB,yBAAyB;AAC7B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,mBAAmB;IACnB,uBAAuB;IACvB,0BAA0B;IAC1B,uBAAuB;AAC3B;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,0BAA0B;IAC1B,uBAAuB;AAC3B;;AAEA;IACI,eAAe;IACf,aAAa;IACb,uBAAuB;IACvB,mBAAmB;AACvB;;AAEA;IACI,SAAS;IACT,uBAAuB;IACvB,eAAe;IACf,+BAA+B;AACnC;;AAEA;IACI,qBAAqB;AACzB;;AAEA;IACI,UAAU;IACV,YAAY;IACZ,kBAAkB;IAClB;wBACoB;AACxB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,sBAAsB;IACtB,WAAW;IACX,uBAAuB;AAC3B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,mBAAmB;AACvB;AACA;IACI,cAAc;IACd,eAAe;IACf,mBAAmB;IACnB,gBAAgB;AACpB;;AAEA;IACI,eAAe;AACnB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,eAAe;AACnB;;AAEA;IACI,yBAAyB;AAC7B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,mBAAmB;IACnB,yBAAyB;IACzB,WAAW;IACX,eAAe;IACf;wBACoB;AACxB;;AAEA;IACI,cAAc;IACd,eAAe;IACf,mBAAmB;IACnB,gBAAgB;AACpB;;AAEA;IACI,eAAe;AACnB;;AAEA;IACI,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,gBAAgB;AACpB;;AAEA;IACI,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,eAAe;IACf,WAAW;IACX,0BAA0B;IAC1B,uBAAuB;AAC3B;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,eAAe;IACf,+BAA+B;AACnC;;AAEA;IACI,qBAAqB;AACzB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,eAAe;IACf,+BAA+B;AACnC;;AAEA;IACI,qBAAqB;AACzB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,eAAe;IACf,+BAA+B;AACnC;;AAEA;IACI,qBAAqB;AACzB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,eAAe;IACf,+BAA+B;AACnC;;AAEA;IACI,qBAAqB;AACzB;;AAEA;IACI,sBAAsB;IACtB,YAAY;IACZ,WAAW;IACX,kBAAkB;AACtB;;AAEA;IACI,sBAAsB;IACtB,YAAY;AAChB;;AAEA;IACI,YAAY;IACZ,oCAAoC;IACpC,sBAAsB;IACtB,yCAAyC;IACzC,mBAAmB;IACnB,aAAa;IACb,gBAAgB;IAChB,eAAe;IACf,aAAa;AACjB;;AAEA;IACI,iBAAiB;IACjB,eAAe;AACnB;;AAEA;IACI,yBAAyB;AAC7B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,mBAAmB;IACnB,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,cAAc;AAClB;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,mBAAmB;IACnB,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,cAAc;AAClB;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,kBAAkB;IAClB,YAAY;IACZ,iBAAiB;IACjB,oCAAoC;AACxC;;AAEA;IACI,WAAW;AACf;AACA;IACI,gBAAgB;AACpB","sourcesContent":["@font-face {\r\n    font-family: 'BMJUAFont';\r\n    src: url('../../fonts/BMJUA_ttf.ttf');\r\n    font-weight: normal;\r\n    font-style: normal;\r\n}\r\n\r\n@font-face {\r\n    font-family: 'HanbitFont';\r\n    src: url('../../fonts/KCC-Hanbit.ttf') format('truetype');\r\n    font-weight: normal;\r\n    font-style: normal;\r\n}\r\n\r\n.buttons-container {\r\n    position: fixed;\r\n    bottom: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    padding: 1px;\r\n    box-sizing: border-box; /* 패딩을 너비에 포함 */\r\n    display: flex;\r\n    justify-content: space-evenly; /* 버튼을 공간에 균등하게 배치 */\r\n    background-color: #fff; /* 배경색 추가 */\r\n    border-top: 1px solid #ccc; /* 상단에 경계선 추가 */\r\n}\r\n\r\n.bmjuaFont {\r\n    font-family: 'BMJUAFont', sans-serif;\r\n}\r\n\r\n.hanbitFont {\r\n    font-family: 'HanbitFont', sans-serif;\r\n    margin-bottom: 10vh;\r\n    text-align: right;\r\n    margin-right: 15%;\r\n}\r\n\r\n.sidebar {\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    height: 90vh;\r\n    background-color: rgb(197, 192, 192);\r\n    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);\r\n    display: flex;\r\n    flex-direction: column;\r\n    align-items: center;\r\n    padding-top: 2vh;\r\n    overflow-x: auto;\r\n    overflow-y: auto;\r\n    white-space: nowrap;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar {\r\n    width: 18px; /* 세로 스크롤바 높이 */\r\n    height: 18px; /* 가로 스크롤바 높이 */\r\n    background-color: #f9f9f9;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar-thumb {\r\n    background-color: #ff914d; /* 세로 스크롤바 색상 */\r\n    border-radius: 10px;\r\n    border: 2px solid #f9f9f9;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar-thumb:horizontal {\r\n    background-color: #ff914d; /* 가로 스크롤바 색상 */\r\n    border-radius: 10px;\r\n    border: 2px solid #f9f9f9;\r\n}\r\n\r\n.nicknameSpace {\r\n    display: flex;\r\n    flex-direction: row;\r\n    margin: 3vh 0vh 2vh 0vh;\r\n    align-items: center;\r\n    justify-content: center;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n}\r\n\r\n.contentContainer {\r\n    display: flex;\r\n    flex-direction: column;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n}\r\n\r\n.nickname {\r\n    font-size: 20px;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n.pencil {\r\n    width: 9%;\r\n    margin: 0vh 0vh 0vh 1vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.pencil:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.line {\r\n    width: 88%;\r\n    height: 20px;\r\n    margin-bottom: 3vh;\r\n    /* pointer-events: none;\r\n    user-select: none; */\r\n}\r\n\r\n.forderSpace {\r\n    display: flex;\r\n    flex-direction: column;\r\n    align-items:flex-start;\r\n    width: 100%;\r\n    /* user-select: none; */\r\n}\r\n\r\n.folderWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    margin: 0vh 0vh 0.5vh 0vh;\r\n    align-items: center;\r\n}\r\n.forderImage {\r\n    width: 1.25rem;\r\n    height: 1.25rem;\r\n    margin-right: 1.5vh;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.forderImage:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.folderName {\r\n    width: fit-content;\r\n}\r\n\r\n.folderName:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.fileName {\r\n    font-family: 'hanbitFont';\r\n}\r\n\r\n.fileSpace {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin: 0vh 0vh 0.5vh 0vh;\r\n    width: 100%;\r\n    cursor: pointer;\r\n    /* pointer-events: none;\r\n    user-select: none; */\r\n}\r\n\r\n.fileImage {\r\n    width: 1.35rem;\r\n    height: 1.35rem;\r\n    margin-right: 1.5vh;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.fileImage:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.fileName:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.addButton {\r\n    width: 1rem;\r\n    height: 1rem;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.addButton:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.sideButtonWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    position: fixed;\r\n    bottom: 5vh;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n}\r\n\r\n.profileImage {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.profileImage:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.makeFileButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.makeFileButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.trashButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.trashButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.settingButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.settingButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.folderWrapper:hover {\r\n    background-color: gray;\r\n    color: white;\r\n    width: 110%;\r\n    border-radius: 8px;\r\n}\r\n\r\n.fileSpace:hover {\r\n    background-color: gray;\r\n    color: white;\r\n}\r\n\r\n.contextMenu {\r\n    width: 150px;\r\n    background-color: rgb(250, 242, 242);\r\n    border: 1px solid #ccc;\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);\r\n    border-radius: 10px;\r\n    padding: 10px;\r\n    list-style: none;\r\n    position: fixed;\r\n    z-index: 1000;\r\n}\r\n\r\n.contextMenu li {\r\n    padding: 8px 12px;\r\n    cursor: pointer;\r\n}\r\n\r\n.contextMenu li:hover {\r\n    background-color: #f5f5f5;\r\n}\r\n\r\n.editWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin-top: 7px;\r\n    margin-left: 5px;\r\n}\r\n\r\n.editIcon {\r\n    width: 1.75rem;\r\n}\r\n\r\n.rightClickEdit {\r\n    margin-left: 5px;\r\n}\r\n\r\n.rightClickEdit:hover {\r\n    color: #ff914d;\r\n}\r\n\r\n.deleteWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin-bottom: 7px;\r\n    margin-left: 5px;\r\n}\r\n\r\n.deleteIcon {\r\n    width: 1.75rem;\r\n}\r\n\r\n.rightClickDelete {\r\n    margin-left: 5px;\r\n}\r\n\r\n.rightClickDelete:hover {\r\n    color: #ff914d;\r\n}\r\n\r\n.renderNameField {\r\n    display: flex;\r\n    text-align: center;\r\n    height: 30px;\r\n    font-size: medium;\r\n    background-color: rgb(250, 242, 242);\r\n}\r\n\r\n.item {\r\n    width: 100%;\r\n}\r\n.itemIndent {\r\n    margin-left: 3vh;\r\n}"],"sourceRoot":""}]);
+}
+
+.selected {
+    background-color: 'gray';
+    color: 'white';
+}`, "",{"version":3,"sources":["webpack://./src/css/directory/directory.css"],"names":[],"mappings":"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","sourcesContent":["@font-face {\r\n    font-family: 'BMJUAFont';\r\n    src: url('../../fonts/BMJUA_ttf.ttf');\r\n    font-weight: normal;\r\n    font-style: normal;\r\n}\r\n\r\n@font-face {\r\n    font-family: 'HanbitFont';\r\n    src: url('../../fonts/KCC-Hanbit.ttf') format('truetype');\r\n    font-weight: normal;\r\n    font-style: normal;\r\n}\r\n\r\n.buttons-container {\r\n    position: fixed;\r\n    bottom: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    padding: 1px;\r\n    box-sizing: border-box; /* 패딩을 너비에 포함 */\r\n    display: flex;\r\n    justify-content: space-evenly; /* 버튼을 공간에 균등하게 배치 */\r\n    background-color: #fff; /* 배경색 추가 */\r\n    border-top: 1px solid #ccc; /* 상단에 경계선 추가 */\r\n}\r\n\r\n.buttons-button {\r\n    position: fixed;\r\n    bottom: 0;\r\n    left: 0;\r\n    width: 20%;\r\n    padding: 1px;\r\n    box-sizing: border-box; /* 패딩을 너비에 포함 */\r\n    display: flex;\r\n    justify-content: space-evenly; /* 버튼을 공간에 균등하게 배치 */\r\n    background-color: #fff; /* 배경색 추가 */\r\n    border-top: 1px solid #ccc; /* 상단에 경계선 추가 */\r\n}\r\n\r\n.bmjuaFont {\r\n    font-family: 'BMJUAFont', sans-serif;\r\n}\r\n\r\n.hanbitFont {\r\n    font-family: 'HanbitFont', sans-serif;\r\n    margin-bottom: 10vh;\r\n    text-align: right;\r\n    margin-right: 15%;\r\n}\r\n\r\n.sidebar {\r\n    /* position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    width: 100%;\r\n    height: 90vh;\r\n    background-color: rgb(197, 192, 192);\r\n    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);\r\n    display: flex;\r\n    flex-direction: column;\r\n    align-items: center;\r\n    padding-top: 2vh;\r\n    overflow-x: auto;\r\n    overflow-y: auto;\r\n    white-space: nowrap; */\r\n    height: 85vh;\r\n    background-color: rgb(197, 192, 192);\r\n    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);\r\n    display: flex;\r\n    flex-direction: column;\r\n    padding-top: 2vh;\r\n    white-space: nowrap;\r\n    overflow-x: auto;\r\n    padding-bottom: 60px;\r\n    padding-right: 20px;\r\n    padding-left: 20px;\r\n    position: relative;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar {\r\n    width: 18px; /* 세로 스크롤바 높이 */\r\n    height: 18px; /* 가로 스크롤바 높이 */\r\n    background-color: #f9f9f9;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar-thumb {\r\n    background-color: #ff914d; /* 세로 스크롤바 색상 */\r\n    border-radius: 10px;\r\n    border: 2px solid #f9f9f9;\r\n}\r\n\r\n.sidebar::-webkit-scrollbar-thumb:horizontal {\r\n    background-color: #ff914d; /* 가로 스크롤바 색상 */\r\n    border-radius: 10px;\r\n    border: 2px solid #f9f9f9;\r\n}\r\n\r\n.nicknameSpace {\r\n    display: flex;\r\n    flex-direction: row;\r\n    margin: 3vh 0vh 2vh 0vh;\r\n    align-items: center;\r\n    justify-content: center;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n}\r\n\r\n.contentContainer {\r\n    display: flex;\r\n    flex-direction: column;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n}\r\n\r\n.nickname {\r\n    font-size: 20px;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n\r\n.pencil {\r\n    width: 9%;\r\n    margin: 0vh 0vh 0vh 1vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.pencil:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.line {\r\n    width: 100%;\r\n    height: 20px;\r\n    margin-bottom: 3vh;\r\n    /* pointer-events: none;\r\n    user-select: none; */\r\n}\r\n\r\n.forderSpace {\r\n    display: flex;\r\n    flex-direction: column;\r\n    align-items:flex-start;\r\n    width: 100%;\r\n    /* user-select: none; */\r\n}\r\n\r\n.folderWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    margin: 0vh 0vh 0.5vh 0vh;\r\n    align-items: center;\r\n}\r\n.forderImage {\r\n    width: 1.25rem;\r\n    height: 1.25rem;\r\n    margin-right: 1.5vh;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.forderImage:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.folderName {\r\n    width: fit-content;\r\n}\r\n\r\n.folderName:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.fileName {\r\n    font-family: 'hanbitFont';\r\n}\r\n\r\n.fileSpace {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin: 0vh 0vh 0.5vh 0vh;\r\n    width: 100%;\r\n    cursor: pointer;\r\n    /* pointer-events: none;\r\n    user-select: none; */\r\n}\r\n\r\n.fileImage {\r\n    width: 1.35rem;\r\n    height: 1.35rem;\r\n    margin-right: 1.5vh;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.fileImage:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.fileName:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.addButton {\r\n    width: 1rem;\r\n    height: 1rem;\r\n    margin-left: 3vh;\r\n}\r\n\r\n.addButton:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.sideButtonWrapper {\r\n    /* flex-shrink: 0; */\r\n    width: 420px;\r\n    flex-direction: row;\r\n    /* bottom: 5vh; */\r\n    border-radius: 15px 15px 0px 0px;\r\n    /* pointer-events: none; */\r\n    /* user-select: none; */\r\n    background-color: #979797;\r\n        /* 배경색 설정 */\r\n    padding: 10px 40px;\r\n    display: flex;\r\n    justify-content: space-evenly;\r\n    align-items: center;\r\n    position: fixed;\r\n    bottom: 0;\r\n    left: 0;\r\n}\r\n\r\n.profileImage {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.profileImage:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.makeFileButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.makeFileButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.trashButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    margin-right: 4vh;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.trashButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.settingButton {\r\n    width: 2rem;\r\n    height: 2rem;\r\n    cursor: pointer;\r\n    transition: transform 0.1s ease;\r\n}\r\n\r\n.settingButton:hover {\r\n    transform: scale(1.2);\r\n}\r\n\r\n.folderWrapper:hover {\r\n    background-color: gray;\r\n    color: white;\r\n    width: 110%;\r\n    border-radius: 8px;\r\n}\r\n\r\n.fileSpace:hover {\r\n    background-color: gray;\r\n    color: white;\r\n}\r\n\r\n.contextMenu {\r\n    width: 150px;\r\n    background-color: rgb(250, 242, 242);\r\n    border: 1px solid #ccc;\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);\r\n    border-radius: 10px;\r\n    padding: 10px;\r\n    list-style: none;\r\n    position: fixed;\r\n    z-index: 1000;\r\n}\r\n\r\n.contextMenu li {\r\n    padding: 8px 12px;\r\n    cursor: pointer;\r\n}\r\n\r\n.contextMenu li:hover {\r\n    background-color: #f5f5f5;\r\n}\r\n\r\n.editWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin-top: 7px;\r\n    margin-left: 5px;\r\n}\r\n\r\n.editIcon {\r\n    width: 1.75rem;\r\n}\r\n\r\n.rightClickEdit {\r\n    margin-left: 5px;\r\n}\r\n\r\n.rightClickEdit:hover {\r\n    color: #ff914d;\r\n}\r\n\r\n.deleteWrapper {\r\n    display: flex;\r\n    flex-direction: row;\r\n    align-items: center;\r\n    margin-bottom: 7px;\r\n    margin-left: 5px;\r\n}\r\n\r\n.deleteIcon {\r\n    width: 1.75rem;\r\n}\r\n\r\n.rightClickDelete {\r\n    margin-left: 5px;\r\n}\r\n\r\n.rightClickDelete:hover {\r\n    color: #ff914d;\r\n}\r\n\r\n.renderNameField {\r\n    display: flex;\r\n    text-align: center;\r\n    height: 30px;\r\n    font-size: medium;\r\n    background-color: rgb(250, 242, 242);\r\n}\r\n\r\n.item {\r\n    width: 100%;\r\n}\r\n.itemIndent {\r\n    margin-left: 3vh;\r\n}\r\n\r\n.selected {\r\n    background-color: 'gray';\r\n    color: 'white';\r\n}"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/css/directory/modal.css":
+/*!***************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/css/directory/modal.css ***!
+  \***************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content button {
+    margin-top: 20px;
+}`, "",{"version":3,"sources":["webpack://./src/css/directory/modal.css"],"names":[],"mappings":"AAAA;IACI,eAAe;IACf,MAAM;IACN,OAAO;IACP,QAAQ;IACR,SAAS;IACT,oCAAoC;IACpC,aAAa;IACb,uBAAuB;IACvB,mBAAmB;IACnB,aAAa;AACjB;;AAEA;IACI,sBAAsB;IACtB,aAAa;IACb,kBAAkB;IAClB,yCAAyC;IACzC,kBAAkB;AACtB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,gBAAgB;AACpB","sourcesContent":[".modal-overlay {\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    right: 0;\r\n    bottom: 0;\r\n    background-color: rgba(0, 0, 0, 0.5);\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n    z-index: 1000;\r\n}\r\n\r\n.modal-content {\r\n    background-color: #fff;\r\n    padding: 20px;\r\n    border-radius: 8px;\r\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\r\n    text-align: center;\r\n}\r\n\r\n.modal-content h2 {\r\n    margin-top: 0;\r\n}\r\n\r\n.modal-content button {\r\n    margin-top: 20px;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1280,9 +1435,18 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.loginOpenBtn{
   }
   
 .loginTitleWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     position: relative;
-    margin-top: 5vh;
+    margin-top: 12vh;
+    margin-bottom: 18vh;
+}
+
+.loginImage {
+    width: 360px;
+    height: 90px;
 }
   
 .loginTitle{
@@ -1299,7 +1463,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.loginOpenBtn{
     width: 470px;
     height: 270px;
     padding: 15px;
-    border-radius:20px;
+    /* border-radius:20px; */
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 1); /* 그림자 추가 */
 }
   
@@ -1338,7 +1502,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.loginOpenBtn{
 
 }
   
-  `, "",{"version":3,"sources":["webpack://./src/css/login/login.css"],"names":[],"mappings":"AAAA;IACI,eAAe;EACjB;;AAEF;IACI,eAAe;EACjB;;AAEF;IACI,wBAAwB;EAC1B;;AAEF;IACI,WAAW;IACX,YAAY;IACZ,eAAe;IACf,MAAM;IACN,OAAO;IACP,aAAa;IACb,uBAAuB;IACvB,mBAAmB;IACnB,2BAA2B;IAC3B,UAAU;IACV,UAAU;EACZ;;AAEF;IACI,WAAW;IACX,kBAAkB;IAClB,eAAe;AACnB;;AAEA;IACI,kBAAkB;IAClB,YAAY;IACZ,wBAAwB;IACxB,eAAe;IACf,cAAc;AAClB;;AAEA;IACI,kBAAkB;IAClB,yBAAyB;IACzB,YAAY;IACZ,aAAa;IACb,aAAa;IACb,kBAAkB;IAClB,yCAAyC,EAAE,WAAW;AAC1D;;;;AAIA;IACI,aAAa;AACjB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,6BAA6B;AACjC;;AAEA;IACI,WAAW,EAAE,WAAW;IACxB,YAAY,EAAE,WAAW;IACzB,kBAAkB,EAAE,aAAa;IACjC,sBAAsB,EAAE,yBAAyB;IACjD,2BAA2B,EAAE,iBAAiB;IAC9C,4BAA4B,EAAE,iBAAiB;IAC/C,eAAe,EAAE,kBAAkB;AACvC;;AAEA;IACI,yDAAmD;AACvD;;AAEA;IACI,yDAAoD;AACxD;;AAEA;IACI,yDAAoD;;AAExD","sourcesContent":[".loginOpenBtn{\r\n    cursor: pointer;\r\n  }\r\n  \r\n.clickable{\r\n    cursor: pointer;\r\n  }\r\n  \r\n.customFaster  {\r\n    animation-duration: 0.5s;\r\n  }\r\n  \r\n.loginContainer{\r\n    width: 100%;\r\n    height: 100%;\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n    background: rgba(0,0,0,0.5);\r\n    z-index: 2;\r\n    opacity: 1;\r\n  }\r\n  \r\n.loginTitleWrapper{\r\n    width: 100%;\r\n    position: relative;\r\n    margin-top: 5vh;\r\n}\r\n  \r\n.loginTitle{\r\n    text-align: center;\r\n    color: black;\r\n    font-family: 'bmjuaFont';\r\n    font-size: 30px;\r\n    margin: 38px 0; \r\n}\r\n  \r\n.loginContent {\r\n    position: absolute;\r\n    background-color: #ffffff;\r\n    width: 470px;\r\n    height: 270px;\r\n    padding: 15px;\r\n    border-radius:20px;\r\n    box-shadow: 5px 5px 15px rgba(0, 0, 0, 1); /* 그림자 추가 */\r\n}\r\n  \r\n  \r\n\r\n.hidden{\r\n    display: none;\r\n}\r\n\r\n.socialLoginBtnWrapper{\r\n    display: flex;\r\n    flex-direction: row;\r\n    justify-content: space-around;\r\n}\r\n\r\n.socialLoginBtn {\r\n    width: 50px; /* 버튼의 크기 */\r\n    height: 50px; /* 버튼의 크기 */\r\n    border-radius: 50%; /* 원형으로 만들기 */\r\n    background-size: cover; /* 배경 이미지가 버튼 크기에 맞게 조정 */\r\n    background-position: center; /* 배경 이미지 중앙 정렬 */\r\n    background-repeat: no-repeat; /* 배경 이미지 반복 없음 */\r\n    cursor: pointer; /* 마우스 오버시 커서 변경 */\r\n}\r\n\r\n.naverBtn{\r\n    background-image: url('../../images/naverLogo.png'); \r\n}\r\n\r\n.googleBtn{\r\n    background-image: url('../../images/googleLogo.png'); \r\n}\r\n\r\n.kakaoBtn{\r\n    background-image: url('../../images/kakaologin.png'); \r\n\r\n}\r\n  \r\n  "],"sourceRoot":""}]);
+  `, "",{"version":3,"sources":["webpack://./src/css/login/login.css"],"names":[],"mappings":"AAAA;IACI,eAAe;EACjB;;AAEF;IACI,eAAe;EACjB;;AAEF;IACI,wBAAwB;EAC1B;;AAEF;IACI,WAAW;IACX,YAAY;IACZ,eAAe;IACf,MAAM;IACN,OAAO;IACP,aAAa;IACb,uBAAuB;IACvB,mBAAmB;IACnB,2BAA2B;IAC3B,UAAU;IACV,UAAU;EACZ;;AAEF;IACI,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,WAAW;IACX,kBAAkB;IAClB,gBAAgB;IAChB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,YAAY;AAChB;;AAEA;IACI,kBAAkB;IAClB,YAAY;IACZ,wBAAwB;IACxB,eAAe;IACf,cAAc;AAClB;;AAEA;IACI,kBAAkB;IAClB,yBAAyB;IACzB,YAAY;IACZ,aAAa;IACb,aAAa;IACb,wBAAwB;IACxB,yCAAyC,EAAE,WAAW;AAC1D;;;;AAIA;IACI,aAAa;AACjB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,6BAA6B;AACjC;;AAEA;IACI,WAAW,EAAE,WAAW;IACxB,YAAY,EAAE,WAAW;IACzB,kBAAkB,EAAE,aAAa;IACjC,sBAAsB,EAAE,yBAAyB;IACjD,2BAA2B,EAAE,iBAAiB;IAC9C,4BAA4B,EAAE,iBAAiB;IAC/C,eAAe,EAAE,kBAAkB;AACvC;;AAEA;IACI,yDAAmD;AACvD;;AAEA;IACI,yDAAoD;AACxD;;AAEA;IACI,yDAAoD;;AAExD","sourcesContent":[".loginOpenBtn{\r\n    cursor: pointer;\r\n  }\r\n  \r\n.clickable{\r\n    cursor: pointer;\r\n  }\r\n  \r\n.customFaster  {\r\n    animation-duration: 0.5s;\r\n  }\r\n  \r\n.loginContainer{\r\n    width: 100%;\r\n    height: 100%;\r\n    position: fixed;\r\n    top: 0;\r\n    left: 0;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n    background: rgba(0,0,0,0.5);\r\n    z-index: 2;\r\n    opacity: 1;\r\n  }\r\n  \r\n.loginTitleWrapper{\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    width: 100%;\r\n    position: relative;\r\n    margin-top: 12vh;\r\n    margin-bottom: 18vh;\r\n}\r\n\r\n.loginImage {\r\n    width: 360px;\r\n    height: 90px;\r\n}\r\n  \r\n.loginTitle{\r\n    text-align: center;\r\n    color: black;\r\n    font-family: 'bmjuaFont';\r\n    font-size: 30px;\r\n    margin: 38px 0; \r\n}\r\n  \r\n.loginContent {\r\n    position: absolute;\r\n    background-color: #ffffff;\r\n    width: 470px;\r\n    height: 270px;\r\n    padding: 15px;\r\n    /* border-radius:20px; */\r\n    box-shadow: 5px 5px 15px rgba(0, 0, 0, 1); /* 그림자 추가 */\r\n}\r\n  \r\n  \r\n\r\n.hidden{\r\n    display: none;\r\n}\r\n\r\n.socialLoginBtnWrapper{\r\n    display: flex;\r\n    flex-direction: row;\r\n    justify-content: space-around;\r\n}\r\n\r\n.socialLoginBtn {\r\n    width: 50px; /* 버튼의 크기 */\r\n    height: 50px; /* 버튼의 크기 */\r\n    border-radius: 50%; /* 원형으로 만들기 */\r\n    background-size: cover; /* 배경 이미지가 버튼 크기에 맞게 조정 */\r\n    background-position: center; /* 배경 이미지 중앙 정렬 */\r\n    background-repeat: no-repeat; /* 배경 이미지 반복 없음 */\r\n    cursor: pointer; /* 마우스 오버시 커서 변경 */\r\n}\r\n\r\n.naverBtn{\r\n    background-image: url('../../images/naverLogo.png'); \r\n}\r\n\r\n.googleBtn{\r\n    background-image: url('../../images/googleLogo.png'); \r\n}\r\n\r\n.kakaoBtn{\r\n    background-image: url('../../images/kakaologin.png'); \r\n\r\n}\r\n  \r\n  "],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -35020,6 +35184,58 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./src/css/directory/modal.css":
+/*!*************************************!*\
+  !*** ./src/css/directory/modal.css ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_modal_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!./modal.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/directory/modal.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_modal_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_modal_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_modal_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_modal_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
 /***/ "./src/css/login/login.css":
 /*!*********************************!*\
   !*** ./src/css/login/login.css ***!
@@ -35448,6 +35664,56 @@ module.exports = __webpack_require__.p + "9cb43ac06d52cbabadfe.png";
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 module.exports = __webpack_require__.p + "837e3760ea1a8f590ad7.png";
+
+/***/ }),
+
+/***/ "./src/images/icon/logout.png":
+/*!************************************!*\
+  !*** ./src/images/icon/logout.png ***!
+  \************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "8536e7a128f68549e15b.png";
+
+/***/ }),
+
+/***/ "./src/images/icon/ododocLogo.gif":
+/*!****************************************!*\
+  !*** ./src/images/icon/ododocLogo.gif ***!
+  \****************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "1011f5c53868bd652a5d.gif";
+
+/***/ }),
+
+/***/ "./src/images/icon/sitehome.png":
+/*!**************************************!*\
+  !*** ./src/images/icon/sitehome.png ***!
+  \**************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "b3a9d23f9a98b3743a61.png";
+
+/***/ }),
+
+/***/ "./src/images/icon/start.png":
+/*!***********************************!*\
+  !*** ./src/images/icon/start.png ***!
+  \***********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "f2e6a65efc4fd15fede1.png";
+
+/***/ }),
+
+/***/ "./src/images/icon/stop.png":
+/*!**********************************!*\
+  !*** ./src/images/icon/stop.png ***!
+  \**********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__.p + "81d1dd210545072d3282.png";
 
 /***/ }),
 
