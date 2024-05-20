@@ -25,9 +25,18 @@
   }
   
 .loginTitleWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     position: relative;
-    margin-top: 5vh;
+    margin-top: 12vh;
+    margin-bottom: 18vh;
+}
+
+.loginImage {
+    width: 360px;
+    height: 90px;
 }
   
 .loginTitle{
@@ -44,7 +53,7 @@
     width: 470px;
     height: 270px;
     padding: 15px;
-    border-radius:20px;
+    /* border-radius:20px; */
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 1); /* 그림자 추가 */
 }
   

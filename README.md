@@ -35,7 +35,28 @@
 ![img](./readme/gif/vscodeuse.gif)
 <br>
 
-- Intelli J Plugin
+- IntelliJ Plugin
+
+  | 로그인                                                        | 폴더 생성                                                        |
+  |------------------------------------------------------------|--------------------------------------------------------------|
+  | <img src="./readme/gif/IntelliJ_GIF/로그인.gif" height="350"> | <img src="./readme/gif/IntelliJ_GIF/폴더_생성.gif" height="350"> |
+
+  |파일 생성|폴더 및 파일 이름 수정|
+  |---|---|
+  |<img src="./readme/gif/IntelliJ_GIF/파일_생성.gif" height="350">|<img src="./readme/gif/IntelliJ_GIF/폴더_및_파일_이름_수정.gif" height="350">|
+
+  |파일 연동|                                   |
+  |---|-----------------------------------|
+  |<img src="./readme/gif/IntelliJ_GIF/파일_연동.gif" height="350">| <div style="width: 151px;"></div> |
+
+  |홈 버튼|
+  |---|
+  |![img](./readme/gif/IntelliJ_GIF/홈버튼.gif)|
+
+  |개발 정리|
+  |---|
+  |![img](./readme/gif/IntelliJ_GIF/개발_정리.gif)|
+
 <br>
 
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ab/512.gif" alt="💫" width="32" height="32"> 서비스 아키텍처
@@ -140,12 +161,12 @@ feat: 버튼 추가
 | chore    | 빌드 업무 수정, 패키지 매니저 수정                                        |
 | test     | 테스트 코드 수정, 누락된 테스트를 추가할 때, 리팩토링 테스트 추가         |
 | design   | CSS 등 사용자 UI 디자인 변경                                              |
-| hotfix   | 너무 급해                                                                 |
+| hotfix   | 긴급하게  수정해야할 일이 있을 경우                                                               |
 | init     | 프로젝트 초기 생성                                                        |
 
 ## <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Water%20Wave.png" alt="Water Wave" width="25" height="25" /> Git Flow
 
-- 프로젝트 명 : 오도독
+- 프로젝트 명 : Ododoc
 - 프론트 : frontend
   - frontend/fe_repo
 - 백 : backend
@@ -161,7 +182,7 @@ feat: 버튼 추가
 
 </aside>
 
-- 여기가 모든 소스 코드가 통합된 브랜치
+- 모든 브랜치의 소스 코드가 통합되는 위치
 
 ### develop branch
 
@@ -198,10 +219,10 @@ EXT/vscode_feature/fruite_create**
 
   - local setting 파일들 추가 ex) work.ini
 
-- 중앙집중식 워크플로우를 개선한 워크플로우로, feature 브랜치, hotfix 브랜치 등 다양한 브랜치를 사용합니다.
-- feature 브랜치에서 개발을 진행하고, 각 파트의 develop 브랜치로 병합합니다.
-- hotfix 브랜치에서 긴급한 수정을 진행하고, develop 브랜치로 병합합니다.
-- refactor 브랜치에서 이미 개발한 기능에 대해서 리패토링을 진행하고 develop 브랜치로 병합합니다.
+- 중앙집중식 워크플로우를 개선한 워크플로우로, feature 브랜치, hotfix 브랜치 등 다양한 브랜치를 사용.
+- feature 브랜치에서 개발을 진행하고, 각 파트의 develop 브랜치로 병합.
+- hotfix 브랜치에서 긴급한 수정을 진행하고, develop 브랜치로 병합.
+- refactor 브랜치에서 이미 개발한 기능에 대해서 리패토링을 진행하고 develop 브랜치로 병합.
 
 | 브랜치   | 용도                   |
 | -------- | ---------------------- |
@@ -246,7 +267,14 @@ EXT/vscode_feature/fruite_create**
 ### <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f606/512.gif" alt="😆" width="32" height="32"> 이준희 (팀원\_백엔드)
 
 ```
-- Intelli J 플러그인 개발
+- ERD 설계
+- Kakao, Naver, Google 소셜 로그인
+- 로그인 테스트 코드 작성
+- IntelliJ Plugin 개발
+- JavaFX WebView, WebEngine을 이용한 Plugin 로그인 개발
+- Plugin 디렉토리 조회, 생성, 수정 개발 
+- 코드 변경 사항 감지 로직 개발
+- 개발 과정 데이터 가공 백엔드 서버 개발
 ```
 
 <br>

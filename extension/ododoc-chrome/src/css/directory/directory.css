@@ -25,6 +25,19 @@
     border-top: 1px solid #ccc; /* 상단에 경계선 추가 */
 }
 
+.buttons-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 20%;
+    padding: 1px;
+    box-sizing: border-box; /* 패딩을 너비에 포함 */
+    display: flex;
+    justify-content: space-evenly; /* 버튼을 공간에 균등하게 배치 */
+    background-color: #fff; /* 배경색 추가 */
+    border-top: 1px solid #ccc; /* 상단에 경계선 추가 */
+}
+
 .bmjuaFont {
     font-family: 'BMJUAFont', sans-serif;
 }
@@ -37,7 +50,7 @@
 }
 
 .sidebar {
-    position: fixed;
+    /* position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -50,7 +63,19 @@
     padding-top: 2vh;
     overflow-x: auto;
     overflow-y: auto;
+    white-space: nowrap; */
+    height: 85vh;
+    background-color: rgb(197, 192, 192);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    padding-top: 2vh;
     white-space: nowrap;
+    overflow-x: auto;
+    padding-bottom: 60px;
+    padding-right: 20px;
+    padding-left: 20px;
+    position: relative;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -107,7 +132,7 @@
 }
 
 .line {
-    width: 88%;
+    width: 100%;
     height: 20px;
     margin-bottom: 3vh;
     /* pointer-events: none;
@@ -188,12 +213,22 @@
 }
 
 .sideButtonWrapper {
-    display: flex;
+    /* flex-shrink: 0; */
+    width: 420px;
     flex-direction: row;
-    position: fixed;
-    bottom: 5vh;
+    /* bottom: 5vh; */
+    border-radius: 15px 15px 0px 0px;
     /* pointer-events: none; */
     /* user-select: none; */
+    background-color: #979797;
+        /* 배경색 설정 */
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }
 
 .profileImage {
@@ -329,4 +364,9 @@
 }
 .itemIndent {
     margin-left: 3vh;
+}
+
+.selected {
+    background-color: 'gray';
+    color: 'white';
 }

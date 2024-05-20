@@ -15,9 +15,9 @@ api.interceptors.request.use(
             const { accessToken } = JSON.parse(authDetails);
             if (accessToken) {
                 config.headers["Authorization"] = `${accessToken}`;
+                console.log(config.headers);
             }
         }
-        console.log(config.headers);
         return config;
     },
     // 토큰 없을 때: 에러 띄우기

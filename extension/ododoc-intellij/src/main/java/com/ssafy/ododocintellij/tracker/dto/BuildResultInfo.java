@@ -1,13 +1,12 @@
 package com.ssafy.ododocintellij.tracker.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class BuildResultInfo {
 
     private String details;
     private List<ModifiedFileInfo> modifiedFiles;
+    private ErrorFileInfo errorFile;
 
     public String getDetails() {
         return details;
@@ -23,5 +22,13 @@ public class BuildResultInfo {
 
     public void setModifiedFiles(List<ModifiedFileInfo> modifiedFiles) {
         this.modifiedFiles = modifiedFiles;
+    }
+
+    public ErrorFileInfo getErrorFile() {
+        return errorFile;
+    }
+
+    public void setErrorFile(ErrorFileInfo errorFile) {
+        this.errorFile = errorFile;
     }
 }

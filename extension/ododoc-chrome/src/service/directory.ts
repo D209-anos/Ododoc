@@ -14,15 +14,12 @@ interface IContentItem {
 // directory 조회
 export const fetchDirectory = async (rootId: number | null, token: string | null): Promise<IContentItem | null> => {
     try {
-        console.log(rootId);
         const response = await api.get<Response>(`/directory/${rootId}`, {
             headers: {
               Authorization: token,
             },
           });
-        console.log(response);
         const data = response.data.data
-        console.log(data)
 
         // localStorage.setItem('directoryData', JSON.stringify(data));
         return data;

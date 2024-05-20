@@ -18,12 +18,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.java_websocket.client.WebSocketClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -137,6 +135,8 @@ public class OauthLoginFrame extends Stage {
                 alert.showAndWait();
                 close();
                 cookieManager.getCookieStore().removeAll();
+                webEngine.executeScript("localStorage.clear();");
+                webEngine.load("about:blank");
             });
         };
 
@@ -212,6 +212,8 @@ public class OauthLoginFrame extends Stage {
                             alert.showAndWait();
                             close();
                             cookieManager.getCookieStore().removeAll();
+                            webEngine.executeScript("localStorage.clear();");
+                            webEngine.load("about:blank");
                         });
 
                         return;
@@ -243,8 +245,10 @@ public class OauthLoginFrame extends Stage {
         Project tempProject = null;
         for(int i = 0; i < size; i++){
             tempProject = projectProvider.getProjects().poll();
-            tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
-            projectTracker.initHashStatus(tempProject);
+            if(tempProject.isOpen()){
+                tempProject.getMessageBus().connect().subscribe(ExecutionManager.EXECUTION_TOPIC, new CodeListener(tempProject));
+                projectTracker.initHashStatus(tempProject);
+            }
         }
     }
 
@@ -264,7 +268,6 @@ public class OauthLoginFrame extends Stage {
                 Alert alert = WebSocketReConnectAlert.makeAlert();
                 Optional<ButtonType> result = alert.showAndWait();
                 if(result.isPresent() && result.get() == ButtonType.OK) {
-                    System.out.println("연결 시도");
                     connectWebSocket();
                 }
                 else {

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.ssafy"
-version = "1.0-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
 
 repositories {
   mavenCentral()
@@ -15,8 +15,9 @@ dependencies {
   implementation("org.openjfx:javafx:21.0.3")
   implementation("com.googlecode.json-simple:json-simple:1.1.1")
   implementation("org.java-websocket:Java-WebSocket:1.5.2")
-  implementation ("org.springframework:spring-webflux:5.3.9")
+  implementation("org.springframework:spring-webflux:5.3.9")
   implementation("io.projectreactor.netty:reactor-netty:1.0.17")
+  implementation("org.jetbrains:annotations:23.0.0")
 }
 
 javafx {
@@ -28,7 +29,7 @@ javafx {
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
   version.set("2023.3.4")
-  type.set("IC") // Target IDE Platform
+  type.set("IU") // Target IDE Platform
 
   plugins.set(listOf("com.intellij.java"))
 }
@@ -38,6 +39,7 @@ tasks {
   withType<JavaCompile> {
     sourceCompatibility = "17"
     targetCompatibility = "17"
+    options.encoding = "UTF-8"
   }
 
   patchPluginXml {

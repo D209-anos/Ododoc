@@ -38,7 +38,6 @@ public class MemberController {
      */
     @PostMapping(value = "/authorization/{provider}")
     public LoginResponse login(@RequestBody LoginRequest loginRequest, @PathVariable String provider, HttpServletResponse response) {
-        log.info("login 실행 : {}", loginRequest);
         Directory directory = memberService.getMemberInfo(provider, loginRequest.getCode(), loginRequest.getUrl());
 
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());
@@ -108,7 +107,7 @@ public class MemberController {
         Directory directory = memberService.getMemberInfo(provider, code, "https://k10d209.p.ssafy.io/api/oauth2/authorization/chrome/" + provider);
         LoginResponse loginResponse = jwtProvider.makeLoginResponse(directory);
         String encodedTitle = URLEncoder.encode(loginResponse.title(), StandardCharsets.UTF_8.toString());
-        String chromeUri = "chrome-extension://nefohmbgipjojkepcndhnhnbpbldabdi/index.html?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
+        String chromeUri = "chrome-extension://indcppfoaokmlpnbcpndlcoamibdobce/index.html?token=" + loginResponse.accessToken() + "&provider=" + loginResponse.oAuthProvider() +
                 "&rootId=" + loginResponse.rootId() + "&title=" + encodedTitle + "&type=" + loginResponse.type();
         jwtProvider.setRefreshTokenForClient(response, directory.getMember());
         response.sendRedirect(chromeUri);

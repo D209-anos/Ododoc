@@ -3,6 +3,9 @@ import './css/login/login.css';
 import Sidebar from './components/sidebar/Sidebar';
 import './css/directory/directory.css'
 import { logout } from './service/user';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { FileProvider } from './contexts/FileContext';
+import OdodocMain from './images/icon/ododocLogo.gif'
 
 const App = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null); 
@@ -21,14 +24,12 @@ const App = () => {
     const root = localStorage.getItem('rootId');
     const storeName = localStorage.getItem('title');
 
-    console.log("타이틀 디코딩 직전", title)
     if (title) {
       const decodedTitle = decodeURIComponent(title);
       setFolderTitle(decodedTitle)
       console.log('Decoded Title:', folderTitle);
     }
 
-    console.log("타이틀 디코딩 끝?")
     if (accessToken && provider && rootId && title) {
       setAccessToken(accessToken); // 상태 업데이트
       setRootId(rootId);
@@ -52,6 +53,8 @@ const App = () => {
         google: process.env.REACT_APP_GOOGLE_CLIENT_ID,
         naver: process.env.REACT_APP_NAVER_CLIENT_ID
     };
+
+    const extensionId = chrome.runtime.id;
 
     const redirectUri = {
         kakao: process.env.REACT_APP_KAKAO_REDIRECT_URI,
@@ -82,26 +85,28 @@ const App = () => {
   }
 
   return (
-    <div>
-      {!accessToken ? (
-        <div className="loginContent">
-          <div className="loginTitleWrapper">
-            <p className="loginTitle">Login</p>
+    <AuthProvider>
+      <div>
+        {!accessToken ? (
+          <div className="loginContent">
+            <div className="loginTitleWrapper">
+              <img src={OdodocMain} className='loginimage' alt="" />
+            </div>
+            <div className="socialLoginBtnWrapper">
+              <div className="naverBtn socialLoginBtn" onClick={() => handleSocialLogin('naver')}></div>
+              <div className="googleBtn socialLoginBtn" onClick={() => handleSocialLogin('google')}></div>
+              <div className="kakaoBtn socialLoginBtn" onClick={() => handleSocialLogin('kakao')}></div>
+            </div>
           </div>
-          <div className="socialLoginBtnWrapper">
-            <div className="naverBtn socialLoginBtn" onClick={() => handleSocialLogin('naver')}></div>
-            <div className="googleBtn socialLoginBtn" onClick={() => handleSocialLogin('google')}></div>
-            <div className="kakaoBtn socialLoginBtn" onClick={() => handleSocialLogin('kakao')}></div>
+        ) : (
+          <div>
+            <FileProvider>
+              <Sidebar accessToken={accessToken} rootId={Number(rootId)} title={folderTitle} onLogout={handleLogout} />
+            </FileProvider>
           </div>
-        </div>
-      ) : (
-        <div>
-          <Sidebar accessToken={accessToken} rootId={rootId} title={folderTitle} />
-          <div className="buttons-container" onClick={handleLogout}>Logout</div>
-        </div>
-        
-      )}
-    </div>
+        )}
+      </div>
+    </AuthProvider>
   );
 };
 
