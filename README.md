@@ -8,11 +8,7 @@
 
 <br>
 
-## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="🔥" width="32" height="32"> Ododoc 소개 및 (UCC+시연) 영상
-
-#### ✔ 소개
-
-<br>
+## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f525/512.gif" alt="🔥" width="32" height="32"> Ododoc UCC+시연 영상
 
 #### ✔ UCC 영상
 - https://www.youtube.com/watch?v=qScnZKmp0eU
@@ -111,10 +107,6 @@
 - jenkins
   <br>
   <br>
-
-## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2753/512.gif" alt="❓" width="32" height="32"> 포팅 메뉴얼
-
-<br>
 
 ## 👨‍👩‍👧 협업툴
 
