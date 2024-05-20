@@ -1,5 +1,7 @@
 package com.ssafy.ododoc.file.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.ododoc.common.util.S3Util;
 import com.ssafy.ododoc.directory.entity.DirectoryClosure;
 import com.ssafy.ododoc.directory.repository.DirectoryClosureRepository;
@@ -21,6 +23,7 @@ import com.ssafy.ododoc.file.repository.RedisFileRepository;
 import com.ssafy.ododoc.file.type.AddType;
 import com.ssafy.ododoc.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
 
     private final DirectoryRepository directoryRepository;
@@ -39,6 +43,7 @@ public class FileService {
     private final RedisFileRepository redisFileRepository;
     private final DirectoryClosureRepository directoryClosureRepository;
     private final S3Util s3Util;
+    private final ObjectMapper objectMapper;
 
     public ImageResponse uploadImage(Long directoryId, MultipartFile image, Member member) {
         Directory directory = directoryRepository.findById(directoryId)
@@ -177,6 +182,12 @@ public class FileService {
         for(Map.Entry<String, Block> entry : addRequest.getFileBlock().entrySet()) {
             entry.getValue().getMeta().setOrder(lastOrder++);
             content.put(entry.getKey(), entry.getValue());
+        }
+
+        try {
+            log.info("저장 :" + objectMapper.writeValueAsString(content));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
         redisFile.setLastOrder(lastOrder - 1);
