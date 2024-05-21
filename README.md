@@ -24,7 +24,7 @@
 - Chrome Extension
   |로그인|
   |---|
-  |![img](./readme/gif/chrome/chrome_login.gif)|
+  |![img](./readme/gif/chrome/chrome_login.png)|
 
   |파일 선택|
   |---|
