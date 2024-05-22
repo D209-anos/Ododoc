@@ -313,10 +313,12 @@ EXT/vscode_feature/fruite_create**
 ### <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f917/512.gif" alt="🤗" width="32" height="32"> 이주미 (팀원\_프론트)
 
 ```
-- 로그인 구현
-- 사이드바 디렉토리 기능 및 화면 구현
-- 홈페이지 구현
-- 가이드 페이지 구현
+- 소셜 로그인 개발
+- 파일 네비게이터 기능 및 화면 개발
+- 랜딩페이지 UX/UI 개발
+- 폴더 구조 설계 및 컴포넌트 모듈화
+- 가이드 페이지 개발
+- 발표 자료 제작
 ```
 
 <br>
